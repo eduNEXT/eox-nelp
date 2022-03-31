@@ -1,0 +1,4 @@
+# Main requirements of your plugin application.
+-c constraints.txt
+
+Django

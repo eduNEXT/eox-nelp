@@ -13,6 +13,7 @@ from rest_framework import serializers
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.fields import AbsoluteURLField
+from bs4 import BeautifulSoup
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -163,7 +164,44 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # Note: This makes a call to the modulestore, unlike the other
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
-        return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+        raw_overview = CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+        self.raw_overview = raw_overview
+        return raw_overview
+    overview_object = serializers.SerializerMethodField()
+    def get_overview_object(self, course_overview):
+
+        html_str = self.raw_overview
+        def get_titles_and_paragraphs(tag, title_tag_atr, p_tag_atr, title_name="titles", p_name="paragraphs"):
+            return {
+                title_name:  [title.string for title in tag.find_all(title_tag_atr) ],
+                p_name: [p.string for p in tag.find_all(p_tag_atr) ]
+            }
+        soup = BeautifulSoup(html_str, 'html.parser')
+        about_tag = soup.find_all("section", class_="about")
+        abouts = [get_titles_and_paragraphs(about, "h2","p", title_name="titles", p_name="paragraphs") for about in about_tag]
+        prereq_tag = soup.find_all("section", class_="prerequisites")
+        prereqs = [get_titles_and_paragraphs(prereq, "h2","p", title_name="titles", p_name="paragraphs") for prereq in prereq_tag]
+        staff_tag = soup.find("section", class_="course-staff")
+        staff = {
+        "titles": [h2.contents for h2 in staff_tag.find_all("h2") ],
+
+        }
+        teachers =  staff_tag.find_all("article", class_="teacher")
+
+        teacher_list = [get_titles_and_paragraphs(teacher, "h3","p", title_name="name", p_name="bio") for teacher in teachers]
+
+        staff ['teachers'] = teacher_list
+        faq = soup.find_all("section", class_="faq")
+        faq_responses = faq[0].find_all("article", class_="response")
+        responses = [get_titles_and_paragraphs(response, "h3","p", title_name="titles", p_name="paragraphs") for response in faq_responses]
+
+        return {
+            "about_description": abouts,
+            "staff": staff,
+            "prereqs": prereqs,
+            "faq": responses,
+        }
+
 
 
 class CourseKeySerializer(serializers.BaseSerializer):  # pylint:disable=abstract-method

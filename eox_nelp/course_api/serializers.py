@@ -169,31 +169,48 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         return raw_overview
     overview_object = serializers.SerializerMethodField()
     def get_overview_object(self, course_overview):
+        """Get an object that parse the html information and extract
+        `about_description`,`staff`, `prereqs` and `faqs` of course_overview.
+         https://edx.readthedocs.io/projects/edx-open-learning-xml/en/latest/about/overview.html
+        """
 
         html_str = self.raw_overview
+        def decompose_str_p(p_tag):
+            """Join all str ia paragraph tag in one string."""
+            gen = p_tag.strings
+            string_list = [string for string in gen]
+            return ''.join(string_list)
+
         def get_titles_and_paragraphs(tag, title_tag_atr, p_tag_atr, title_name="titles", p_name="paragraphs"):
-            return {
+            """Get an object represetantion after searching by desired titles and paragraphs tags"""
+            try:
+                return {
                 title_name:  [title.string for title in tag.find_all(title_tag_atr) ],
-                p_name: [p.string for p in tag.find_all(p_tag_atr) ]
-            }
+                p_name: [decompose_str_p(p_tag) for p_tag in tag.find_all(p_tag_atr) ]
+                }
+
+            except:
+                return {}
+
         soup = BeautifulSoup(html_str, 'html.parser')
+
         about_tag = soup.find_all("section", class_="about")
         abouts = [get_titles_and_paragraphs(about, "h2","p", title_name="titles", p_name="paragraphs") for about in about_tag]
+
         prereq_tag = soup.find_all("section", class_="prerequisites")
         prereqs = [get_titles_and_paragraphs(prereq, "h2","p", title_name="titles", p_name="paragraphs") for prereq in prereq_tag]
-        staff_tag = soup.find("section", class_="course-staff")
-        staff = {
-        "titles": [h2.contents for h2 in staff_tag.find_all("h2") ],
 
-        }
-        teachers =  staff_tag.find_all("article", class_="teacher")
+        staff_tag = soup.find_all("section", class_="course-staff")
+        staff = {}
+        if staff_tag:
+            staff["titles"] = [h2.contents for h2 in staff_tag[0].find_all("h2") ],
 
+        teachers =  soup.find_all("article", class_="teacher")
         teacher_list = [get_titles_and_paragraphs(teacher, "h3","p", title_name="name", p_name="bio") for teacher in teachers]
-
         staff ['teachers'] = teacher_list
-        faq = soup.find_all("section", class_="faq")
-        faq_responses = faq[0].find_all("article", class_="response")
-        responses = [get_titles_and_paragraphs(response, "h3","p", title_name="titles", p_name="paragraphs") for response in faq_responses]
+
+        faq_responses = soup.find_all("article", class_="response")
+        responses = [get_titles_and_paragraphs(response, "h3","p", title_name="h3_questions", p_name="p_answers") for response in faq_responses]
 
         return {
             "about_description": abouts,

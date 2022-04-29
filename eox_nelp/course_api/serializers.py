@@ -176,8 +176,8 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         html_str = self.raw_overview
         def decompose_str_p(p_tag):
             """Join all str in a paragraph tag in one string."""
-            gen = p_tag.strings
-            string_list = [string for string in gen]
+            generator = p_tag.strings
+            string_list = [string for string in generator]
             return ''.join(string_list)
 
         def get_titles_and_paragraphs(tag, title_tag_atr, p_tag_atr, title_name="titles", p_name="paragraphs"):

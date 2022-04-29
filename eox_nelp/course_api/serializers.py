@@ -164,9 +164,8 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         # Note: This makes a call to the modulestore, unlike the other
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
-        raw_overview = CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
-        self.raw_overview = raw_overview
-        return raw_overview
+        self.raw_overview = CourseDetails.fetch_about_attribute(course_overview.id, 'overview')
+        return self.raw_overview
     overview_object = serializers.SerializerMethodField()
     def get_overview_object(self, course_overview):
         """Get an object that parse the html information and extract

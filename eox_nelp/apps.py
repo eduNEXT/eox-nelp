@@ -37,6 +37,7 @@ class eoxNelpConfig(AppConfig):
                 'common': {'relative_path': 'settings.common'},
                 'test': {'relative_path': 'settings.test'},
                 'production': {'relative_path': 'settings.production'},
+                'devstack': {'relative_path': 'settings.devstack'},
             },
         },
     }

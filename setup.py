@@ -92,10 +92,10 @@ setup(
     zip_safe=False,
     entry_points={
         "lms.djangoapp": [
-            'eox_nelp = eox_nelp.apps:eoxNelpConfig',
+            'eox_nelp = eox_nelp.apps:EoxNelpConfig',
         ],
         "cms.djangoapp": [
-            'eox_nelp = eox_nelp.apps:eoxNelpConfig',
-],
+            'eox_nelp = eox_nelp.apps:EoxNelpCMSConfig',
+        ],
     },
 )

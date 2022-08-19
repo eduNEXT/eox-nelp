@@ -23,7 +23,7 @@ def plugin_settings(settings):
     Defines eox-nelp settings when app is used as a plugin to edx-platform.
     See: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    settings.EOX_NELP_COURSE_CREATORS_BACKEND = 'eox_nelp.edxapp_wrapper.backends.course_creators_l_v1'
+    settings.EOX_NELP_COURSE_CREATORS_BACKEND = 'eox_nelp.edxapp_wrapper.backends.course_creators_k_v1'
     if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:

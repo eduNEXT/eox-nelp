@@ -1,9 +1,8 @@
-"""courseCreators admin file.
+"""CourseCreators admin file.
 Contains all the nelped admin models for course_creators.
 classes:
-    nelpCourseCreatorAdmin: EoxNelp CourseCreators admin class.
+    NelpCourseCreatorAdmin: EoxNelp CourseCreators admin class.
 """
-from __future__ import absolute_import
 
 from django.contrib import admin
 
@@ -15,7 +14,7 @@ from eox_nelp.edxapp_wrapper.course_creators import (
 
 
 class NelpCourseCreatorAdmin(CourseCreatorAdmin):
-    """EoxSupport CertificateTemplate admin class.
+    """Nelp CourseCreatorAdmin class.
     This adds searching fields and shows the organization name instead of the organization id.
     """
     readonly_fields = ['state_changed']
@@ -29,6 +28,7 @@ class NelpCourseCreatorAdmin(CourseCreatorAdmin):
 
     def has_add_permission(self, request):
         return True
+
     def has_delete_permission(self, request, obj=None):
         return True
 

@@ -35,7 +35,7 @@ class EoxNelpConfig(AppConfig):
 class EoxNelpCMSConfig(AppConfig):
     """App configuration"""
     name = 'eox_nelp'
-    verbose_name = "eduNEXT Openedx Extensions"
+    verbose_name = "Nelp Openedx Extensions"
 
     plugin_app = {
         'url_config': {

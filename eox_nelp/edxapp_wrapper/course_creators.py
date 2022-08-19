@@ -1,8 +1,8 @@
 """Wrapper course_creator module file.
 This contains all the required dependencies from course_creators.
 Attributes:
-    backend:Imported ccx module by using the plugin settings.
-    CourseCreator: Wrapper courseCreator model.
+    backend:Imported module by using the plugin settings.
+    CourseCreator: Wrapper CourseCreator model.
     CourseCreatorAdmin: Wrapper CourseCreatorAdmin class.
 """
 from importlib import import_module

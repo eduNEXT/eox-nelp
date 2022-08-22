@@ -2,8 +2,6 @@
 Settings for eox-nelp
 """
 
-from __future__ import absolute_import, unicode_literals
-
 from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 

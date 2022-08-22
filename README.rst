@@ -6,7 +6,8 @@ Nelp plugin for custom development.
 Features
 ########
 
-Place your plugin features list.
+- Courses api endoing modified.
+- Extra `course_creator` model add option in studio admin.
 
 Installation
 ############
@@ -22,9 +23,4 @@ Open edX devstack
 Usage
 #####
 
-Include a usage description for your plugin.
-
-Contributing
-############
-
-Add your contribution policy. (If required)
+Extend `edx-platform` for Nelp requirements withou changing base platform code.

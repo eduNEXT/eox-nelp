@@ -11,6 +11,13 @@ Change Log
 .. There should always be an "Unreleased" section for changes pending release.
 Unreleased
 ----------
+[0.1.1] - 2022-08-23
+---------------------
+
+Added
+~~~~~
+* User search button to add user in course creator model admin.
+
 
 [0.1.0] - 2022-08-22
 ---------------------

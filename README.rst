@@ -6,7 +6,7 @@ Nelp plugin for custom development.
 Features
 ########
 
-- Courses api endoing modified.
+- Courses api endpoint modified. {lms-doamin}/eox-nelp/courses/v1/courses/
 - Extra `course_creator` model add option in studio admin.
 
 Installation
@@ -23,4 +23,4 @@ Open edX devstack
 Usage
 #####
 
-Extend `edx-platform` for Nelp requirements withou changing base platform code.
+Extend `edx-platform` for Nelp requirements without changing base platform code.

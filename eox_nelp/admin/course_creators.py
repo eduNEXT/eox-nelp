@@ -17,6 +17,7 @@ class NelpCourseCreatorAdmin(CourseCreatorAdmin):
     """Nelp CourseCreatorAdmin class.
     This adds searching fields and shows the organization name instead of the organization id.
     """
+    raw_id_fields = ['user']
     readonly_fields = ['state_changed']
     # Controls the order on the edit form (without this, read-only fields appear at the end).
     fieldsets = ()

@@ -197,7 +197,7 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
         def get_source_images(tag, image_name="image_url"):
             try:
                 return {
-                image_name: [self.context['request'].build_absolute_uri(title['src']) for title in tag.find_all('img') ]
+                image_name: [self.context['request'].build_absolute_uri(title.get('src')) for title in tag.find_all('img') ]
                 }
             except:
                 return {

@@ -189,7 +189,10 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
                 }
 
             except:
-                return {}
+                return {
+                    title_name: [],
+                    p_name: [],
+                }
 
         def get_source_images(tag, image_name="image_url"):
             try:
@@ -197,7 +200,9 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
                 image_name: [self.context['request'].build_absolute_uri(title['src']) for title in tag.find_all('img') ]
                 }
             except:
-                return {}
+                return {
+                    image_name: []
+                }
         soup = BeautifulSoup(html_str, 'html.parser')
 
         about_tag = soup.find_all("section", class_="about")

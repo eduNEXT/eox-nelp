@@ -189,8 +189,20 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
                 }
 
             except:
-                return {}
+                return {
+                    title_name: [],
+                    p_name: [],
+                }
 
+        def get_source_images(tag, image_name="image_url"):
+            try:
+                return {
+                image_name: [self.context['request'].build_absolute_uri(title.get('src')) for title in tag.find_all('img') ]
+                }
+            except:
+                return {
+                    image_name: []
+                }
         soup = BeautifulSoup(html_str, 'html.parser')
 
         about_tag = soup.find_all("section", class_="about")
@@ -205,7 +217,8 @@ class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-meth
             staff["titles"] = [h2.contents for h2 in staff_tag[0].find_all("h2") ],
 
         teachers =  soup.find_all("article", class_="teacher")
-        teacher_list = [get_titles_and_paragraphs(teacher, "h3","p", title_name="name", p_name="bio") for teacher in teachers]
+        teacher_list = [{**get_titles_and_paragraphs(teacher, "h3","p", title_name="name", p_name="bio"),
+                         **get_source_images(teacher) } for teacher in teachers]
         staff ['teachers'] = teacher_list
 
         faq_responses = soup.find_all("article", class_="response")

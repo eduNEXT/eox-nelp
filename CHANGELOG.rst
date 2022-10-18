@@ -11,6 +11,14 @@ Change Log
 .. There should always be an "Unreleased" section for changes pending release.
 Unreleased
 ----------
+[1.0.0] - 2022-10-18
+---------------------
+
+Added
+~~~~~
+* Maple compatibility
+
+
 [0.2.1] - 2022-09-19
 ---------------------
 
@@ -44,4 +52,4 @@ Changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Added
 ~~~~~
-* Hello world for the plugin.
+* Hello world for the plugin. Starting in Koa.

@@ -14,18 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
 
 from eox_nelp import views
-#from eox_nelp.api_schema import docs_ui_view
 
-app_name = 'eox_nelp' # pylint: disable=invalid-name
+app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^eox-info$', views.info_view),
     url(r'^courses/', include('eox_nelp.course_api.urls')),
-   # url(r'^api/', include('eox_nelp.api.urls', namespace='eox-api')),
-    #url(r'^data-api/', include('eox_nelp.api.data.v1.urls', namespace='eox-data-api')),
-    #url(r'^api-docs/$', docs_ui_view, name='apidocs-ui'),
-
 ]

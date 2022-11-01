@@ -31,6 +31,13 @@ class EoxNelpConfig(AppConfig):
         }
     }
 
+    def ready(self):
+        """
+        Method to perform actions after apps registry is ended.
+        """
+        # This is required in order to register the receiver inside handlers module.
+        from cms.djangoapps.contentstore.signals import handlers  # pylint: disable=unused-import
+
 
 class EoxNelpCMSConfig(AppConfig):
     """App configuration"""

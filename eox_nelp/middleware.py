@@ -61,6 +61,18 @@ class ExtendedProfileFieldsMiddleware:
             'sport': ['soccer', 'football', 'tennis'],
             'movie': ['Harry Potter', 'Karate kid']
         }
+
+        # if you want to add translations
+
+        extended_profile_fields_translations = {
+            "ar": {
+                'hobby': 'هواية',
+            },
+            "es": {
+                'sport': 'Deporte',
+                'movie': 'Pelicula'
+            }
+        }
     """
 
     def __init__(self, get_response):
@@ -70,13 +82,18 @@ class ExtendedProfileFieldsMiddleware:
         # The following line resets to the default values, to avoid tenants overlapping.
         RegistrationFormFactory.EXTRA_FIELDS = DEFAULT_EXTRA_FIELDS.copy()
         extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
+        extended_profile_fields_translations = configuration_helpers.get_value(
+            'extended_profile_fields_translations',
+            {},
+        )
+        translations = extended_profile_fields_translations.get(request.LANGUAGE_CODE, {})
 
         for field_name in extended_profile_fields:
             RegistrationFormFactory.EXTRA_FIELDS.append(field_name)
             setattr(
                 RegistrationFormFactory,
                 f'_add_{field_name}_field',
-                self._generate_handler(field_name),
+                self._generate_handler(field_name, translations.get(field_name, field_name)),
             )
             # Set attributes in accounts since those fields are required by
             # "add_field_with_configurable_select_option" method.
@@ -93,7 +110,7 @@ class ExtendedProfileFieldsMiddleware:
 
         return self.get_response(request)
 
-    def _generate_handler(self, field):
+    def _generate_handler(self, field, label):
         """Every field will require a handler method, check the logic here
         https://github.com/eduNEXT/edunext-platform/blob/ednx-release/mango.master.nelp/
         openedx/core/djangoapps/user_authn/views/registration_form.py#L360,
@@ -101,10 +118,11 @@ class ExtendedProfileFieldsMiddleware:
 
         Args:
             field: String
+            label: String
         Returns:
             func: Handler method
         """
-        label = field.capitalize()
+        label = label.capitalize()
 
         def handler(form_instance, form_desc, required=True):
             """Wrapper of https://github.com/eduNEXT/edunext-platform/blob/ednx-release/

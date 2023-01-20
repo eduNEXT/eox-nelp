@@ -87,7 +87,7 @@ class ExtendedProfileFieldsMiddleware:
             {},
         )
         translations = extended_profile_fields_translations.get(request.LANGUAGE_CODE, {})
-
+        extended_profile_fields = list(set(extended_profile_fields) - set(DEFAULT_EXTRA_FIELDS))
         for field_name in extended_profile_fields:
             RegistrationFormFactory.EXTRA_FIELDS.append(field_name)
             setattr(

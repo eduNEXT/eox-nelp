@@ -5,6 +5,8 @@ Required NELP middlewares that allow to customize edx-platform.
 classes:
     ExtendedProfileFieldsMiddleware: Set extended_profile_fields in registration form.
 """
+from django.utils.translation import gettext_lazy as _
+
 from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
 from eox_nelp.edxapp_wrapper.user_authn import RegistrationFormFactory
 from eox_nelp.edxapp_wrapper.user_api import accounts
@@ -88,6 +90,7 @@ class ExtendedProfileFieldsMiddleware:
         )
         translations = extended_profile_fields_translations.get(request.LANGUAGE_CODE, {})
         extended_profile_fields = list(set(extended_profile_fields) - set(DEFAULT_EXTRA_FIELDS))
+
         for field_name in extended_profile_fields:
             RegistrationFormFactory.EXTRA_FIELDS.append(field_name)
             setattr(
@@ -100,12 +103,12 @@ class ExtendedProfileFieldsMiddleware:
             setattr(
                 accounts,
                 f'REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG',
-                f'Select your {field_name}',
+                "{} {}".format(_('Select your'), translations.get(field_name, field_name)),
             )
             setattr(
                 accounts,
                 f'REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG',
-                f'Enter your {field_name}',
+                "{} {}".format(_('Enter your'), translations.get(field_name, field_name)),
             )
 
         return self.get_response(request)

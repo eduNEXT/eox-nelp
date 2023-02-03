@@ -8,9 +8,12 @@ from os.path import dirname, realpath
 from subprocess import CalledProcessError, check_output
 
 import six
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from eox_theming.configuration import ThemingConfiguration as theming
+from rest_framework import status
 
 import eox_nelp
+from eox_nelp.edxapp_wrapper.mfe_config_view import MFEConfigView
 
 
 def info_view(request):
@@ -34,3 +37,30 @@ def info_view(request):
         json.dumps(response_data),
         content_type="application/json"
     )
+
+
+class NelpMFEConfigView(MFEConfigView):
+    """
+    Provides an API endpoint to get the MFE_CONFIG from site configuration with
+    nelp extra fields.
+    """
+
+    def get(self, request):
+        """
+        Return the MFE configuration by NELP(adding custom nelp fields).
+        """
+        base_get_response = super().get(request)
+
+        if base_get_response.status_code != 200:
+            return base_get_response
+
+        mfe_config_dict = json.loads(base_get_response.content)
+        theme_options = theming.options('THEME_OPTIONS')
+        interactive_color = theming.options('interactive_color')
+        theme_additions = {
+            'THEME_OPTIONS': theme_options,
+            'pgn-color-primary-base': interactive_color,
+        }
+        mfe_config_dict.update(theme_additions)
+
+        return JsonResponse(mfe_config_dict, status=status.HTTP_200_OK)

@@ -22,4 +22,5 @@ app_name = 'eox_nelp'  # pylint: disable=invalid-name
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^eox-info$', views.info_view),
     url(r'^courses/', include('eox_nelp.course_api.urls')),
+    url(r'^api/mfe_config/v1/', views.NelpMFEConfigView.as_view(), name='nelp_config'),
 ]

@@ -45,13 +45,6 @@ class EoxNelpCMSConfig(AppConfig):
     verbose_name = "Nelp Openedx Extensions"
 
     plugin_app = {
-        'url_config': {
-            'cms.djangoapp': {
-                'namespace': 'eox-nelp',
-                'regex': r'^eox-nelp/',
-                'relative_path': 'urls',
-            }
-        },
         'settings_config': {
             'cms.djangoapp': {
                 'test': {'relative_path': 'settings.test'},

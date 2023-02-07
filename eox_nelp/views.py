@@ -59,7 +59,7 @@ class NelpMFEConfigView(MFEConfigView):
         interactive_color = theming.options('interactive_color')
         theme_additions = {
             'THEME_OPTIONS': theme_options,
-            'pgn-color-primary-base': interactive_color,
+            'CUSTOM_PRIMARY_COLORS': {'pgn-color-primary-base': interactive_color},
         }
         mfe_config_dict.update(theme_additions)
 

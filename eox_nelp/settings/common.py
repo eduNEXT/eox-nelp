@@ -10,10 +10,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'edx_proctoring',
-    'django_filters',
-    'oauth2_provider',
-    'django_countries',
 )
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'

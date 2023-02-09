@@ -3,3 +3,10 @@
 
 pycodestyle
 pylint
+coverage
+mock
+testfixtures
+path.py
+django-fake-model
+ddt
+flake8

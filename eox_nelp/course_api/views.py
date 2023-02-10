@@ -13,10 +13,10 @@ from rest_framework.exceptions import NotFound
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
-from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
-from .api import course_detail, list_course_keys, list_courses
-from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
-from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+from lms.djangoapps.course_api import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE_LIST_API
+from lms.djangoapps.course_api.api import course_detail, list_course_keys, list_courses
+from lms.djangoapps.course_api.forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
+from .serializers import CourseDetailSerializer, CourseKeySerializer
 
 
 @view_auth_classes(is_authenticated=False)

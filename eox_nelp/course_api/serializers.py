@@ -11,7 +11,6 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from openedx.core.djangoapps.models.course_details import CourseDetails
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.fields import AbsoluteURLField
 from bs4 import BeautifulSoup
 

@@ -2,11 +2,11 @@
 Course API URLs
 """
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import path, re_path
 
-from .views import CourseDetailView, CourseListView
+from .views import NelpCourseDetailView, NelpCourseListView
 
 urlpatterns = [
-    url(r'^v1/courses/$', CourseListView.as_view(), name="course-list"),
-    url(r'^v1/courses/{}'.format(settings.COURSE_KEY_PATTERN), CourseDetailView.as_view(), name="course-detail"),
+    path('v1/courses/', NelpCourseListView.as_view(), name="nelp-course-list"),
+    re_path(rf'^v1/courses/{settings.COURSE_KEY_PATTERN}', NelpCourseDetailView.as_view(), name="nelp-course-detail"),
 ]

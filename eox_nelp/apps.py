@@ -35,8 +35,9 @@ class EoxNelpConfig(AppConfig):
         """
         Method to perform actions after apps registry is ended.
         """
+        # pylint: disable=unused-import, import-error, import-outside-toplevel
         # This is required in order to register the receiver inside handlers module.
-        from cms.djangoapps.contentstore.signals import handlers  # pylint: disable=unused-import
+        from cms.djangoapps.contentstore.signals import handlers  # noqa: F401
 
 
 class EoxNelpCMSConfig(AppConfig):

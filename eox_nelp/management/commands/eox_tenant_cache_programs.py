@@ -7,20 +7,13 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-
 from eox_tenant.models import Route
 from eox_tenant.signals import _update_settings
 from eox_tenant.tenant_wise.proxies import TenantSiteConfigProxy
-
-from openedx.core.djangoapps.catalog.cache import (
-    SITE_PATHWAY_IDS_CACHE_KEY_TPL,
-    SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
-)
+from openedx.core.djangoapps.catalog.cache import SITE_PATHWAY_IDS_CACHE_KEY_TPL, SITE_PROGRAM_UUIDS_CACHE_KEY_TPL
 from openedx.core.djangoapps.catalog.management.commands.cache_programs import Command as BaseCacheProgramCommand
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.utils import (
-    create_catalog_api_client,
-)
+from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 
 logger = logging.getLogger(__name__)
 User = get_user_model()  # pylint: disable=invalid-name

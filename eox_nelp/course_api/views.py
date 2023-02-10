@@ -4,6 +4,7 @@ Course API Views
 
 
 from eox_nelp.edxapp_wrapper.course_api import CourseDetailView, CourseListView
+
 from .serializers import NelpCourseDetailSerializer
 
 

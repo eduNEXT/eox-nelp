@@ -8,6 +8,7 @@ from os.path import dirname, realpath
 from subprocess import CalledProcessError, check_output
 
 import six
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from eox_theming.configuration import ThemingConfiguration as theming
 from rest_framework import status
@@ -62,5 +63,12 @@ class NelpMFEConfigView(MFEConfigView):
             'CUSTOM_PRIMARY_COLORS': {'pgn-color-primary-base': interactive_color},
         }
         mfe_config_dict.update(theme_additions)
+
+        mfe_config_map = getattr(settings, "MFE_CONFIG_MAP", {})
+        mfe_config_map_additions = {
+            mfe_config_key: getattr(settings, setting_key, None)
+            for (setting_key, mfe_config_key) in mfe_config_map.items()
+        }
+        mfe_config_dict.update(mfe_config_map_additions)
 
         return JsonResponse(mfe_config_dict, status=status.HTTP_200_OK)

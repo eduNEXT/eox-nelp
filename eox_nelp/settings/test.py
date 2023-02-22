@@ -27,10 +27,6 @@ plugin_settings(SETTINGS)
 vars().update(SETTINGS.__dict__)
 
 
-ALLOWED_HOSTS = ['*']
-
-# This key needs to be defined so that the check_apps_ready passes and the
-# AppRegistry is loaded
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -38,10 +34,9 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['*']
 ENV_ROOT = '.'
-
-FEATURES = {}
-FEATURES['USE_REDIRECTION_MIDDLEWARE'] = True
+ROOT_URLCONF = 'eox_nelp.urls'
 
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
@@ -49,26 +44,17 @@ COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 
-PROCTORING_SETTINGS = {
-    'LINK_URLS': {
-        'contact_us': 'http://test-link.com/contact',
-        'faq': 'http://test-link.com/faq',
-        'online_proctoring_rules': 'http://test-link.com/rules',
-        'tech_requirements': 'http://test-link.com/tech',
-    },
-    'SITE_NAME': 'test-site-name',
-    'PLATFORM_NAME': 'test-platform-name',
-}
+SILENCED_SYSTEM_CHECKS = [
+    'admin.E403', 'admin.E406', 'admin.E408', 'admin.E409', 'admin.E410', 'admin.E002', 'admin.E035',
+]
 
-PROCTORING_BACKENDS = {
-    'software_secure': {
-        'crypto_key': 'test-key',
-        'exam_register_endpoint': 'test-enpoint',
-        'exam_sponsor': 'test-sponsor',
-        'organization': 'test-org',
-        'secret_key': 'test-secret-key',
-        'secret_key_id': 'test-secret-key-id',
-        'software_download_url': 'http://test.com/url',
-    },
-    'DEFAULT': 'software_secure',
-}
+
+# ------------external plugins configuration backends----------------
+
+EOX_THEMING_CONFIGURATION_HELPER_BACKEND = 'eox_theming.edxapp_wrapper.backends.j_configuration_helpers_tests'
+EOX_THEMING_THEMING_HELPER_BACKEND = 'eox_theming.edxapp_wrapper.backends.j_theming_helpers_tests'
+EOX_THEMING_EDXMAKO_BACKEND = 'eox_theming.edxapp_wrapper.backends.j_mako_tests'
+EOX_THEMING_BASE_LOADER_BACKEND = 'eox_theming.edxapp_wrapper.backends.j_loaders_tests'
+EOX_THEMING_CONFIG_SOURCES = [
+    'from_django_settings',
+]

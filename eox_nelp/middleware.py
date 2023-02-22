@@ -8,9 +8,8 @@ classes:
 from django.utils.translation import gettext_lazy as _
 
 from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
-from eox_nelp.edxapp_wrapper.user_authn import RegistrationFormFactory
 from eox_nelp.edxapp_wrapper.user_api import accounts
-
+from eox_nelp.edxapp_wrapper.user_authn import RegistrationFormFactory
 
 # Copy default values from https://github.com/eduNEXT/edunext-platform/blob/ednx-release/mango.master.nelp
 # /openedx/core/djangoapps/user_authn/views/registration_form.py#L308
@@ -103,12 +102,12 @@ class ExtendedProfileFieldsMiddleware:
             setattr(
                 accounts,
                 f'REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG',
-                "{} {}".format(_('Select your'), translations.get(field_name, field_name)),
+                f"{_('Select your')} {translations.get(field_name, field_name)}",
             )
             setattr(
                 accounts,
                 f'REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG',
-                "{} {}".format(_('Enter your'), translations.get(field_name, field_name)),
+                f"{_('Enter your')} {translations.get(field_name, field_name)}",
             )
 
         return self.get_response(request)
@@ -131,6 +130,6 @@ class ExtendedProfileFieldsMiddleware:
             """Wrapper of https://github.com/eduNEXT/edunext-platform/blob/ednx-release/
             mango.master.nelp/openedx/core/djangoapps/user_authn/views/registration_form.py#L657
             """
+            # pylint: disable=protected-access
             form_instance._add_field_with_configurable_select_options(field, label, form_desc, required=required)
-
         return handler

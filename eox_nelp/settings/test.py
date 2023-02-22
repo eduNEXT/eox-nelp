@@ -2,7 +2,7 @@
 Settings for eox-nelp
 """
 
-from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import  # noqa: F401
 
 
 class SettingsClass:
@@ -14,23 +14,18 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     Defines eox-nelp settings when app is used as a plugin to edx-platform.
     See: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
-    settings.EOX_NELP_COURSE_CREATORS_BACKEND = 'eox_nelp.edxapp_wrapper.backends.course_creators_k_v1'
-    settings.EOX_NELP_SITE_CONFIGURATION = 'eox_nelp.edxapp_wrapper.backends.site_configuration_m_v1'
-    settings.EOX_NELP_USER_API = 'eox_nelp.edxapp_wrapper.backends.user_api_m_v1'
-    settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.backends.user_authn_m_v1'
-    settings.EOX_NELP_MFE_CONFIG_VIEW = 'eox_nelp.edxapp_wrapper.backends.mfe_config_view_m_v1'
-    settings.EOX_NELP_COURSE_API = 'eox_nelp.edxapp_wrapper.backends.course_api_m_v1'
+    settings.EOX_NELP_COURSE_CREATORS_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.course_creators_k_v1'
+    settings.EOX_NELP_SITE_CONFIGURATION = 'eox_nelp.edxapp_wrapper.test_backends.site_configuration_m_v1'
+    settings.EOX_NELP_USER_API = 'eox_nelp.edxapp_wrapper.test_backends.user_api_m_v1'
+    settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.test_backends.user_authn_m_v1'
+    settings.EOX_NELP_MFE_CONFIG_VIEW = 'eox_nelp.edxapp_wrapper.test_backends.mfe_config_view_m_v1'
+    settings.EOX_NELP_COURSE_API = 'eox_nelp.edxapp_wrapper.test_backends.course_api_m_v1'
 
 
 SETTINGS = SettingsClass()
 plugin_settings(SETTINGS)
 vars().update(SETTINGS.__dict__)
 
-try:
-    import edx_when  # pylint: disable=unused-import
-    INSTALLED_APPS += ('eox_nelp', 'edx_when.apps.EdxWhenConfig')
-except ImportError:
-    INSTALLED_APPS += ('eox_nelp',)
 
 ALLOWED_HOSTS = ['*']
 

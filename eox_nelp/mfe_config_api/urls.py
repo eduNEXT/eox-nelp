@@ -2,7 +2,6 @@
 """
 from django.urls import include, path
 
-
 app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
 urlpatterns = [  # pylint: disable=invalid-name

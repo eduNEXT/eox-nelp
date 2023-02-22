@@ -12,7 +12,6 @@ from importlib import import_module
 
 from django.conf import settings
 
-
 backend = import_module(settings.EOX_NELP_COURSE_API)
 
 CourseDetailSerializer = backend.get_course_detail_serializer()

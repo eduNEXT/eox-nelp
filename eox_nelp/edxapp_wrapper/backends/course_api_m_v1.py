@@ -2,7 +2,7 @@
 This file contains all the necessary course_creators dependencies from
 https://github.com/eduNEXT/edunext-platform/tree/master/lms/djangoapps/course_api
 """
-from lms.djangoapps.course_api import views, serializers  # pylint: disable=import-error
+from lms.djangoapps.course_api import serializers, views  # pylint: disable=import-error
 
 
 def get_course_detail_serializer():

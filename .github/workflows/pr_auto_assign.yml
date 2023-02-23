@@ -1,0 +1,18 @@
+name: PR-Issue assignment 📝
+
+on:
+    issues:
+        types: [opened]
+    pull_request:
+        types: [opened]
+
+jobs:
+    auto-assign:
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Auto-assign PR-Issue'
+              uses: pozil/auto-assign-issue@v1.11.0
+              with:
+                assignees: johanv26,andrey-canon
+                numOfAssignee: 1
+                allowSelfAssign: false

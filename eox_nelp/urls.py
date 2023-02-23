@@ -20,7 +20,7 @@ from eox_nelp import views
 app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
 urlpatterns = [  # pylint: disable=invalid-name
-    url(r'^eox-info$', views.info_view),
+    url(r'^eox-info$', views.info_view, name='eox-info'),
     url(r'^courses/', include('eox_nelp.course_api.urls')),
     url(r'^api/mfe_config/', include('eox_nelp.mfe_config_api.urls', namespace='mfe-config-api')),
 ]

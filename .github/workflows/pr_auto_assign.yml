@@ -13,6 +13,7 @@ jobs:
             - name: 'Auto-assign PR-Issue'
               uses: pozil/auto-assign-issue@v1.11.0
               with:
-                assignees: johanv26,andrey-canon
+                assignees: nelp-ops-crew
                 numOfAssignee: 1
                 allowSelfAssign: false
+                repo-token: ${{ secrets.NELP_PAT }}

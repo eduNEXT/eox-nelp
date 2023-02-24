@@ -14,7 +14,7 @@ INSTALLED_APPS = [
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
-
+COURSE_EXPERIENCE_APP = 'eox_nelp.course_experience'
 
 def plugin_settings(settings):
     """
@@ -30,3 +30,5 @@ def plugin_settings(settings):
 
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)
+    if COURSE_EXPERIENCE_APP not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS.append(COURSE_EXPERIENCE_APP)

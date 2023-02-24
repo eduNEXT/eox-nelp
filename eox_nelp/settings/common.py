@@ -10,11 +10,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'eox_nelp',
-    'eox_nelp.course_experience',
+    'eox_nelp.nelp_course_experience',
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
-COURSE_EXPERIENCE_APP = 'eox_nelp.course_experience'
+COURSE_EXPERIENCE_APP = 'eox_nelp.nelp_course_experience'
 
 def plugin_settings(settings):
     """

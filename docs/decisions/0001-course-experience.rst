@@ -97,7 +97,7 @@ API Examples for sub-sections
         }
       }
 
-  POST request
+  PUT request
 
   /eox-nelp/api/experience/v1/rate/sections/<usage-id>/
 
@@ -146,7 +146,7 @@ API Examples for sub-sections
         }
       }
 
-  POST request
+  PUT request
 
   /eox-nelp/api/experience/v1/report/sections/<usage-id>/
 
@@ -199,7 +199,7 @@ API Examples for courses
         }
       }
 
-  POST request
+  PUT request
 
   /eox-nelp/api/experience/v1/rate/courses/<course-id>/
 
@@ -248,7 +248,7 @@ API Examples for courses
         }
       }
 
-  POST request
+  PUT request
 
   /eox-nelp/api/experience/v1/report/courses/<course-id>/
 

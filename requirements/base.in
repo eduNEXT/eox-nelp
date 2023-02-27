@@ -6,10 +6,12 @@ eox-core
 eox-tenant
 eox-theming
 edx-i18n-tools
-edx-drf-extensions
+django-filter
 djangorestframework
 bs4
 mako
 edx-opaque-keys
 requests-oauthlib
 social-auth-app-django
+djangorestframework-jsonapi==5.0.0
+edx-drf-extensions

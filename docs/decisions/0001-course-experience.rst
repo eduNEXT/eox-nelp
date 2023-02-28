@@ -18,21 +18,23 @@ Decisions
 =========
 
 1. Create a course experience module.
-2. Create ``RateCourse`` model with the following fields.
+2. Create ``LikeDislikeCourse`` model with the following fields.
 
   * author => Foreign key to user model, the user who set their opinion.
 
-  * status => String field with choices: Liked, disliked and not-set.
+  * status => Boolean field with choices: 1=Liked, 0=disliked and None=not-set.
 
-  * course_id => String field, course identifier to allow course rating.
+  * course_id => Foreign key to course overview model, course identifier.
 
-3. Create ``RateSection`` model with the following fields.
+3. Create ``LikeDislikeUnit`` model with the following fields.
 
   * author => Foreign key to user model, the user who set their opinion.
 
-  * status => String field with choices: Liked, disliked and not-set.
+  * status => Boolean field with choices: 1=Liked, 0=disliked and None=not-set.
 
-  * item_id => String field, this is course subsection identifier.
+  * item_id => UsageKeyField, this is course unit identifier.
+
+  * course_id => Foreign key to course overview model, course identifier.
 
 4. Create ``ReportCourse`` model with the following fields.
 
@@ -50,9 +52,9 @@ Decisions
 
    - Other objection.
 
-  * course_id => String field, course identifier to allow course rating.
+  * course_id => Foreign key to course overview model, course identifier.
 
-5. Create ``ReportSection`` model with the following fields.
+5. Create ``ReportUnit`` model with the following fields.
 
   * author => Foreign key to user model, the user who set their opinion.
 
@@ -68,17 +70,19 @@ Decisions
 
    - Other objection.
 
-  * item_id => String field, this is course subsection identifier.
+  * item_id => UsageKeyField, this is course unit identifier.
 
-6. Set model constrains, each model should be unique per sub-sections and user or course and user.
+  * course_id => Foreign key to course overview model, course identifier.
+
+6. Set model constrains, each model should be unique per units and user or course and user.
 7. Create API views for each model.
 
 
-API Examples for sub-sections
+API Examples for units
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   GET request
 
-  /eox-nelp/api/experience/v1/rate/sections/<usage-id>/
+  /eox-nelp/api/experience/v1/like/units/<usage-id>/
 
   Response
 
@@ -86,20 +90,20 @@ API Examples for sub-sections
 
       {
         "data": {
-         "type": "rate-section"
+         "type": "like-unit"
          "attributes": {
            "usage-id": "block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f",
            "status": "disliked"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/rate/sections/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
+           "self": "/eox-nelp/api/experience/v1/like/units/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
          }
         }
       }
 
   POST request
 
-  /eox-nelp/api/experience/v1/rate/sections/<usage-id>/
+  /eox-nelp/api/experience/v1/like/units/<usage-id>/
 
   .. code-block:: json
 
@@ -114,20 +118,20 @@ API Examples for sub-sections
 
       {
         "data": {
-         "type": "rate-section"
+         "type": "like-unit"
          "attributes": {
            "usage-id": "block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f",
            "status": "liked"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/rate/sections/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
+           "self": "/eox-nelp/api/experience/v1/like/units/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
          }
         }
       }
 
   GET request
 
-  /eox-nelp/api/experience/v1/report/sections/<usage-id>/
+  /eox-nelp/api/experience/v1/report/units/<usage-id>/
 
   Response
 
@@ -135,20 +139,20 @@ API Examples for sub-sections
 
       {
         "data": {
-         "type": "report-section"
+         "type": "report-unit"
          "attributes": {
            "usage-id": "block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f",
            "reason": "sexual_content"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/report/sections/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
+           "self": "/eox-nelp/api/experience/v1/report/units/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
          }
         }
       }
 
   POST request
 
-  /eox-nelp/api/experience/v1/report/sections/<usage-id>/
+  /eox-nelp/api/experience/v1/report/units/<usage-id>/
 
   .. code-block:: json
 
@@ -163,13 +167,13 @@ API Examples for sub-sections
 
       {
         "data": {
-         "type": "report-section"
+         "type": "report-unit"
          "attributes": {
            "usage-id": "block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f",
            "reason": "sexual_content"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/report/sections/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
+           "self": "/eox-nelp/api/experience/v1/report/units/block-v1:edX+C102+2022-t3+type@vertical+block@437dedc792a648e0b90911b8349d769f/"
          }
         }
       }
@@ -180,7 +184,7 @@ API Examples for courses
 
   GET request
 
-  /eox-nelp/api/experience/v1/rate/courses/<course-id>/
+  /eox-nelp/api/experience/v1/like/courses/<course-id>/
 
   Response
 
@@ -194,14 +198,14 @@ API Examples for courses
            "status": "disliked"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/rate/courses/course-v1:test+CS501+2022_T4/"
+           "self": "/eox-nelp/api/experience/v1/like/courses/course-v1:test+CS501+2022_T4/"
          }
         }
       }
 
   POST request
 
-  /eox-nelp/api/experience/v1/rate/courses/<course-id>/
+  /eox-nelp/api/experience/v1/like/courses/<course-id>/
 
   .. code-block:: json
 
@@ -222,7 +226,7 @@ API Examples for courses
            "status": "liked"
          },
          "links": {
-           "self": "/eox-nelp/api/experience/v1/rate/courses/course-v1:test+CS501+2022_T4/"
+           "self": "/eox-nelp/api/experience/v1/like/courses/course-v1:test+CS501+2022_T4/"
          }
         }
       }

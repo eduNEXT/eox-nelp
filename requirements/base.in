@@ -8,3 +8,4 @@ edx-i18n-tools
 djangorestframework
 bs4
 mako
+edx-opaque-keys

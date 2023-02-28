@@ -15,6 +15,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     See: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
     """
     settings.EOX_NELP_COURSE_CREATORS_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.course_creators_k_v1'
+    settings.EOX_NELP_COURSE_OVERVIEWS_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.course_overviews_m_v1'
     settings.EOX_NELP_SITE_CONFIGURATION = 'eox_nelp.edxapp_wrapper.test_backends.site_configuration_m_v1'
     settings.EOX_NELP_USER_API = 'eox_nelp.edxapp_wrapper.test_backends.user_api_m_v1'
     settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.test_backends.user_authn_m_v1'
@@ -47,6 +48,9 @@ USERNAME_PATTERN = fr'(?P<username>{USERNAME_REGEX_PARTIAL})'
 SILENCED_SYSTEM_CHECKS = [
     'admin.E403', 'admin.E406', 'admin.E408', 'admin.E409', 'admin.E410', 'admin.E002', 'admin.E035',
 ]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+TESTING_MIGRATIONS = True
 
 
 # ------------external plugins configuration backends----------------

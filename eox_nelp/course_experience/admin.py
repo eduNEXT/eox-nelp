@@ -1,0 +1,72 @@
+"""Course experience admin file.
+
+Contains the admin models for user course experiences.
+
+classes:
+    LikeDislikeUnitAdmin: Admin class for LikeDislikeUnit model.
+    LikeDislikeCourseAdmin: Admin class for LikeDislikeCourse model.
+    ReportCourseAdmin: Admin class for ReportCourse model.
+    ReportUnitAdmin: Admin class for ReportUnit model.
+"""
+from typing import Type
+
+from django.contrib import admin
+from django.contrib.auth import get_user_model
+
+from eox_nelp.course_experience.models import LikeDislikeCourse, LikeDislikeUnit, ReportCourse, ReportUnit
+
+User = get_user_model()
+
+
+class BaseAdmin(admin.ModelAdmin):
+    """Base class that allow to extract username from author field.
+
+    methods:
+        get_author_username: Returns username from User instance.
+    """
+    @admin.display(ordering="author__username", description="Author")
+    def get_author_username(self, obj: Type[User]) -> str:
+        """Return username from User instance"""
+        return obj.author.username
+
+
+class LikeDislikeUnitAdmin(BaseAdmin):
+    """Admin class for LikeDislikeUnit.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = ("get_author_username", "status", "item_id", "course_id")
+
+
+class LikeDislikeCourseAdmin(BaseAdmin):
+    """Admin class for LikeDislikeCourse.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = ("get_author_username", "status", "course_id")
+
+
+class ReportUnitAdmin(BaseAdmin):
+    """Admin class for ReportUnit.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = ("get_author_username", "reason", "item_id", "course_id")
+
+
+class ReportCourseAdmin(BaseAdmin):
+    """Admin class for ReportCourse.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = ("get_author_username", "reason", "course_id")
+
+
+admin.site.register(LikeDislikeUnit, LikeDislikeUnitAdmin)
+admin.site.register(LikeDislikeCourse, LikeDislikeCourseAdmin)
+admin.site.register(ReportUnit, ReportUnitAdmin)
+admin.site.register(ReportCourse, ReportCourseAdmin)

@@ -16,7 +16,7 @@ beautifulsoup4==4.11.2
     #   bs4
 bs4==0.0.1
     # via -r requirements/base.txt
-coverage==7.1.0
+coverage==7.2.0
     # via -r requirements/test.in
 ddt==1.6.0
     # via -r requirements/test.in
@@ -34,6 +34,8 @@ django-fake-model==0.1.4
 djangorestframework==3.14.0
     # via -r requirements/base.txt
 edx-i18n-tools==0.9.2
+    # via -r requirements/base.txt
+edx-opaque-keys==2.3.0
     # via -r requirements/base.txt
 eox-tenant==8.0.0
     # via
@@ -66,9 +68,13 @@ path==16.6.0
     #   path-py
 path-py==12.5.0
     # via -r requirements/test.in
+pbr==5.11.1
+    # via
+    #   -r requirements/base.txt
+    #   stevedore
 platformdirs==3.0.0
     # via pylint
-polib==1.1.1
+polib==1.2.0
     # via
     #   -r requirements/base.txt
     #   edx-i18n-tools
@@ -80,6 +86,10 @@ pyflakes==3.0.1
     # via flake8
 pylint==2.16.2
     # via -r requirements/test.in
+pymongo==3.13.0
+    # via
+    #   -r requirements/base.txt
+    #   edx-opaque-keys
 pytz==2022.7.1
     # via
     #   -r requirements/base.txt
@@ -101,6 +111,10 @@ sqlparse==0.4.3
     # via
     #   -r requirements/base.txt
     #   django
+stevedore==5.0.0
+    # via
+    #   -r requirements/base.txt
+    #   edx-opaque-keys
 testfixtures==7.1.0
     # via -r requirements/test.in
 tomli==2.0.1
@@ -108,8 +122,6 @@ tomli==2.0.1
 tomlkit==0.11.6
     # via pylint
 typing-extensions==4.5.0
-    # via
-    #   astroid
-    #   pylint
+    # via astroid
 wrapt==1.14.1
     # via astroid

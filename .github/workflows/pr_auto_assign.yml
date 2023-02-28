@@ -1,9 +1,9 @@
 name: PR Issue Assignment 📝
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
   pull_request:
-    types: [opened]
+    types: [opened, reopened]
 
 jobs:
     auto-assign:
@@ -12,7 +12,6 @@ jobs:
             - name: 'Auto-assign PR-Issue'
               uses: pozil/auto-assign-issue@v1.11.0
               with:
-                assignees: nelp-ops-crew
+                teams: nelp-ops-crew
                 numOfAssignee: 1
-                allowSelfAssign: false
                 repo-token: ${{ secrets.NELP_PAT }}

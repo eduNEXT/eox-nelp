@@ -1,0 +1,23 @@
+repo_root:
+- '*'
+requirements:
+- requirements/**/*
+django_plugin:
+- 'eox_nelp/*'
+course_api:
+- eox_nelp/course_api/**/*
+admin:
+- eox_nelp/admin/**/*
+course_experience:
+- eox_nelp/course_experience/**/*
+mfe_config_api:
+- eox_nelp/mfe_config_api/**/*
+translations:
+- eox_nelp/locale/**/*
+commands:
+- eox_nelp/management/**/*
+# Add 'test' label to any change to test*.py files.
+test:
+- '**/test*.py'
+github_actions:
+- '.github/**/*'

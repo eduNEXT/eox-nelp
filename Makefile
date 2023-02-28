@@ -31,7 +31,7 @@ requirements: ## install environment requirements
 	pip install -r requirements/base.txt
 
 install-automation-reqs: ## install tox requirements
-	$(TOX) pip install -r requirements/tox.txt
+	pip install -r requirements/tox.txt
 
 install-test-reqs: ## install test requirements
 	$(TOX) pip install -r requirements/test.txt --exists-action w

@@ -80,3 +80,6 @@ EOX_THEMING_BASE_LOADER_BACKEND = 'eox_theming.edxapp_wrapper.backends.j_loaders
 EOX_THEMING_CONFIG_SOURCES = [
     'from_django_settings',
 ]
+
+EOX_CORE_COURSEWARE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.courseware_m_v1"
+EOX_CORE_GRADES_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.grades_m_v1"

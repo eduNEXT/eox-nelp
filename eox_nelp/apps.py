@@ -31,18 +31,18 @@ class EoxNelpConfig(AppConfig):
         },
         'signals_config': {
             'lms.djangoapp': {
-                'relative_path': 'receivers',
+                'relative_path': 'signals.receivers',
                 'receivers': [
                     {
-                        'receiver_func_name': 'send_futurex_progress',
+                        'receiver_func_name': 'block_completion_progress_publisher',
                         'signal_path': 'django.db.models.signals.post_save',
-                        'dispatch_uid': 'send_futurex_progress_receiver',
+                        'dispatch_uid': 'block_completion_publisher_receviver',
                         'sender_path': 'completion.models.BlockCompletion',
                     },
                     {
-                        'receiver_func_name': 'send_futurex_progress',
-                        'signal_path': 'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED',
-                        'dispatch_uid': 'send_futurex_progress_receiver',
+                        'receiver_func_name': 'course_grade_changed_progress_publisher',
+                        'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED',
+                        'dispatch_uid': 'course_grade_publisher_receiver',
                     },
                 ],
             },

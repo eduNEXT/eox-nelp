@@ -2,6 +2,7 @@
 -c constraints.txt
 
 Django
+eox-core
 eox-tenant
 eox-theming
 edx-i18n-tools
@@ -11,3 +12,4 @@ bs4
 mako
 edx-opaque-keys
 requests-oauthlib
+social-auth-app-django

@@ -5,6 +5,7 @@ Django
 eox-tenant
 eox-theming
 edx-i18n-tools
+edx-drf-extensions
 djangorestframework
 bs4
 mako

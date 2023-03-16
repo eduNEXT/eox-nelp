@@ -38,6 +38,7 @@ class EoxNelpConfig(AppConfig):
         # pylint: disable=unused-import, import-error, import-outside-toplevel
         # This is required in order to register the receiver inside handlers module.
         from cms.djangoapps.contentstore.signals import handlers  # noqa: F401
+        import eox_nelp.signals
 
 
 class EoxNelpCMSConfig(AppConfig):

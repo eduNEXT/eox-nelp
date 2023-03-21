@@ -27,11 +27,11 @@ def send_completion_progress_2_futurex(**kwargs):
     session_key = None
     engine = import_module(settings.SESSION_ENGINE)
     rx.session = engine.SessionStore(session_key)
+    existing_legacy_frontend_setting = getattr(settings, "USE_LEARNING_LEGACY_FRONTEND", None)
+    setattr(settings, "USE_LEARNING_LEGACY_FRONTEND", False)
     SpecificProgressTabView = ProgressTabView(request=rx, format_kwarg={})
-
-    breakpoint()
-
     progress_student_response = SpecificProgressTabView.get(rx, course_key_string=str(course_key), student_id=student.id)
+    setattr(settings, "USE_LEARNING_LEGACY_FRONTEND", existing_legacy_frontend_setting) if existing_legacy_frontend_setting else delattr(settings, "USE_LEARNING_LEGACY_FRONTEND")
     data = progress_student_response.data
     completion_summary = data.get('completion_summary', {})
     user_has_passing_grade = data.get('user_has_passing_grade', {})

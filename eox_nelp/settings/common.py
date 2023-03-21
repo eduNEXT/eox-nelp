@@ -28,5 +28,9 @@ def plugin_settings(settings):
     settings.EOX_NELP_MFE_CONFIG_VIEW = 'eox_nelp.edxapp_wrapper.backends.mfe_config_view_m_v1'
     settings.EOX_NELP_COURSE_API = 'eox_nelp.edxapp_wrapper.backends.course_api_m_v1'
 
+    settings.FUTUREX_API_URL = 'https://testing-site.com'
+    settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
+    settings.FUTUREX_API_CLIENT_SECRET = 'my-test-client-secret'
+
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)

@@ -9,3 +9,4 @@ djangorestframework
 bs4
 mako
 edx-opaque-keys
+requests-oauthlib

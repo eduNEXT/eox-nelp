@@ -25,8 +25,9 @@ def send_completion_progress_2_futurex(**kwargs):
     instance = kwargs['instance']
     course_id = str(instance.context_key)
     user_id = instance.user_id
-    sync_post(course_id, user_id)
     breakpoint()
+
+    sync_post(course_id, user_id)
 
     async_post.delay(course_id, user_id)
 
@@ -63,8 +64,7 @@ def get_completion_data_from_progress_tab_view(request, course_id, user_id):
     return data
 
 
-def get_mock_request(user_id):
-    user = User.objects.get(id=user_id)
+def get_mock_request(user):
     rx = HttpRequest()
     rx.user = user
     rx.META = {'SERVER_NAME': settings.ALLOWED_HOSTS[0], 'HTTP_HOST': settings.ALLOWED_HOSTS[0]}

@@ -28,7 +28,25 @@ class EoxNelpConfig(AppConfig):
                 'production': {'relative_path': 'settings.production'},
                 'devstack': {'relative_path': 'settings.devstack'},
             },
-        }
+        },
+        'signals_config': {
+            'lms.djangoapp': {
+                'relative_path': 'receivers',
+                'receivers': [
+                    {
+                        'receiver_func_name': 'send_futurex_progress',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'send_futurex_progress_receiver',
+                        'sender_path': 'completion.models.BlockCompletion',
+                    },
+                    {
+                        'receiver_func_name': 'send_futurex_progress',
+                        'signal_path': 'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED',
+                        'dispatch_uid': 'send_futurex_progress_receiver',
+                    },
+                ],
+            },
+        },
     }
 
     def ready(self):

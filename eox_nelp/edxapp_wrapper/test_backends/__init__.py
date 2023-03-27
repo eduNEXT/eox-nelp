@@ -1,6 +1,8 @@
 """Test Backend module."""
 from django.contrib import admin
 from django.db import models
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 
 
@@ -28,3 +30,15 @@ class DummyAdmin(admin.ModelAdmin):
 
 class DummyView(APIView):
     """Dummy APIView class."""
+
+
+class DummyListView(ListAPIView):
+    """Dummy ListAPIView class."""
+
+
+class DummyRetrieveView(RetrieveAPIView):
+    """Dummy RetrieveAPIView class."""
+
+
+class DummySerializer(Serializer):
+    """Dummy Serializer class."""

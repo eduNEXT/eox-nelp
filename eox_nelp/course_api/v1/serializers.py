@@ -2,7 +2,7 @@
 Course API Serializers.  Representing course catalog data
 """
 from bs4 import BeautifulSoup
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from rest_framework import serializers
 
 from eox_nelp.edxapp_wrapper.course_api import CourseDetailSerializer
@@ -30,7 +30,12 @@ class NelpCourseDetailSerializer(CourseDetailSerializer):  # pylint: disable=abs
         """
         Get the representation for SerializerMethodField `course_about_url`
         """
-        return self.context["request"].build_absolute_uri(reverse("about_course", args=[course_overview.id]))
+        try:
+            about_course_path = reverse("about_course", args=[course_overview.id])
+        except NoReverseMatch:
+            about_course_path = f"/courses/{course_overview.id}/about"
+
+        return self.context["request"].build_absolute_uri(about_course_path)
 
     overview = serializers.SerializerMethodField()
 
@@ -41,7 +46,9 @@ class NelpCourseDetailSerializer(CourseDetailSerializer):  # pylint: disable=abs
         # Note: This makes a call to the modulestore, unlike the other
         # fields from CourseSerializer, which get their data
         # from the CourseOverview object in SQL.
-        self.raw_overview = super().get_overview(course_overview)
+        raw_overview = super().get_overview(course_overview)
+        self.raw_overview = "" if raw_overview is None else raw_overview
+
         return self.raw_overview
 
     overview_object = serializers.SerializerMethodField()

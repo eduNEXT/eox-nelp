@@ -83,7 +83,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CourseOverview',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    opaque_keys.edx.django.models.CourseKeyField(
+                        db_index=True,
+                        primary_key=True,
+                        max_length=255,
+                        verbose_name='ID',
+                    ),
+                ),
             ],
         ),
     ]

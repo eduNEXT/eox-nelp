@@ -56,6 +56,20 @@ SILENCED_SYSTEM_CHECKS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 TESTING_MIGRATIONS = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'PAGE_SIZE': 10,
+    'URL_FORMAT_OVERRIDE': None,
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '60/minute',
+        'service_user': '800/minute',
+        'registration_validation': '30/minute',
+    },
+}
+
 
 # ------------external plugins configuration backends----------------
 

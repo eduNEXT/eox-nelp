@@ -1,12 +1,9 @@
+"""eox_nelp course_api  urls
 """
-Course API URLs
-"""
-from django.conf import settings
-from django.urls import path, re_path
+from django.urls import include, path
 
-from .views import NelpCourseDetailView, NelpCourseListView
+app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
-urlpatterns = [
-    path('v1/courses/', NelpCourseListView.as_view(), name="nelp-course-list"),
-    re_path(rf'^v1/courses/{settings.COURSE_KEY_PATTERN}', NelpCourseDetailView.as_view(), name="nelp-course-detail"),
+urlpatterns = [  # pylint: disable=invalid-name
+    path('v1/', include('eox_nelp.course_api.v1.urls', namespace='v1')),
 ]

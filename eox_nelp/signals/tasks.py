@@ -7,6 +7,7 @@ tasks:
 import logging
 
 from celery import shared_task
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
@@ -45,6 +46,9 @@ def dispatch_futurex_progress(course_id, user_id, is_complete=None):
         user_id (str): User identifier.
         is_complete (bool): Determines is that hast complete the course
     """
+    if not getattr(settings, "ACTIVATE_DISPATCH_FUTUREX_PROGRESS", False):
+        return
+
     user = User.objects.get(id=user_id)
     user_has_passing_grade = is_complete if is_complete is not None else _user_has_passing_grade(user, course_id)
 

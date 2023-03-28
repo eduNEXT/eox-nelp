@@ -54,7 +54,7 @@ quality: clean install-test-reqs## check coding style with pycodestyle and pylin
 
 python-test: clean install-test-reqs## Run test suite.
 	$(TOX) coverage run --source ./eox_nelp manage.py test
-	$(TOX) coverage report -m --fail-under=90
+	$(TOX) coverage report -m --fail-under=92
 
 complexity: clean install-test-reqs## Run complexity suite with flake8.
 	$(TOX) flake8  --max-complexity 10 eox_nelp

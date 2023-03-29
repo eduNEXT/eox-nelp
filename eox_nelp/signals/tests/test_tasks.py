@@ -6,7 +6,10 @@ Classes:
 """
 import unittest
 
+from ddt import data, ddt
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from social_django.models import UserSocialAuth
@@ -21,6 +24,8 @@ from eox_nelp.signals.tasks import (
 )
 
 User = get_user_model()
+FALSY_ACTIVATION_VALUES = [0, "", None, [], False, {}, ()]
+TRUTHY_ACTIVATION_VALUES = [1, "true", "activated", ["activated"], True, {"activated": "true"}]
 
 
 class UserHasPassingGradeTestCase(unittest.TestCase):
@@ -42,15 +47,21 @@ class UserHasPassingGradeTestCase(unittest.TestCase):
         course_grade_factory_mock().read.assert_called_with(user, course_key=CourseKey.from_string(course_id))
 
 
+@ddt
 class DipatchFuturexProgressTestCase(unittest.TestCase):
     """Test class for function `dispatch_futurex_progress`"""
 
+    @override_settings()
     @patch("eox_nelp.signals.tasks._generate_progress_enrollment_data")
     @patch("eox_nelp.signals.tasks._post_futurex_progress")
-    def test_dispatch_futurex_progress(self, post_futurex_progress_mock, generate_progress_enrollment_data_mock):
+    @data(*TRUTHY_ACTIVATION_VALUES)
+    def test_call_dispatch_futurex_progress(
+        self, truthy_value, post_futurex_progress_mock, generate_progress_enrollment_data_mock,
+    ):
         """Test when `dispatch_futurex_progress` is called
         with the required parameters. Check the functions inside are called with
-        their desired values.
+        their desired values. Also with the setting `ACTIVATE_DISPATCH_FUTUREX_PROGRESS` configurated
+        with truthy value.
 
         Expected behavior:
             - `_generate_progress_enrollment_data` is called with the right values.
@@ -58,7 +69,7 @@ class DipatchFuturexProgressTestCase(unittest.TestCase):
         """
         user, _ = User.objects.get_or_create(username="vader")
         course_id = "course-v1:test+Cx105+2022_T4"
-        data = {
+        progress_enrollment_data = {
             "courseId": "course-v1:edX+213+2121",
             "userId": 16734,
             "approxTotalCourseHrs": None,
@@ -67,7 +78,8 @@ class DipatchFuturexProgressTestCase(unittest.TestCase):
             "enrolledAt": "2023-03-16T20:24:19.494709Z",
             "isCompleted": False,
         }
-        generate_progress_enrollment_data_mock.return_value = data
+        generate_progress_enrollment_data_mock.return_value = progress_enrollment_data
+        setattr(settings, "ACTIVATE_DISPATCH_FUTUREX_PROGRESS", truthy_value)
 
         dispatch_futurex_progress(course_id, user.id, is_complete=True)
 
@@ -76,7 +88,55 @@ class DipatchFuturexProgressTestCase(unittest.TestCase):
             course_id=course_id,
             user_has_passing_grade=True,
         )
-        post_futurex_progress_mock.assert_called_with(data)
+        post_futurex_progress_mock.assert_called_with(progress_enrollment_data)
+
+    @override_settings()
+    @patch("eox_nelp.signals.tasks._generate_progress_enrollment_data")
+    @patch("eox_nelp.signals.tasks._post_futurex_progress")
+    def test_not_call_dispatch_logic_setting_not_configured(
+        self, post_futurex_progress_mock, generate_progress_enrollment_data_mock
+    ):
+        """Test `dispatch_futurex_progress` is called but the logic inside not.
+        So `generate_progress_enrollment_data` and `post_futurex_progress` are not called
+        due no setting configured.
+
+        Expected behavior:
+            - generate_progress_enrollment_data is not called due settings.
+            - post_futurex_progress_mock is not called due settings.
+        """
+        user, _ = User.objects.get_or_create(username="vader")
+        course_id = "course-v1:test+Cx105+2022_T4"
+        if hasattr(settings, "ACTIVATE_DISPATCH_FUTUREX_PROGRESS"):
+            delattr(settings, "ACTIVATE_DISPATCH_FUTUREX_PROGRESS")
+
+        dispatch_futurex_progress(course_id, user.id, is_complete=True)
+
+        generate_progress_enrollment_data_mock.assert_not_called()
+        post_futurex_progress_mock.assert_not_called()
+
+    @override_settings()
+    @patch("eox_nelp.signals.tasks._generate_progress_enrollment_data")
+    @patch("eox_nelp.signals.tasks._post_futurex_progress")
+    @data(*FALSY_ACTIVATION_VALUES)
+    def test_not_call_dispatch_logic_setting_falsy(
+        self, falsy_value, post_futurex_progress_mock, generate_progress_enrollment_data_mock,
+    ):
+        """Test `dispatch_futurex_progress` is called but the logic inside not.
+        So `generate_progress_enrollment_data` and `post_futurex_progress` are not called
+        due setting configured with falsy value.
+
+        Expected behavior:
+            - generate_progress_enrollment_data is not called due settings.
+            - post_futurex_progress_mock is not called due settings.
+        """
+        user, _ = User.objects.get_or_create(username="vader")
+        course_id = "course-v1:test+Cx105+2022_T4"
+        setattr(settings, "ACTIVATE_DISPATCH_FUTUREX_PROGRESS", falsy_value)
+
+        dispatch_futurex_progress(course_id, user.id, is_complete=True)
+
+        generate_progress_enrollment_data_mock.assert_not_called()
+        post_futurex_progress_mock.assert_not_called()
 
 
 class PostFuturexProgressTestCase(unittest.TestCase):
@@ -92,7 +152,7 @@ class PostFuturexProgressTestCase(unittest.TestCase):
             - FuturexApiClient is used with the right values.
             - Log successful sent to service message.
         """
-        data = {
+        progress_enrollment_data = {
             "courseId": "course-v1:edX+213+2121",
             "userId": 16734,
             "approxTotalCourseHrs": None,
@@ -105,16 +165,16 @@ class PostFuturexProgressTestCase(unittest.TestCase):
         service_response = {'status': {'success': True, 'message': 'successful', 'code': 1}}
         log_post = (
             f"send_futurex_progress --- "
-            f"The data {data} was sent to the futurex service host {service_base_url}. "
+            f"The data {progress_enrollment_data} was sent to the futurex service host {service_base_url}. "
             f"The response was: {service_response}"
         )
         futurex_api_client_mock().base_url = service_base_url
         futurex_api_client_mock().enrollment_progress.return_value = service_response
 
         with self.assertLogs(tasks.__name__, level="INFO") as logs:
-            _post_futurex_progress(data)
+            _post_futurex_progress(progress_enrollment_data)
 
-        futurex_api_client_mock().enrollment_progress.assert_called_with(data)
+        futurex_api_client_mock().enrollment_progress.assert_called_with(progress_enrollment_data)
         self.assertEqual(logs.output, [f"INFO:{tasks.__name__}:{log_post}"])
 
 
@@ -134,10 +194,7 @@ class GetCompletionSummaryTestCase(unittest.TestCase):
 
         _get_completion_summary(user, course_id)
 
-        courses_mock.get_course_blocks_completion_summary.assert_called_with(
-            course_key,
-            user
-        )
+        courses_mock.get_course_blocks_completion_summary.assert_called_with(course_key, user)
 
 
 class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):

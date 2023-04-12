@@ -18,3 +18,12 @@ def get_course_published_signal():
         Mock class.
     """
     return Mock()
+
+
+def get_exception_ItemNotFoundError():
+    """Test backend for eox_nelp.edxapp_wrapper.backends.modulestore_m_v1.
+
+    Returns:
+        Mock class.
+    """
+    return Exception

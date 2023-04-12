@@ -3,14 +3,18 @@
 tasks:
     create_course_notifications: Creates UpcomingCourseDueDate records based on due dates.
 """
+# lint-amnesty, pylint: disable=cyclic-import
+
 import datetime
 
 from celery import shared_task
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.notifications.models import UpcomingCourseDueDate
+from eox_nelp.notifications.notify_course_due_date import notify_upcoming_course_due_date
 
 
 @shared_task
@@ -87,3 +91,14 @@ def create_course_notifications(course_id):
             location_id=sub_section.location,
             sent=False,
         ).delete()
+
+
+@shared_task
+def notify_upcoming_course_due_date_by_id(upcoming_course_due_date_id):
+    """Notify an UpcomingCourseDueDate using its id.
+
+    Args:
+        upcoming_course_due_date_id (int): id of an UpcomingCourseDueDate object.
+    """
+    upcoming_course_due_date = get_object_or_404(UpcomingCourseDueDate, id=upcoming_course_due_date_id)
+    notify_upcoming_course_due_date(upcoming_course_due_date)

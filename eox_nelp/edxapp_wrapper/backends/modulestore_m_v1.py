@@ -4,6 +4,7 @@ This file contains all the necessary dependencies from
 https://github.com/eduNEXT/edunext-platform/blob/master/common/lib/xmodule/xmodule/modulestore
 """
 from xmodule.modulestore.django import SignalHandler, modulestore  # pylint: disable=import-error
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 def get_modulestore():
@@ -24,3 +25,13 @@ def get_course_published_signal():
         course_published SwitchedSignal.
     """
     return SignalHandler.course_published
+
+
+def get_exception_ItemNotFoundError():
+    """Allow to get ItemNotFoundError Exception from
+    https://github.com/eduNEXT/edunext-platform/blob/master/common/lib/xmodule/xmodule/modulestore/exceptions.py#L6
+
+    Returns:
+        ItemNotFoundError Exception.
+    """
+    return ItemNotFoundError

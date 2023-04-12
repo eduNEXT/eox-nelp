@@ -7,14 +7,16 @@ import datetime
 import unittest
 
 from ddt import data, ddt
+from django.http import Http404
 from django.utils import timezone
-from mock import Mock
+from mock import Mock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.notifications.models import UpcomingCourseDueDate
-from eox_nelp.notifications.tasks import create_course_notifications
+from eox_nelp.notifications.tasks import create_course_notifications, notify_upcoming_course_due_date_by_id
 
 
 @ddt
@@ -374,3 +376,34 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
             subsections.append(subsection)
 
         return subsections
+
+
+class NotifyUpcomingCourseDueDateByIdTestCase(unittest.TestCase):
+    """Test class for task  notify_upcoming_course_due_date_by_id"""
+    @patch("eox_nelp.notifications.tasks.notify_upcoming_course_due_date")
+    def test_notify_upcoming_course_due_date_by_id(self, notify_upcoming_course_due_date_mock):
+        """Test method `notify_upcoming_course_due_date_by_id`.
+         Expected behavior:
+            - notify_upcoming_course_due_date is called with righ value.
+        """
+        instance, _ = UpcomingCourseDueDate.objects.get_or_create(  # pylint: disable=no-member
+            course=CourseOverview.objects.create(id="course-v1:testu+Cx105+2022_T4"),
+            location_id="block-v1:testu+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a",
+            due_date=timezone.now() + datetime.timedelta(days=18),
+            notification_date=timezone.now(),
+        )
+
+        notify_upcoming_course_due_date_by_id(instance.id)
+
+        notify_upcoming_course_due_date_mock.assert_called_with(instance)
+
+    @patch("eox_nelp.notifications.tasks.notify_upcoming_course_due_date")
+    def test_wrong_id_notify_upcoming_course_due_date_by_id(self, notify_upcoming_course_due_date_mock):
+        """Test method `notify_upcoming_course_due_date_by_id` with not exist id.
+         Expected behavior:
+            - raise http404 django Exception.
+            - notify_upcoming_course_due_date is not called .
+        """
+        self.assertRaises(Http404, notify_upcoming_course_due_date_by_id, -999)
+
+        notify_upcoming_course_due_date_mock.assert_not_called()

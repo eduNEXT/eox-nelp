@@ -14,7 +14,12 @@ INSTALLED_APPS = [
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
-
+EOX_NELP_BEAT_SCHEDULES = {
+    'log_message_task': {
+        'task': 'eox_nelp.notifications.tasks.periodic_task.log_message',  # Update with your app's task path
+        'schedule': 60.0,  # 300 seconds = 5 minutes
+    },
+}
 
 def plugin_settings(settings):
     """
@@ -35,3 +40,7 @@ def plugin_settings(settings):
 
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)
+    if getattr(settings, 'CELERY_BEAT_SCHEDULE', None):
+        settings.CELERY_BEAT_SCHEDULE = {**settings.CELERY_BEAT_SCHEDULE, **EOX_NELP_BEAT_SCHEDULES}
+    else:
+        setattr(settings, 'CELERY_BEAT_SCHEDULE', EOX_NELP_BEAT_SCHEDULES)

@@ -1,12 +1,15 @@
 # tasks.py
 
-from celery import shared_task
 import logging
+
+from celery import shared_task
+
 logger = logging.getLogger(__name__)
 
 @shared_task
-def log_message():
+def send_upcoming_course_due_date_emails():
     """
-    Task to log a message every 5 minutes
+    Task to send upcoming course due date emails.
     """
-    logger.info("This is a log message.")  # Log your desired message here
+    logger.info("------Sending upcoming course due date emails.-------")
+    logger.info("This is a log message. yeah yeah")

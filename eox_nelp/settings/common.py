@@ -14,7 +14,9 @@ INSTALLED_APPS = [
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
-
+EOX_NELP_CELERY_TASKS = (
+    "eox_nelp.notifications.tasks",
+)
 
 def plugin_settings(settings):
     """
@@ -35,3 +37,8 @@ def plugin_settings(settings):
 
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)
+
+    if getattr(settings, "CELERY_IMPORTS", None):
+        settings.CELERY_IMPORTS += EOX_NELP_CELERY_TASKS
+    else:
+        settings.CELERY_IMPORTS = EOX_NELP_CELERY_TASKS

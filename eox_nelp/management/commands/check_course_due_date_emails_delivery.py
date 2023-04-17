@@ -5,9 +5,6 @@ import logging
 
 from django.core.management import BaseCommand
 
-from eox_nelp.notifications.tasks import send_course_due_date_emails
-
-
 logger = logging.getLogger(__name__)
 
 

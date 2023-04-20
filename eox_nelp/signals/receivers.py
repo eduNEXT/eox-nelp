@@ -6,6 +6,7 @@ Functions:
     block_completion_progress_publisher: it will publish the user progress based on post_save signal.
     course_grade_changed_progress_publisher: it will publish the user progress based on COURSE_GRADE_CHANGED signal.
 """
+from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.signals.tasks import dispatch_futurex_progress
 
 
@@ -41,3 +42,14 @@ def course_grade_changed_progress_publisher(
         user_id=user.id,
         is_complete=course_grade.passed,
     )
+
+
+def create_course_notifications(course_key, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the course_published signal, that belong to
+    the class SignalHandler from xmodule, and this will create upcoming notifications
+    based on the sub-section due dates.
+
+    Args:
+        course_key<CourseLocator>: Opaque keys locator used to identify a course.
+    """
+    create_course_notifications_task.delay(course_id=str(course_key))

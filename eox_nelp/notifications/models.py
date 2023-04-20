@@ -1,5 +1,4 @@
-"""
-Notifications models. This contains all models related with the notification.
+"""Notifications models. This contains all models related with the notification.
 
 Models:
     UpcomingCourseDueDate: Model that sends notifications based on the subsection stored data.

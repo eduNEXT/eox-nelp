@@ -21,6 +21,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.test_backends.user_authn_m_v1'
     settings.EOX_NELP_MFE_CONFIG_VIEW = 'eox_nelp.edxapp_wrapper.test_backends.mfe_config_view_m_v1'
     settings.EOX_NELP_COURSE_API = 'eox_nelp.edxapp_wrapper.test_backends.course_api_m_v1'
+    settings.EOX_NELP_XMODULE_MODULESTORE = 'eox_nelp.edxapp_wrapper.test_backends.modulestore_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'

@@ -72,4 +72,16 @@ class EoxNelpCMSConfig(AppConfig):
                 'devstack': {'relative_path': 'settings.devstack'},
             },
         },
+        'signals_config': {
+            'cms.djangoapp': {
+                'relative_path': 'signals.receivers',
+                'receivers': [
+                    {
+                        'receiver_func_name': 'create_course_notifications',
+                        'signal_path': 'eox_nelp.edxapp_wrapper.modulestore.course_published',
+                        'dispatch_uid': 'create_course_notifications_receiver',
+                    },
+                ],
+            },
+        },
     }

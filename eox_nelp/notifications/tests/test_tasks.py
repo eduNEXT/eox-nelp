@@ -17,6 +17,7 @@ from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.notifications.models import UpcomingCourseDueDate
 from eox_nelp.notifications.tasks import create_course_notifications, notify_upcoming_course_due_date_by_id
+from eox_nelp.tests.utils import generate_list_mock_data
 
 
 @ddt
@@ -103,7 +104,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
             }
         }
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections([])
+        modulestore.return_value.get_items.return_value = generate_list_mock_data([])
         current_records = list(
             UpcomingCourseDueDate.objects.all().values_list("id", flat=True)  # pylint: disable=no-member
         )
@@ -133,7 +134,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
             }
         }
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [{"due": None}, {"due": None}]
         )
         current_records = list(
@@ -169,7 +170,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         course_key = CourseKey.from_string(self.course_id)
         location_1 = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
         location_2 = "block-v1:test+CS501+2022_T4+type@sequential+block@ww47308785454564646343dd581b4rrr"
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -216,7 +217,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         expected_notification_date = due_date - datetime.timedelta(days=7)
         course_key = CourseKey.from_string(self.course_id)
         location = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -266,7 +267,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         new_due_date = timezone.now() + datetime.timedelta(days=18)
         expected_notification_date = new_due_date - datetime.timedelta(days=7)
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": new_due_date,
@@ -315,7 +316,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         location = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
         due_date = timezone.now() + datetime.timedelta(days=18)
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -343,39 +344,6 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
                     notification_date=due_date - datetime.timedelta(days=int(day_in_advance)),
                 )
             )
-
-    def _generate_subsections(self, subsections_data):
-        """Helper method to create Mock subsection based on the given data.
-
-        Args:
-            subsections_data: This should be a list of dicts with the following structure:
-
-            [
-                {
-                    "due": due_date,
-                    "location": location
-                },
-                {
-                    "due": due_date,
-                    "location": location
-                },
-                ...
-            ]
-            Every dictionary should contain the subsection data.
-
-        Returns:
-            List of mocks.
-        """
-        subsections = []
-
-        for subsection_data in subsections_data:
-            subsection = Mock()
-            subsection.due = subsection_data.get("due")
-            subsection.location = subsection_data.get("location")
-
-            subsections.append(subsection)
-
-        return subsections
 
 
 class NotifyUpcomingCourseDueDateByIdTestCase(unittest.TestCase):

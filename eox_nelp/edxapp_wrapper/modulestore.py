@@ -16,3 +16,4 @@ backend = import_module(settings.EOX_NELP_XMODULE_MODULESTORE)
 
 modulestore = backend.get_modulestore()
 course_published = backend.get_course_published_signal()
+ItemNotFoundError = backend.get_exception_ItemNotFoundError()

@@ -7,14 +7,17 @@ import datetime
 import unittest
 
 from ddt import data, ddt
+from django.http import Http404
 from django.utils import timezone
-from mock import Mock
+from mock import Mock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.notifications.models import UpcomingCourseDueDate
-from eox_nelp.notifications.tasks import create_course_notifications
+from eox_nelp.notifications.tasks import create_course_notifications, notify_upcoming_course_due_date_by_id
+from eox_nelp.tests.utils import generate_list_mock_data
 
 
 @ddt
@@ -101,7 +104,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
             }
         }
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections([])
+        modulestore.return_value.get_items.return_value = generate_list_mock_data([])
         current_records = list(
             UpcomingCourseDueDate.objects.all().values_list("id", flat=True)  # pylint: disable=no-member
         )
@@ -131,7 +134,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
             }
         }
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [{"due": None}, {"due": None}]
         )
         current_records = list(
@@ -167,7 +170,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         course_key = CourseKey.from_string(self.course_id)
         location_1 = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
         location_2 = "block-v1:test+CS501+2022_T4+type@sequential+block@ww47308785454564646343dd581b4rrr"
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -214,7 +217,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         expected_notification_date = due_date - datetime.timedelta(days=7)
         course_key = CourseKey.from_string(self.course_id)
         location = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -264,7 +267,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         new_due_date = timezone.now() + datetime.timedelta(days=18)
         expected_notification_date = new_due_date - datetime.timedelta(days=7)
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": new_due_date,
@@ -313,7 +316,7 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
         location = "block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a"
         due_date = timezone.now() + datetime.timedelta(days=18)
         course_key = CourseKey.from_string(self.course_id)
-        modulestore.return_value.get_items.return_value = self._generate_subsections(
+        modulestore.return_value.get_items.return_value = generate_list_mock_data(
             [
                 {
                     "due": due_date,
@@ -342,35 +345,33 @@ class CreateCourseNotificationsTestCase(unittest.TestCase):
                 )
             )
 
-    def _generate_subsections(self, subsections_data):
-        """Helper method to create Mock subsection based on the given data.
 
-        Args:
-            subsections_data: This should be a list of dicts with the following structure:
-
-            [
-                {
-                    "due": due_date,
-                    "location": location
-                },
-                {
-                    "due": due_date,
-                    "location": location
-                },
-                ...
-            ]
-            Every dictionary should contain the subsection data.
-
-        Returns:
-            List of mocks.
+class NotifyUpcomingCourseDueDateByIdTestCase(unittest.TestCase):
+    """Test class for task  notify_upcoming_course_due_date_by_id"""
+    @patch("eox_nelp.notifications.tasks.notify_upcoming_course_due_date")
+    def test_notify_upcoming_course_due_date_by_id(self, notify_upcoming_course_due_date_mock):
+        """Test method `notify_upcoming_course_due_date_by_id`.
+         Expected behavior:
+            - notify_upcoming_course_due_date is called with righ value.
         """
-        subsections = []
+        instance, _ = UpcomingCourseDueDate.objects.get_or_create(  # pylint: disable=no-member
+            course=CourseOverview.objects.create(id="course-v1:testu+Cx105+2022_T4"),
+            location_id="block-v1:testu+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a",
+            due_date=timezone.now() + datetime.timedelta(days=18),
+            notification_date=timezone.now(),
+        )
 
-        for subsection_data in subsections_data:
-            subsection = Mock()
-            subsection.due = subsection_data.get("due")
-            subsection.location = subsection_data.get("location")
+        notify_upcoming_course_due_date_by_id(instance.id)
 
-            subsections.append(subsection)
+        notify_upcoming_course_due_date_mock.assert_called_with(instance)
 
-        return subsections
+    @patch("eox_nelp.notifications.tasks.notify_upcoming_course_due_date")
+    def test_wrong_id_notify_upcoming_course_due_date_by_id(self, notify_upcoming_course_due_date_mock):
+        """Test method `notify_upcoming_course_due_date_by_id` with not exist id.
+         Expected behavior:
+            - raise http404 django Exception.
+            - notify_upcoming_course_due_date is not called .
+        """
+        self.assertRaises(Http404, notify_upcoming_course_due_date_by_id, -999)
+
+        notify_upcoming_course_due_date_mock.assert_not_called()

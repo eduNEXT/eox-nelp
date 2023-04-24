@@ -4,6 +4,7 @@ Models:
     UpcomingCourseDueDate: Model that sends notifications based on the subsection stored data.
 """
 import logging
+from importlib import import_module
 
 from django.db import models
 from opaque_keys.edx.django.models import UsageKeyField
@@ -41,5 +42,8 @@ class UpcomingCourseDueDate(models.Model):
         """Send email remainders to enrolled users."""
         LOGGER.info(
             "Processing notification for UpcomingCourseDueDate with id %s",
+            self.id,  # pylint: disable=no-member
+        )
+        import_module("eox_nelp.notifications.tasks").notify_upcoming_course_due_date_by_id.delay(
             self.id,  # pylint: disable=no-member
         )

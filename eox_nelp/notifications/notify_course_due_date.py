@@ -3,6 +3,7 @@ upcoming_course_due_date
 """
 import logging
 
+from django.conf import settings
 from django.utils import timezone
 
 from eox_nelp.edxapp_wrapper.bulk_email import CourseEmailTemplate, get_course_email_context
@@ -69,39 +70,14 @@ def generate_email_messages(subsection_xblock, course_xblock):
             (dict): Dict with the messages rendered of the email.
             It contains: subject, plaintext_msg and html_msg
     """
-    email_context = get_course_email_context(course_xblock)
     course_email_template = CourseEmailTemplate.get_template(name='base-notification-template')
-    subsection_name = subsection_xblock.display_name
-    course_name = course_xblock.display_name
-    subsection_due_date = str(subsection_xblock.due)
-    delta = subsection_xblock.due - timezone.now()
-    time_remaining = (
-        f"{delta.days} days, {delta.seconds // 3600:02d} hours, "
-        f"and {(delta.seconds // 60) % 60:02d} mins"
-    )
-    text_message = (
-        f"The course {course_name} has a notification. "
-        f"The subsection {subsection_name} is coming soon. "
-        f"The due date of this subsection is UTC {subsection_due_date}. "
-        f"There are approx {time_remaining} for the due date of the subsection."
-    )
-
-    html_message = (
-        f"<p>The course {course_name} has a notification. "
-        f"The subsection {subsection_name} is coming soon.</p>\n"
-        f"<p>The due date of this subsection is UTC {subsection_due_date}. "
-        f"There are approx {time_remaining} for the due date of the subsection.</p>"
-    )
-
-    subject = (
-        f"[Futurex platform] Notification due date(left {delta.days} days) of subsection {subsection_name} "
-        f"from course {course_name}"
-    )
-    plaintext_msg = course_email_template.render_plaintext(text_message, email_context)
-    html_msg = course_email_template.render_htmltext(html_message, email_context)
+    email_context = get_course_email_context(course_xblock)
+    email_context["subsection_title"] = subsection_xblock.display_name
+    email_context["subsection_delta"] = subsection_xblock.due - timezone.now()
+    email_context["subsection_due_date"] = str(subsection_xblock.due)
 
     return {
-        "subject": subject,
-        "plaintext_msg": plaintext_msg,
-        "html_msg": html_msg,
+        "subject": settings.FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE.format(**email_context),
+        "plaintext_msg": course_email_template.render_plaintext("", email_context),
+        "html_msg": course_email_template.render_htmltext("", email_context),
     }

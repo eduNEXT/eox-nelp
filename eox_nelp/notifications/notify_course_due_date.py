@@ -74,7 +74,7 @@ def generate_email_messages(subsection_xblock, course_xblock):
     email_context = get_course_email_context(course_xblock)
     email_context["subsection_title"] = subsection_xblock.display_name
     email_context["subsection_delta"] = subsection_xblock.due - timezone.now()
-    email_context["subsection_due_date"] = str(subsection_xblock.due)
+    email_context["subsection_due_date"] = subsection_xblock.due
 
     return {
         "subject": settings.FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE.format(**email_context),

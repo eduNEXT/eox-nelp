@@ -6,7 +6,7 @@ Classes:
 from datetime import timedelta
 
 from ddt import data, ddt
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from mock import patch
 
@@ -65,31 +65,21 @@ class NotifyUpcomingCourseDueDateTestCase(TestCase):
             sent=False,
             defaults={"sent": False},
         )
-        course_name = "course-display-name"
-        subsection_name = "subsection-display-name"
+        course_title = "course-display-name"
+        subsection_title = "subsection-display-name"
         recipients_list = ["vader@star.com", "palpatine@star.com"]
-        delta = subsection_due_date - timezone.now()
-        time_remaining = (
-            f"{delta.days} days, {delta.seconds // 3600:02d} hours, "
-            f"and {(delta.seconds // 60) % 60:02d} mins"
-        )
-        expected_text_msg = (
-            f"The course {course_name} has a notification. "
-            f"The subsection {subsection_name} is coming soon. "
-            f"The due date of this subsection is UTC {subsection_due_date}. "
-            f"There are approx {time_remaining} for the due date of the subsection."
-        )
-        expected_html_msg = (
-            f"<p>The course {course_name} has a notification. "
-            f"The subsection {subsection_name} is coming soon.</p>\n"
-            f"<p>The due date of this subsection is UTC {subsection_due_date}. "
-            f"There are approx {time_remaining} for the due date of the subsection.</p>"
-        )
+        subsection_delta = subsection_due_date - timezone.now()
+        expected_text_msg = "expected-text-msg"
+        expected_html_msg = "expected-html-msg"
         expected_subject = (
-            f"[Futurex platform] Notification due date(left {delta.days} days) of subsection {subsection_name} "
-            f"from course {course_name}"
+            f"[Futurex platform] Notification due date(left {subsection_delta.days} days) "
+            f"of subsection {subsection_title} "
+            f"from course {course_title}"
         )
-        expected_email_context = {"course_image_url": "https://testing.image.jpg"}
+        expected_email_context = {
+            "course_image_url": "https://testing.image.jpg",
+            "course_title": course_title,
+        }
         sent_emails = 1
         self.course_enrollment_mock.objects.filter.return_value = generate_list_mock_data(
             [
@@ -100,7 +90,7 @@ class NotifyUpcomingCourseDueDateTestCase(TestCase):
         self.get_xblock_from_usage_key_string_mock.return_value = generate_list_mock_data(
             [
                 {
-                    "display_name": subsection_name,
+                    "display_name": subsection_title,
                     "due": subsection_due_date,
                 },
             ],
@@ -108,31 +98,103 @@ class NotifyUpcomingCourseDueDateTestCase(TestCase):
         self.get_xblock_course_from_usage_key_string_mock.return_value = generate_list_mock_data(
             [
                 {
-                    "display_name": course_name,
+                    "display_name": course_title,
                 },
             ],
         )[0]
         self.get_course_email_context_mock.return_value = expected_email_context
-        self.course_email_template_mock.render_plaintext.return_value = expected_text_msg
-        self.course_email_template_mock.render_htmltext.return_value = expected_html_msg
+        self.course_email_template_mock.get_template.return_value.render_plaintext.return_value = expected_text_msg
+        self.course_email_template_mock.get_template.return_value.render_htmltext.return_value = expected_html_msg
         self.send_email_multialternative_mock.return_value = sent_emails
 
         with self.assertLogs(notify_course_due_date.__name__, level="INFO") as logs:
             notify_upcoming_course_due_date(instance)
 
-        self.course_email_template_mock.get_template().render_plaintext.assert_called_with(
-            expected_text_msg,
-            expected_email_context,
+        self.course_email_template_mock.get_template().render_plaintext.assert_called_with("", expected_email_context)
+        self.course_email_template_mock.get_template().render_htmltext.assert_called_with("", expected_email_context)
+        self.send_email_multialternative_mock.assert_called_with(
+            subject=expected_subject,
+            plaintext_msg=expected_text_msg,
+            html_msg=expected_html_msg,
+            recipient_emails=recipients_list,
         )
-        self.course_email_template_mock.get_template().render_htmltext.assert_called_with(
-            expected_html_msg,
-            expected_email_context,
+        self.assertTrue(instance.sent)
+        succesful_log = f"{sent_emails} emails sent related the upcoming_course_due_date: {instance.__dict__} -------"
+        self.assertEqual(logs.output, [f"INFO:{notify_course_due_date.__name__}:{succesful_log}"])
+
+    @override_settings(
+        FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE=(
+            "Custom subject from stars {subsection_delta.days} of subsection {subsection_title} "
+        ),
+    )
+    def test_notify_upcoming_course_due_date_custom_subject(self):
+        """Test correct behaviour of sending email with
+        method `notify_upcoming_course_due_date`.
+        Expected behavior:
+            - course_email_template.render_plaintext is called with the right values.
+            - course_email_template.render_htmltext is called with the right values.
+            - send_email_multialternative is called with the right values.
+            - The email was sent from the correct email address (if specified)
+            - sent attribute of instance of `UpcomingCourseDueDate` after the process is True.
+            - Log successful of sent message.
+        """
+        subsection_due_date = timezone.now() + timedelta(days=4)
+        instance, _ = UpcomingCourseDueDate.objects.update_or_create(  # pylint: disable=no-member
+            course=CourseOverview.objects.create(id="course-v1:test+Cx105+2022_T4"),
+            location_id="block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a",
+            due_date=subsection_due_date,
+            notification_date=timezone.now(),
+            sent=False,
+            defaults={"sent": False},
         )
-        self.send_email_multialternative_mock(
-            expected_subject,
-            expected_text_msg,
-            expected_html_msg,
-            recipients_list,
+        course_title = "course-display-name"
+        subsection_title = "subsection-display-name"
+        recipients_list = ["vader@star.com", "palpatine@star.com"]
+        subsection_delta = subsection_due_date - timezone.now()
+        expected_text_msg = "expected-text-msg"
+        expected_html_msg = "expected-html-msg"
+        expected_subject = f"Custom subject from stars {subsection_delta.days} of subsection {subsection_title} "
+        expected_email_context = {
+            "course_image_url": "https://testing.image.jpg",
+            "course_title": course_title,
+        }
+        sent_emails = 1
+        self.course_enrollment_mock.objects.filter.return_value = generate_list_mock_data(
+            [
+                {"user": {"email": recipients_list[0]}},
+                {"user": {"email": recipients_list[1]}},
+            ],
+        )
+        self.get_xblock_from_usage_key_string_mock.return_value = generate_list_mock_data(
+            [
+                {
+                    "display_name": subsection_title,
+                    "due": subsection_due_date,
+                },
+            ],
+        )[0]
+        self.get_xblock_course_from_usage_key_string_mock.return_value = generate_list_mock_data(
+            [
+                {
+                    "display_name": course_title,
+                },
+            ],
+        )[0]
+        self.get_course_email_context_mock.return_value = expected_email_context
+        self.course_email_template_mock.get_template.return_value.render_plaintext.return_value = expected_text_msg
+        self.course_email_template_mock.get_template.return_value.render_htmltext.return_value = expected_html_msg
+        self.send_email_multialternative_mock.return_value = sent_emails
+
+        with self.assertLogs(notify_course_due_date.__name__, level="INFO") as logs:
+            notify_upcoming_course_due_date(instance)
+
+        self.course_email_template_mock.get_template().render_plaintext.assert_called_with("", expected_email_context)
+        self.course_email_template_mock.get_template().render_htmltext.assert_called_with("", expected_email_context)
+        self.send_email_multialternative_mock.assert_called_with(
+            subject=expected_subject,
+            plaintext_msg=expected_text_msg,
+            html_msg=expected_html_msg,
+            recipient_emails=recipients_list,
         )
         self.assertTrue(instance.sent)
         succesful_log = f"{sent_emails} emails sent related the upcoming_course_due_date: {instance.__dict__} -------"
@@ -156,6 +218,7 @@ class NotifyUpcomingCourseDueDateTestCase(TestCase):
             sent=False,
             defaults={"sent": False},
         )
+        self.get_course_email_context_mock.return_value = {}
         self.course_enrollment_mock.objects.filter.return_value = []
         self.get_xblock_from_usage_key_string_mock.return_value = None
         self.get_xblock_course_from_usage_key_string_mock.return_value = None
@@ -185,24 +248,29 @@ class NotifyUpcomingCourseDueDateTestCase(TestCase):
             sent=False,
             defaults={"sent": False},
         )
-        course_name = "course-display-name"
-        subsection_name = "subsection-display-name"
+        course_title = "course-display-name"
+        subsection_title = "subsection-display-name"
         recipients_list = ["vader@star.com", "palpatine@star.com"]
+        expected_email_context = {
+            "course_image_url": "https://testing.image.jpg",
+            "course_title": course_title,
+        }
         enrollments_data = [
             {"user": {"email": recipients_list[0]}},
             {"user": {"email": recipients_list[1]}},
         ]
         subsection_xblock_data = [
             {
-                "display_name": subsection_name,
+                "display_name": subsection_title,
                 "due": subsection_due_date,
             },
         ]
         course_xblock_data = [
             {
-                "display_name": course_name,
+                "display_name": course_title,
             },
         ]
+        self.get_course_email_context_mock.return_value = expected_email_context
         self.course_enrollment_mock.objects.filter.return_value = generate_list_mock_data(enrollments_data)
         self.get_xblock_from_usage_key_string_mock.return_value = generate_list_mock_data(subsection_xblock_data)[0]
         self.get_xblock_course_from_usage_key_string_mock.return_value = generate_list_mock_data(course_xblock_data)[0]

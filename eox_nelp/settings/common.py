@@ -14,6 +14,11 @@ INSTALLED_APPS = [
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
+DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = (
+    "[Futurex platform] Notification due date(left {subsection_delta.days} days) "
+    "of subsection {subsection_title} "
+    "from course {course_title}"
+)
 
 
 def plugin_settings(settings):
@@ -35,6 +40,7 @@ def plugin_settings(settings):
     settings.FUTUREX_API_URL = 'https://testing-site.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
     settings.FUTUREX_API_CLIENT_SECRET = 'my-test-client-secret'
+    settings.FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE
     settings.BULK_EMAIL_DEFAULT_RETRY_DELAY = 30
     settings.BULK_EMAIL_MAX_RETRIES = 3
 

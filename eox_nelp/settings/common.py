@@ -3,6 +3,8 @@ Settings for eox-core
 """
 from __future__ import absolute_import, unicode_literals
 
+from importlib.util import find_spec
+
 SECRET_KEY = 'a-not-to-be-trusted-secret-key'
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -19,6 +21,8 @@ DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = (
     "of subsection {subsection_title} "
     "from course {course_title}"
 )
+
+JSON_API_REST_FRAMEWORK = 'rest_framework_json_api'
 
 
 def plugin_settings(settings):
@@ -46,3 +50,5 @@ def plugin_settings(settings):
 
     if COURSE_CREATOR_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)
+    if find_spec(JSON_API_REST_FRAMEWORK) and JSON_API_REST_FRAMEWORK not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS.append(JSON_API_REST_FRAMEWORK)

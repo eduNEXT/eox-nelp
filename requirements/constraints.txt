@@ -10,3 +10,10 @@
 
 # openedx Mango version is working with 3.2.
 Django<4.0
+# json api has to be compatible with rest-framework 3.12.4(maple)
+djangorestframework-jsonapi==5.0.0
+djangorestframework==3.12.4
+# maple django edx rest extensions
+edx-drf-extensions==8.0.0
+# maple django filter version
+django-filter==21.1

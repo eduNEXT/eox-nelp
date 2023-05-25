@@ -13,7 +13,14 @@ from typing import Type
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from eox_nelp.course_experience.models import LikeDislikeCourse, LikeDislikeUnit, ReportCourse, ReportUnit
+from eox_nelp.course_experience.models import (
+    FeedbackCourse,
+    FeedbackUnit,
+    LikeDislikeCourse,
+    LikeDislikeUnit,
+    ReportCourse,
+    ReportUnit,
+)
 
 User = get_user_model()
 
@@ -66,7 +73,42 @@ class ReportCourseAdmin(BaseAdmin):
     list_display = ("get_author_username", "reason", "course_id")
 
 
+class FeedbackUnitAdmin(BaseAdmin):
+    """Admin class for FeedbackUnit.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = (
+        "get_author_username",
+        "item_id",
+        "course_id",
+        "rating_content",
+        "feedback",
+        "public",
+    )
+
+
+class FeedbackCourseAdmin(BaseAdmin):
+    """Admin class for FeedbackCourse.
+
+    attributes:
+        list_display: Fields to be shown in admin interface.
+    """
+    list_display = (
+        "get_author_username",
+        "course_id",
+        "rating_content",
+        "feedback",
+        "public",
+        "rating_instructors",
+        "recommended",
+    )
+
+
 admin.site.register(LikeDislikeUnit, LikeDislikeUnitAdmin)
 admin.site.register(LikeDislikeCourse, LikeDislikeCourseAdmin)
 admin.site.register(ReportUnit, ReportUnitAdmin)
 admin.site.register(ReportCourse, ReportCourseAdmin)
+admin.site.register(FeedbackUnit, FeedbackUnitAdmin)
+admin.site.register(FeedbackCourse, FeedbackCourseAdmin)

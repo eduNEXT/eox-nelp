@@ -298,7 +298,6 @@ class CourseExperienceTestMixin(ExperienceTestMixin):
         url_endpoint = reverse(self.reverse_viewname_detail, kwargs=self.object_url_kwarg)
 
         response = self.client.get(url_endpoint)
-
         self.assertIn(response.headers["Content-Type"], RESPONSE_CONTENT_TYPES)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), self.base_data)
@@ -347,7 +346,9 @@ class CourseExperienceTestMixin(ExperienceTestMixin):
         """
         url_endpoint = reverse(self.reverse_viewname_list)
         expected_data = self.base_data.copy()
-        expected_data["data"]["attributes"][self.change_field] = self.post_data[self.change_field]
+        expected_data["data"]["attributes"].update(
+            {key: value for key, value in self.post_data.items() if key != "course_id"}
+        )
         expected_data["data"]["relationships"]["course_id"]["data"]["id"] = self.post_data["course_id"]["id"]
 
         response = self.client.post(url_endpoint, self.post_data, format="json", contentType="application/json")

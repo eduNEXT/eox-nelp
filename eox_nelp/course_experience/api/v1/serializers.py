@@ -1,7 +1,13 @@
 """Serializers used for the experience views."""
 from rest_framework_json_api import serializers
 
-from eox_nelp.course_experience.models import LikeDislikeCourse, LikeDislikeUnit, ReportCourse, ReportUnit
+from eox_nelp.course_experience.models import (
+    FeedbackCourse,
+    LikeDislikeCourse,
+    LikeDislikeUnit,
+    ReportCourse,
+    ReportUnit,
+)
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
@@ -62,4 +68,16 @@ class ReportCourseExperienceSerializer(ExperienceSerializer):
     class Meta:
         """Class to configure serializer with  model ReportCourse"""
         model = ReportCourse
+        fields = "__all__"
+
+
+class FeedbackCourseExperienceSerializer(ExperienceSerializer):
+    """Class to configure serializer for FeedbackCourseExperience.
+
+    Ancestors:
+        UnitExperienceSerializer: the serializer for unit experiences.
+    """
+    class Meta:
+        """Class to configure serializer with  model ReportCourse"""
+        model = FeedbackCourse
         fields = "__all__"

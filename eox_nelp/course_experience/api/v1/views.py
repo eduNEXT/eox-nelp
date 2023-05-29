@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """The generic views for course-experience API. Nelp flavour.
 Classes:
 - BaseJsonAPIView: General config of rest json api
@@ -9,8 +10,11 @@ Classes:
             - LikeDislikeCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/like/courses/`)
             - ReportCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/report/courses/`)
             - FeedbackCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/feedback/courses/`)
+    - PublicBaseJsonAPIView: General config of rest json api
+        - PublicFeedbackCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/feedback/public/courses/`)
 """
 from django.conf import settings
+from django.db.models import Q
 from django.http import Http404
 from django.http.request import QueryDict
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -27,7 +31,7 @@ from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework_json_api.schemas.openapi import AutoSchema  # pylint: disable=no-name-in-module,syntax-error
-from rest_framework_json_api.views import ModelViewSet
+from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 
 from eox_nelp.course_experience.models import (
     FeedbackCourse,
@@ -36,7 +40,9 @@ from eox_nelp.course_experience.models import (
     ReportCourse,
     ReportUnit,
 )
+from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
 
+from .filters import FeedbackCourseFieldsFilter
 from .serializers import (
     FeedbackCourseExperienceSerializer,
     LikeDislikeCourseExperienceSerializer,
@@ -755,7 +761,7 @@ class FeedbackCourseExperienceView(CourseExperienceView):
                 "type": "FeedbackCourse",
                 "id": "2",
                 "attributes": {
-                    "username": "jordan",
+                    "username": "michael",
                     "rating_content": 5,
                     "feedback": "my feedback ma",
                     "public": false,
@@ -853,3 +859,169 @@ class FeedbackCourseExperienceView(CourseExperienceView):
     queryset = FeedbackCourse.objects.all()  # pylint: disable=no-member
     serializer_class = FeedbackCourseExperienceSerializer
     resource_name = "FeedbackCourse"
+
+
+# -------------------------- ------------------------- PUBLIC VIEWS-----------------------------------------------------
+class PublicBaseJsonAPIView(ReadOnlyModelViewSet):
+    """class to configure base json api parameter
+
+    Ancestors:
+        ReadOnlyModelViewSet : Django rest json api ReadOnlyModelViewSet
+    """
+    allowed_methods = ["GET"]
+    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser)
+    permission_classes = ()
+    http_method_names = ['get']
+
+    def get_queryset(self, *args, **kwargs):
+        """This allows configure the queryset with business configuration.
+
+        Returns:
+            Queryset filtered first by tenant org belowing the course org and then by staff or superuser permission
+            for private records.
+        """
+        experience_qs = ReadOnlyModelViewSet.get_queryset(self, *args, **kwargs)
+
+        current_site_orgs = configuration_helpers.get_current_site_orgs()
+        org_filter = Q()  # Avoiding the `reduce()` for more readability, so a no-op filter starter is needed.
+        for org in current_site_orgs:
+            org_filter |= Q(course_id__org__iexact=org)
+        experience_qs = experience_qs.filter(org_filter)
+
+        if self.request.user.is_superuser or self.request.user.is_staff:
+            return experience_qs.order_by('id')
+
+        return experience_qs.filter(public=True).order_by('id')
+
+    def get_object(self):
+        """Disallow the specific retrieve due could be more than one record associated."""
+        raise Http404
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except InvalidKeyError as exc:
+            raise ValidationError(INVALID_KEY_ERROR) from exc
+
+
+class PublicFeedbackCourseExperienceView(PublicBaseJsonAPIView, FeedbackCourseExperienceView):
+    """View to Public the FeedbackCourseExperienceView.
+    Ancestors:
+        PublicBaseJsonAPIView : Base for json api view configuration
+        FeedbackCourseExperienceView: Base for feedback configuration view.
+
+    ## Usage
+
+    ### **GET** /eox-nelp/api/experience/v1/feedback/public/courses/
+
+    #### Allowed to query param by using for example `filter[rating_content]=3`
+    - course_id.id
+    - author.username
+    - rating_content
+    - rating_instructors
+    - recommended
+    - public(only superusers)
+
+    Query params are url encoded.eg course_id.id change `+`to `%2b`.
+
+    **GET Response Values**
+
+    ``` json
+        {
+            "links": {
+            "first": "http://lms.com/eox-nelp/api/experience/v1/feedback/public/courses/?page%5Bnumber%5D=1",
+            "last": "http://lms.com/eox-nelp/api/experience/v1/feedback/public/courses/?page%5Bnumber%5D=1",
+            "next": null,
+            "prev": null
+            },
+            "data": [
+            {
+                "type": "FeedbackCourse",
+                "id": "1",
+                "attributes": {
+                    "username": "michael",
+                    "rating_content": 3,
+                    "feedback": "feedback option1",
+                    "public": true,
+                    "rating_instructors": 1,
+                    "recommended": true
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": "7"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": "course-v1:edX+2323+232"
+                        }
+                    }
+                }
+            },
+            {
+                "type": "FeedbackCourse",
+                "id": "3",
+                "attributes": {
+                    "username": "jordan",
+                    "rating_content": 2,
+                    "feedback": "werwer",
+                    "public": true,
+                    "rating_instructors": 1,
+                    "recommended": true
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": "9"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": "course-v1:edX+cd101+2023-t2"
+                        }
+                    }
+                }
+            },
+            {
+                "type": "FeedbackCourse",
+                "id": "5",
+                "attributes": {
+                    "username": "otto",
+                    "rating_content": 3,
+                    "feedback": "discovery feedback",
+                    "public": true,
+                    "rating_instructors": 1,
+                    "recommended": true
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": "4"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": "course-v1:edX+2323+232"
+                        }
+                    }
+                }
+            }
+            ],
+            "meta": {
+            "pagination": {
+                "page": 1,
+                "pages": 1,
+                "count": 3
+            }
+            }
+        }
+    ```
+    """
+    filterset_class = FeedbackCourseFieldsFilter

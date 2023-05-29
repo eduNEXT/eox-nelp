@@ -15,7 +15,13 @@ from eox_nelp.course_experience.models import (
 )
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 
-from .mixins_helpers import BASE_COURSE_ID, BASE_ITEM_ID, CourseExperienceTestMixin, UnitExperienceTestMixin
+from .mixins_helpers import (
+    BASE_COURSE_ID,
+    BASE_ITEM_ID,
+    CourseExperienceTestMixin,
+    FeedbackPublicExperienceTestMixin,
+    UnitExperienceTestMixin,
+)
 
 
 class LikeDislikeUnitExperienceTestCase(UnitExperienceTestMixin, APITestCase):
@@ -325,3 +331,37 @@ class FeedbackCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
                 }
             }
         }
+
+
+# -------------------------------------------TEST PUBLIC VIEWS----------------------------------------------------------
+
+class FeedbackPublicCourseExperienceTestCase(FeedbackPublicExperienceTestMixin, APITestCase):
+    """Test PublicFeedbackExperience  view"""
+
+    reverse_viewname_list = "course-experience-api:v1:feedback-public-courses-list"
+    reverse_viewname_detail = "course-experience-api:v1:feedback-public-courses-detail"
+    object_key = "course_id"
+
+    def setUp(self):
+        """
+        Set variables and objects that depends in other class vars.
+        Using self(FeedbackCourseExperienceTestCase).
+        """
+        super().setUp()
+        self.my_course_feedbacks = FeedbackCourse.objects.bulk_create(  # pylint: disable=no-member
+            [
+                FeedbackCourse(
+                    course_id=course_overview_iter,
+                    author=user_iter,
+                    feedback=f"feedback {user_index} by user {user_iter.username} in course {course_overview_iter.id}",
+                    rating_content=user_index,
+                    rating_instructors=user_index + 1,
+                    public=bool(user_index > 3),
+                    recommended=bool(user_index >= 3),
+                )
+                for course_overview_iter in self.course_overviews
+                for user_index, user_iter in enumerate(self.users)
+            ],  # create 15 feedbackcourse: 3 course overview with 5 users.
+        )
+
+        self.object_url_kwarg = {self.object_key: BASE_COURSE_ID}

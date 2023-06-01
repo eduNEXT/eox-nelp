@@ -8,6 +8,7 @@ Classes:
         - CourseExperienceView: config for course-exp views
             - LikeDislikeCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/like/courses/`)
             - ReportCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/report/courses/`)
+            - FeedbackCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/feedback/courses/`)
 """
 from django.conf import settings
 from django.http import Http404
@@ -28,9 +29,16 @@ from rest_framework_json_api.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework_json_api.schemas.openapi import AutoSchema  # pylint: disable=no-name-in-module,syntax-error
 from rest_framework_json_api.views import ModelViewSet
 
-from eox_nelp.course_experience.models import LikeDislikeCourse, LikeDislikeUnit, ReportCourse, ReportUnit
+from eox_nelp.course_experience.models import (
+    FeedbackCourse,
+    LikeDislikeCourse,
+    LikeDislikeUnit,
+    ReportCourse,
+    ReportUnit,
+)
 
 from .serializers import (
+    FeedbackCourseExperienceSerializer,
     LikeDislikeCourseExperienceSerializer,
     LikeDislikeUnitExperienceSerializer,
     ReportCourseExperienceSerializer,
@@ -695,3 +703,153 @@ class ReportCourseExperienceView(CourseExperienceView):
     queryset = ReportCourse.objects.all()  # pylint: disable=no-member
     serializer_class = ReportCourseExperienceSerializer
     resource_name = "ReportCourse"
+
+
+class FeedbackCourseExperienceView(CourseExperienceView):
+    """Class view for Report course experiences.
+    Ancestors:
+        CourseExperienceView: Inherited for courses views config.
+
+    ## Usage
+
+    ### **GET** /eox-nelp/api/experience/v1/feedback/courses/
+
+    **GET Response Values**
+
+    ``` json
+    {
+        "links": {
+            "first": "http://lms-example.com/eox-nelp/api/experience/v1/feedback/courses/?page%5Bnumber%5D=1",
+            "last": "http://lms-example.com/eox-nelp/api/experience/v1/feedback/courses/?page%5Bnumber%5D=1",
+            "next": null,
+            "prev": null
+        },
+        "data": [
+            {
+                "type": "FeedbackCourse",
+                "id": "1",
+                "attributes": {
+                    "username": "michael",
+                    "rating_content": 3,
+                    "feedback": "some feedback opinion hehe 1",
+                    "public": true,
+                    "rating_instructors": 1,
+                    "recommended": true
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": "7"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": "course-v1:edX+test+2023"
+                        }
+                    }
+                }
+            },
+            {
+                "type": "FeedbackCourse",
+                "id": "2",
+                "attributes": {
+                    "username": "jordan",
+                    "rating_content": 5,
+                    "feedback": "my feedback ma",
+                    "public": false,
+                    "rating_instructors": 4,
+                    "recommended": false
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": "7"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": "course-v1:edX+cd101+220-t2"
+                        }
+                    }
+                }
+            }
+        ],
+        "meta": {
+            "pagination": {
+                "page": 1,
+                "pages": 1,
+                "count": 2
+            }
+        }
+    }
+    ```
+
+    ### **POST** /eox-nelp/api/experience/v1/report/courses/
+
+    request example data:
+    ``` json
+    {
+        "rating_content": "2",
+        "rating_instructors": 2,
+        "public": true,
+        "recommended": false
+        "course_id": {
+            "type": "CourseOverview",
+            "id": "course-v1:edX+213+2121"
+        }
+    }
+    ```
+
+    ###  **GET-SPECIFIC** /eox-nelp/api/experience/v1/report/courses/course-v1:edX+test+2023/
+
+    ###  **PATCH** /eox-nelp/api/experience/v1/report/courses/course-v1:edX+test+2023/
+
+    request example data:
+    ``` json
+    {
+        "rating_content": "0",
+        "rating_instructors": 3,
+        "public": true,
+        "recommended": false
+    }
+    ```
+
+    **POST, GET-ESPECIFIC,  PATCH  Response Values**
+    ``` json
+    {
+        "data": {
+            "type": "ReportCourse",
+            "id": "6",
+            "attributes": {
+                "username": "michael",
+                "feedback": "some feedback opinion hehe 1"
+                "rating_content": 4,
+                "rating_instructors": 3,
+                "public": true,
+                "recommended": false
+            },
+            "relationships": {
+                "author": {
+                    "data": {
+                        "type": "User",
+                        "id": "7"
+                    }
+                },
+                "course_id": {
+                    "data": {
+                        "type": "CourseOverview",
+                        "id": "course-v1:edX+test+2023"
+                    }
+                }
+            }
+        }
+    }
+    ```
+    """
+    queryset = FeedbackCourse.objects.all()  # pylint: disable=no-member
+    serializer_class = FeedbackCourseExperienceSerializer
+    resource_name = "FeedbackCourse"

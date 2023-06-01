@@ -6,7 +6,13 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from eox_nelp.course_experience.models import LikeDislikeCourse, LikeDislikeUnit, ReportCourse, ReportUnit
+from eox_nelp.course_experience.models import (
+    FeedbackCourse,
+    LikeDislikeCourse,
+    LikeDislikeUnit,
+    ReportCourse,
+    ReportUnit,
+)
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 
 from .mixins_helpers import BASE_COURSE_ID, BASE_ITEM_ID, CourseExperienceTestMixin, UnitExperienceTestMixin
@@ -146,7 +152,6 @@ class LikeDislikeCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase
     reverse_viewname_list = "course-experience-api:v1:like-courses-list"
     reverse_viewname_detail = "course-experience-api:v1:like-courses-detail"
     object_key = "course_id"
-    change_field = "status"
     new_object_id = "course-v1:edX+cd101+2023-new_course"
     patch_data = {"status": True}
     post_data = {
@@ -202,7 +207,6 @@ class ReportCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
     reverse_viewname_list = "course-experience-api:v1:report-courses-list"
     reverse_viewname_detail = "course-experience-api:v1:report-courses-detail"
     object_key = "course_id"
-    change_field = "reason"
     new_object_id = "course-v1:edX+cd101+2023-new_course"
     patch_data = {"reason": "HA"}
     post_data = {
@@ -233,6 +237,77 @@ class ReportCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
                 "attributes": {
                     "username": f"{self.user.username}",
                     "reason": f"{self.my_course_report.reason}"
+                },
+                "relationships": {
+                    "author": {
+                        "data": {
+                            "type": "User",
+                            "id": f"{self.user.id}"
+                        }
+                    },
+                    "course_id": {
+                        "data": {
+                            "type": "CourseOverview",
+                            "id": f"{self.my_course.id}"
+                        }
+                    }
+                }
+            }
+        }
+
+
+class FeedbackCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
+    """ Test FeedbackCourseExperience view """
+    reverse_viewname_list = "course-experience-api:v1:feedback-courses-list"
+    reverse_viewname_detail = "course-experience-api:v1:feedback-courses-detail"
+    object_key = "course_id"
+    new_object_id = "course-v1:edX+cd101+2023-new_course"
+    patch_data = {
+        "rating_content": 0,
+        "rating_instructors": 3,
+        "public": True,
+        "recommended": False
+    }
+    post_data = {
+        "course_id": {
+            "type": "CourseOverview",
+            "id": f"{new_object_id}",
+        },
+        "feedback": "this is new feedback",
+        "rating_content": 4,
+        "rating_instructors": 3,
+        "public": True,
+        "recommended": False,
+    }
+
+    def setUp(self):
+        """
+        Set variables and objects that depends in other class vars.
+        Using self(FeedbackCourseExperienceTestCase).
+        """
+        super().setUp()
+        self.my_course_feedback, _ = FeedbackCourse.objects.get_or_create(  # pylint: disable=no-member
+            course_id=self.my_course,
+            author_id=self.user.id,
+            feedback="legacy created feedback",
+            rating_content=4,
+            rating_instructors=3,
+            public=True,
+            recommended=False,
+        )
+        self.object_url_kwarg = {self.object_key: BASE_COURSE_ID}
+        self.my_new_course, _ = CourseOverview.objects.get_or_create(id=self.new_object_id)
+        self.base_data = {
+            "data": {
+                "type": "FeedbackCourse",
+                "id": f"{self.my_course_feedback.id}",
+                "attributes": {
+                    "username": f"{self.user.username}",
+                    "feedback": f"{self.my_course_feedback.feedback}",
+                    "rating_content": self.my_course_feedback.rating_content,
+                    "rating_instructors": self.my_course_feedback.rating_instructors,
+                    "public": self.my_course_feedback.public,
+                    "recommended": self.my_course_feedback.recommended,
                 },
                 "relationships": {
                     "author": {

@@ -9,3 +9,10 @@ router.register("report/units", views.ReportUnitExperienceView, basename='report
 router.register("like/courses", views.LikeDislikeCourseExperienceView, basename='like-courses')
 router.register("report/courses", views.ReportCourseExperienceView, basename='report-courses')
 router.register("feedback/courses", views.FeedbackCourseExperienceView, basename='feedback-courses')
+
+# Public-routes
+router.register(
+    "feedback/public/courses",
+    views.PublicFeedbackCourseExperienceView,
+    basename='feedback-public-courses',
+)

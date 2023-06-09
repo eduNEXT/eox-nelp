@@ -7,4 +7,4 @@ def get_configuration_helpers():
     Returns:
         Mock class.
     """
-    return Mock
+    return Mock()

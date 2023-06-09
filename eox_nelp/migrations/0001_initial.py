@@ -92,6 +92,7 @@ class Migration(migrations.Migration):
                         verbose_name='ID',
                     ),
                 ),
+                ('org', models.CharField(blank=True, max_length=500, null=True))
             ],
         ),
     ]

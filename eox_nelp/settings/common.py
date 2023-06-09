@@ -10,6 +10,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sites',
     'django.contrib.sessions',
     'social_django',
     'eox_nelp',
@@ -23,6 +24,7 @@ DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = (
 )
 
 JSON_API_REST_FRAMEWORK = 'rest_framework_json_api'
+EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
 
 
 def plugin_settings(settings):
@@ -52,3 +54,5 @@ def plugin_settings(settings):
         settings.INSTALLED_APPS.append(COURSE_CREATOR_APP)
     if find_spec(JSON_API_REST_FRAMEWORK) and JSON_API_REST_FRAMEWORK not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(JSON_API_REST_FRAMEWORK)
+    if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
+        settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)

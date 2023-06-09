@@ -51,6 +51,14 @@ from .serializers import (
     ReportUnitExperienceSerializer,
 )
 
+try:
+    from eox_audit_model.decorators import audit_drf_api
+except ImportError:
+    def audit_drf_api(*args, **kwargs):  # pylint: disable=unused-argument
+        """Identity decorator"""
+        return lambda x: x
+
+
 INVALID_KEY_ERROR = {
     "error": "bad opaque key(item_id or course_id) `InvalidKeyError`"
 }
@@ -106,6 +114,12 @@ class ExperienceView(BaseJsonAPIView):
         except InvalidKeyError as exc:
             raise Http404 from exc
 
+    @audit_drf_api(
+        action="eox-nelp-course-experience-api-v1-experienceviewset:create",
+        data_filter=["username", "item_id", "course_id"],
+        method_name="eox_nelp_audited_experience_create",
+        save_all_parameters=True,
+    )
     def create(self, request, *args, **kwargs):
         """Perform processing for the request before use the base create method.
         Args:
@@ -120,6 +134,12 @@ class ExperienceView(BaseJsonAPIView):
         except InvalidKeyError as exc:
             raise ValidationError(INVALID_KEY_ERROR) from exc
 
+    @audit_drf_api(
+        action="eox-nelp-course-experience-api-v1-experienceviewset:update",
+        data_filter=["username", "item_id", "course_id"],
+        method_name="eox_nelp_audited_experience_update",
+        save_all_parameters=True,
+    )
     def update(self, request, *args, **kwargs):
         """Perform processing for the request before use the base update method.
         Args:

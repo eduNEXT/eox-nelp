@@ -10,6 +10,8 @@ import {
 
 import { ReportButton, FeedbackCarousel } from '@edunext/frontend-essentials'
 
+import './index.scss';
+
 
 function HelloWorld() {
   return <ReportButton />;

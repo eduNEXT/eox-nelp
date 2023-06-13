@@ -7,11 +7,11 @@ module.exports = {
     context: __dirname,
 
     entry: {
-        feedback_carousel: './eox_nelp/course_experience/src/components/FeedbackCarousel/index',
+        feedback_carousel: './eox_nelp/course_experience/frontend/src/components/FeedbackCarousel/index',
         // tenant_stats: './eox_nelp/course_experience/src/components/TenantStats/index'
     },
     output: {
-        path: path.resolve('./eox_nelp/course_experience/static/js/'),
+        path: path.resolve('./eox_nelp/course_experience/frontend/static/js/'),
     },
     module: {
         rules: [

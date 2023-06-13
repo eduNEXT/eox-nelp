@@ -1,6 +1,8 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
+
 
 module.exports = {
 
@@ -19,11 +21,34 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 use: ['babel-loader']
-            }
+            },
+            {
+              test: /\.(ts|tsx)$/,
+              exclude: /node_modules/,
+              use: [
+                {
+                  loader: 'babel-loader',
+                  options: {
+                    presets: ['@babel/preset-react', '@babel/preset-typescript'],
+                  },
+                },
+                {
+                  loader: 'ts-loader',
+                },
+              ],
+            },
+            {
+              test: /\.scss$/,
+              use: ['style-loader', 'css-loader', 'sass-loader'],
+            },
+            {
+              test: /\.svg$/,
+              use: ['svg-url-loader'],
+            },
         ]
     },
     resolve: {
-        extensions: ['*', '.js', '.jsx']
+        extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
   optimization: {
     minimize: true,
@@ -38,4 +63,10 @@ module.exports = {
       }),
     ],
   },
+  plugins: [
+    new Dotenv({
+        path: path.resolve(process.cwd(), '.env.frontend'),
+        systemvars: true,
+    }),
+  ]
 };

@@ -2,7 +2,12 @@
 Settings for eox-nelp
 """
 
+import os
+from pathlib import Path
+
 from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import  # noqa: F401
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class SettingsClass:
@@ -24,6 +29,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_XMODULE_MODULESTORE = 'eox_nelp.edxapp_wrapper.test_backends.modulestore_m_v1'
     settings.EOX_NELP_BULK_EMAIL_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.bulk_email_m_v1'
     settings.EOX_NELP_STUDENT_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.student_m_v1'
+    settings.EOX_NELP_EDXMAKO_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.edxmako_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
@@ -93,3 +99,26 @@ if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in INSTALLED_APPS:  
     INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)  # noqa: F405
 ALLOW_EOX_AUDIT_MODEL = False
 CELERY_TASK_ALWAYS_EAGER = True
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'course_experience/frontend/templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            # 'loaders': [
+            #     'django.template.loaders.filesystem.Loader',
+            #     'django.template.loaders.app_directories.Loader',
+            # ],
+            'debug': True,
+        },
+    },
+]

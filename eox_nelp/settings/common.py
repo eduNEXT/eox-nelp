@@ -42,6 +42,7 @@ def plugin_settings(settings):
     settings.EOX_NELP_XMODULE_MODULESTORE = 'eox_nelp.edxapp_wrapper.backends.modulestore_m_v1'
     settings.EOX_NELP_BULK_EMAIL_BACKEND = 'eox_nelp.edxapp_wrapper.backends.bulk_email_m_v1'
     settings.EOX_NELP_STUDENT_BACKEND = 'eox_nelp.edxapp_wrapper.backends.student_m_v1'
+    settings.EOX_NELP_EDXMAKO_BACKEND = 'eox_nelp.edxapp_wrapper.backends.edxmako_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing-site.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'

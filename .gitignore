@@ -113,3 +113,10 @@ dmypy.json
 
 # VS Code
 .vscode
+
+# frontend dependencies
+/node_modules
+
+#unnecesary files on frontend build
+report.html
+eox_nelp/static/*.svg

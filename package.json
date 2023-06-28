@@ -1,0 +1,35 @@
+{
+  "name": "eox-nelp",
+  "version": "1.0.0",
+  "description": "Openedx plugin for rendering frontend-essentials library components and embedding their functionality into templates.",
+  "main": "index.js",
+  "scripts": {
+    "build": "fedx-scripts webpack --config ./webpack.prod.config.js",
+    "dev": "fedx-scripts webpack --config ./webpack.dev.config.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/edunext/eox-nelp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/edunext/eox-nelp#readme",
+  "dependencies": {
+    "@edunext/frontend-essentials": "^1.1.0-feedback-carousel",
+    "@edx/brand": "npm:@edx/brand-openedx@^1.2.0",
+    "@edx/frontend-platform": "npm:@edunext/frontend-platform@^3.3.1",
+    "@edx/paragon": "npm:@edunext/paragon@^20.22.48",
+    "babel-loader": "^8.2.3",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "webpack": "^5.86.0"
+  },
+  "devDependencies": {
+    "@edx/browserslist-config": "^1.1.1",
+    "@edx/frontend-build": "^12.4.15",
+    "dotenv-webpack": "^8.0.1",
+    "sass": "^1.63.3",
+    "sass-loader": "^13.3.2",
+    "webpack-merge": "^5.9.0"
+  }
+}

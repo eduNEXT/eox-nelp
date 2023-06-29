@@ -8,3 +8,11 @@ def get_course_enrollment_model():
         Mock class.
     """
     return Mock()
+
+
+def get_course_access_role_model():
+    """Return test Model.
+    Returns:
+        Mock class.
+    """
+    return Mock()

@@ -28,4 +28,5 @@ urlpatterns = [  # pylint: disable=invalid-name
         'frontend/experience/',
         include('eox_nelp.course_experience.frontend.urls', namespace='course-experience-frontend'),
     ),
+    path('api/stats/', include('eox_nelp.stats.api.urls', namespace='stats-api')),
 ]

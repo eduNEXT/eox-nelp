@@ -87,7 +87,7 @@ class BaseFeedback(models.Model):
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     rating_content = models.IntegerField(blank=True, null=True, choices=RATING_OPTIONS)
     feedback = models.CharField(max_length=500, blank=True, null=True)
-    public = models.BooleanField(null=True, default=True)
+    public = models.BooleanField(null=True, default=False)
     course_id = models.ForeignKey(CourseOverview, null=True, on_delete=models.SET_NULL)
 
     class Meta:

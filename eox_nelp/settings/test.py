@@ -30,6 +30,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_BULK_EMAIL_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.bulk_email_m_v1'
     settings.EOX_NELP_STUDENT_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.student_m_v1'
     settings.EOX_NELP_EDXMAKO_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.edxmako_m_v1'
+    settings.EOX_NELP_BRANDING_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.branding_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
@@ -93,6 +94,10 @@ EOX_THEMING_CONFIG_SOURCES = [
 
 EOX_CORE_COURSEWARE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.courseware_m_v1"
 EOX_CORE_GRADES_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.grades_m_v1"
+
+GET_SITE_CONFIGURATION_MODULE = 'eox_tenant.edxapp_wrapper.backends.site_configuration_module_test_v1'
+GET_THEMING_HELPERS = 'eox_tenant.edxapp_wrapper.backends.theming_helpers_test_v1'
+EOX_TENANT_USERS_BACKEND = 'eox_tenant.edxapp_wrapper.backends.users_test_v1'
 
 # ------------eox-audit external config for tests------------------------------
 if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in INSTALLED_APPS:  # noqa: F405

@@ -20,6 +20,20 @@ def generate_list_mock_data(data):
             "due": "due_date",
             "location": "location"
         },
+        {
+            "due" : "due_date",
+            "components": [
+                {
+                    "block_type": "problem",
+                },
+                {
+                    "block_type": "video",
+                },
+                {
+                    "block_type": "html",
+                },
+            ]
+        },
     ]
 
     Every dictionary should be direct key values.No way if there is nested dict the model
@@ -43,6 +57,8 @@ def set_key_values(element):
     for key, value in element.items():
         if isinstance(value, dict):
             setattr(model, key, set_key_values(value))
+        elif isinstance(value, list):
+            setattr(model, key, generate_list_mock_data(value))
         else:
             setattr(model, key, value)
     return model

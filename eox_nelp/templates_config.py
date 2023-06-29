@@ -3,8 +3,10 @@ import os
 
 import eox_nelp.course_experience.frontend.templates as course_experience_templates
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
+from eox_nelp.stats import templates as stats_templates
 
 module_templates_to_include = [
+    stats_templates,
     course_experience_templates,
 ]
 

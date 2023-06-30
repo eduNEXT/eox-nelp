@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from mock import MagicMock
 
 
@@ -7,4 +8,10 @@ def get_edxmako():
     Returns:
         Mock class.
     """
-    return MagicMock()
+    def render_wrapper(template_name, dictionary, namespace, request, **kwargs):
+        return render(request, template_name, context=dictionary)
+
+    edxmako = MagicMock()
+    edxmako.shortcuts.render_to_response = render_wrapper
+
+    return edxmako

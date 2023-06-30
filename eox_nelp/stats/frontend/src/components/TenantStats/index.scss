@@ -1,0 +1,16 @@
+@import "~@edx/brand/paragon/fonts";
+@import "~@edx/brand/paragon/variables";
+@import "~@edx/paragon/scss/core/core";
+@import "~@edx/brand/paragon/overrides";
+
+body {
+  background-color: transparent;
+
+  #tenant-stats{
+    .stats-container{
+      margin: 0;
+      width: auto;
+    }
+  }
+}
+

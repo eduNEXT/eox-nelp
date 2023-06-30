@@ -8,6 +8,7 @@ const config = createConfig('webpack-prod');
 // Override entries.
 config.entry = {
   feedback_carousel: './eox_nelp/course_experience/frontend/src/components/FeedbackCarousel/index',
+  tenant_stats: './eox_nelp/stats/frontend/src/components/TenantStats/index',
 }
 
 // Override output configuration in order to get a unique folder per entry.

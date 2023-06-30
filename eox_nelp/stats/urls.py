@@ -1,4 +1,4 @@
-"""frontend templates urls for course_experience"""
+"""frontend templates urls for stats"""
 from django.urls import path
 
 from eox_nelp.stats.views import get_tenant_stats

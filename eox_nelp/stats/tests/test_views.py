@@ -29,7 +29,7 @@ class GetTenantStatsTestCase(TestCase):
             - template name is as expected.
             - tenant-stats div exist
         """
-        url_endpoint = reverse("stats-frontend:tenant")
+        url_endpoint = reverse("stats:tenant")
 
         response = self.client.get(url_endpoint)
 
@@ -50,7 +50,7 @@ class GetTenantStatsTestCase(TestCase):
             - CSS was included
             - JS was included
         """
-        url_endpoint = f"{reverse('stats-frontend:tenant')}?{query_param}=false"
+        url_endpoint = f"{reverse('stats:tenant')}?{query_param}=false"
 
         response = self.client.get(url_endpoint)
 

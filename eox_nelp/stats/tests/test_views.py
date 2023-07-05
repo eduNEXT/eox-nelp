@@ -37,26 +37,26 @@ class GetTenantStatsTestCase(TestCase):
         self.assertEqual(self.template_name, response.templates[0].name)
         self.assertContains(response, '<div id="tenant-stats"></div')
 
-    @data("videos", "courses", "problems", "instructors", "learners")
-    def test_filter_specific_stat(self, query_param):
+    @data("hideVideos", "hideCourses", "hideProblems", "hideInstructors", "hideLearners")
+    def test_hide_specific_stat(self, query_param):
         """
-        Test that the view render successfully when a query param is included
+        Test that the view renders successfully when a query param is included
 
         Expected behavior:
             - Status code 200.
             - template name is as expected.
             - tenant-stats div exist
-            - the query param is 'false'
+            - the query param is 'true'
             - CSS was included
             - JS was included
         """
-        url_endpoint = f"{reverse('stats-frontend:tenant')}?{query_param}=false"
+        url_endpoint = f"{reverse('stats-frontend:tenant')}?{query_param}=true"
 
         response = self.client.get(url_endpoint)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(self.template_name, response.templates[0].name)
         self.assertContains(response, '<div id="tenant-stats"></div')
-        self.assertEqual("false", response.context[query_param])
+        self.assertEqual("true", response.context[query_param])
         self.assertContains(response, "tenant_stats/css/tenant_stats.css")
         self.assertContains(response, "tenant_stats/js/tenant_stats.js")

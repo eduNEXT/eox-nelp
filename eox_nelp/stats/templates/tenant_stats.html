@@ -8,11 +8,11 @@
 <body>
     <div id="tenant-stats"></div>
     <script>
-      var showVideos = "true" === "${videos}";
-      var showCourses = "true" === "${courses}";
-      var showProblems = "true" === "${problems}";
-      var showLearners = "true" === "${learners}";
-      var showInstructors = "true" === "${instructors}";
+      var showVideos = "false" === "${hideVideos}";
+      var showCourses = "false" === "${hideCourses}";
+      var showProblems = "false" === "${hideProblems}";
+      var showLearners = "false" === "${hideLearners}";
+      var showInstructors = "false" === "${hideInstructors}";
     </script>
     <script src="${static.url('tenant_stats/js/tenant_stats.js')}"></script>
 </body>

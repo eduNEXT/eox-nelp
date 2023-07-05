@@ -21,19 +21,19 @@ def get_tenant_stats(request):
         /eox-nelp/stats/tenant/?videos=false&courses=false
 
     The available options are:
-        videos
-        courses
-        learners
-        instructors
-        problems
+        hideVideos
+        hideCourses
+        hideLearners
+        hideInstructors
+        hideProblems
     """
 
     context = {
-        "courses": "true",
-        "videos": "true",
-        "problems": "true",
-        "learners": "true",
-        "instructors": "true",
+        "hideCourses": "false",
+        "hideVideos": "false",
+        "hideProblems": "false",
+        "hideLearners": "false",
+        "hideInstructors": "false",
     }
     context.update(request.GET.dict())
 

@@ -37,7 +37,7 @@ class GetTenantStatsTestCase(TestCase):
         self.assertEqual(self.template_name, response.templates[0].name)
         self.assertContains(response, '<div id="tenant-stats"></div')
 
-    @data("showVideos", "showCourse", "showProblems", "showInstructors", "showLearners")
+    @data("show_videos", "show_course", "show_problems", "show_instructors", "show_learners")
     def test_get_specific_stat(self, query_param):
         """
         Test that the view render successfully when a query param is included

@@ -15,25 +15,25 @@ def get_tenant_stats(request):
     By default this show nothing since this requires the specific query para to show the content.
 
     Examples:
-        renders just video card /eox-nelp/stats/tenant/?showVideos=true
+        renders just video card /eox-nelp/stats/tenant/?show_videos=true
 
         render multiple components
-        /eox-nelp/stats/tenant/?showVideos=true&showCourses=true&showInstructors=true
+        /eox-nelp/stats/tenant/?show_videos=true&show_courses=true&show_instructors=true
 
     The available options are:
-        showVideos
-        showCourses
-        showLearners
-        showInstructors
-        showProblems
+        show_videos
+        show_courses
+        show_learners
+        show_instructors
+        show_problems
     """
 
     context = {
-        "showCourses": "false",
-        "showVideos": "false",
-        "showProblems": "false",
-        "showLearners": "false",
-        "showInstructors": "false",
+        "show_courses": "false",
+        "show_videos": "false",
+        "show_problems": "false",
+        "show_learners": "false",
+        "show_instructors": "false",
     }
     context.update(request.GET.dict())
 

@@ -1,6 +1,8 @@
 """Serializers used for the experience views."""
+from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
 
+from eox_nelp.course_experience.api.v1.relations import ExperienceResourceRelatedField
 from eox_nelp.course_experience.models import (
     FeedbackCourse,
     LikeDislikeCourse,
@@ -8,6 +10,9 @@ from eox_nelp.course_experience.models import (
     ReportCourse,
     ReportUnit,
 )
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+
+User = get_user_model()
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
@@ -19,6 +24,12 @@ class ExperienceSerializer(serializers.ModelSerializer):
     """
     username = serializers.CharField(
         source="author.username", required=False, allow_blank=True
+    )
+    course_id = ExperienceResourceRelatedField(
+        queryset=CourseOverview.objects,
+    )
+    author = ExperienceResourceRelatedField(
+        queryset=User.objects,
     )
 
 

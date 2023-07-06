@@ -8,6 +8,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from rest_framework import status
 
+from eox_nelp.stats.views import STATS_QUERY_PARAMS
+
 
 @ddt
 class GetTenantStatsTestCase(TestCase):
@@ -37,26 +39,30 @@ class GetTenantStatsTestCase(TestCase):
         self.assertEqual(self.template_name, response.templates[0].name)
         self.assertContains(response, '<div id="tenant-stats"></div')
 
-    @data("show_videos", "show_course", "show_problems", "show_instructors", "show_learners")
-    def test_get_specific_stat(self, query_param):
+        for query_param in STATS_QUERY_PARAMS:
+            self.assertEqual("true", response.context[query_param])
+
+    @data(*STATS_QUERY_PARAMS)
+    def test_filter_stat_out(self, query_param):
         """
-        Test that the view render successfully when a query param is included
+        Since the default behavior shows all the components this tests that specific component
+        is filtered out when the query param is false.
 
         Expected behavior:
             - Status code 200.
             - template name is as expected.
             - tenant-stats div exist
-            - the query param is 'true'
+            - the query param is 'false'
             - CSS was included
             - JS was included
         """
-        url_endpoint = f"{reverse('stats:tenant')}?{query_param}=true"
+        url_endpoint = f"{reverse('stats:tenant')}?{query_param}=false"
 
         response = self.client.get(url_endpoint)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(self.template_name, response.templates[0].name)
         self.assertContains(response, '<div id="tenant-stats"></div')
-        self.assertEqual("true", response.context[query_param])
+        self.assertEqual("false", response.context[query_param])
         self.assertContains(response, "tenant_stats/css/tenant_stats.css")
         self.assertContains(response, "tenant_stats/js/tenant_stats.js")

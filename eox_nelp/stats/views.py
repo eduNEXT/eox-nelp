@@ -5,36 +5,43 @@ Contains all the views for stats
 classes:
     get_tenant_stats: function based view.
 """
-
 from eox_nelp.templates_config import render_to_response
+
+STATS_QUERY_PARAMS = [
+    "show_courses",
+    "show_videos",
+    "show_problems",
+    "show_learners",
+    "show_instructors",
+]
 
 
 def get_tenant_stats(request):
     """
     Simple function based view that renders the StatsContainer essential component.
-    By default this show nothing since this requires the specific query para to show the content.
+    By default this will show all the available stats.
 
     Examples:
-        renders just video card /eox-nelp/stats/tenant/?show_videos=true
+        renders all available stats /eox-nelp/stats/tenant/
 
-        render multiple components
-        /eox-nelp/stats/tenant/?show_videos=true&show_courses=true&show_instructors=true
+        filters out videos, courses and instructors
+        /eox-nelp/stats/tenant/?show_videos=false&show_courses=false&show_instructors=false
 
     The available options are:
-        show_videos
-        show_courses
-        show_learners
-        show_instructors
-        show_problems
-    """
 
-    context = {
-        "show_courses": "false",
-        "show_videos": "false",
-        "show_problems": "false",
-        "show_learners": "false",
-        "show_instructors": "false",
-    }
+        |       name       | default |         Description         |
+
+        |    show_videos   |   true  |    Show the videos stats    |
+
+        |   show_courses   |   true  |    Show the courses stats   |
+
+        |   show_learners  |   true  |    Show the learner stats   |
+
+        | show_instructors |   true  |  Show the instructors stats |
+
+        |  show_problems   |   true  |   Show the problems stats   |
+    """
+    context = {query_param: "true" for query_param in STATS_QUERY_PARAMS}
     context.update(request.GET.dict())
 
     return render_to_response("tenant_stats.html", context)

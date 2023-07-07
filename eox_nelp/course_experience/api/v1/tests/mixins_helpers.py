@@ -12,6 +12,7 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from eox_nelp.course_experience.api.v1.serializers import get_course_extra_attributes, get_user_extra_attributes
 from eox_nelp.course_experience.api.v1.views import INVALID_KEY_ERROR
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 
@@ -34,6 +35,31 @@ class ExperienceTestMixin:
         self.user, _ = User.objects.get_or_create(username="vader")
         self.my_course, _ = CourseOverview.objects.get_or_create(id=BASE_COURSE_ID)
         self.client.force_authenticate(self.user)
+
+    def make_relationships_data(self):
+        """
+        Make the relationships dict with custom extra attributes based in the attributes of the serializers
+        withe variables COURSE_OVERVIEW_EXTRA_ATTRIBUTES and USER_EXTRA_ATTRIBUTES
+
+        Returns:
+            dict: relationships dict with the corresponding shape, and key-values.
+        """
+        return {
+            "author": {
+                "data": {
+                    "type": "User",
+                    "id": f"{self.user.id}",
+                    **get_user_extra_attributes(self.user)
+                }
+            },
+            "course_id": {
+                "data": {
+                    "type": "CourseOverview",
+                    "id": f"{self.my_course.id}",
+                    **get_course_extra_attributes(self.my_course)
+                }
+            },
+        }
 
     def test_get_object_list_by_user(self):
         """ Test a  get  request to the list endpoint for the desired view.
@@ -85,7 +111,6 @@ class ExperienceTestMixin:
         expected_data["data"]["attributes"].update(self.patch_data)
 
         response = self.client.patch(url_endpoint, self.patch_data, format="json")
-
         self.assertIn(response.headers["Content-Type"], RESPONSE_CONTENT_TYPES)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), expected_data)

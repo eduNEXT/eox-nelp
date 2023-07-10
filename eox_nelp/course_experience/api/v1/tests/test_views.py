@@ -61,20 +61,7 @@ class LikeDislikeUnitExperienceTestCase(UnitExperienceTestMixin, APITestCase):
                     "status": self.my_unit_like.status,
                     "item_id": f"{self.my_unit_like.item_id}",
                 },
-                "relationships": {
-                    "author": {
-                        "data": {
-                            "type": "User",
-                            "id": f"{self.user.id}",
-                        }
-                    },
-                    "course_id": {
-                        "data": {
-                            "type": "CourseOverview",
-                            "id": f"{self.my_course.id}",
-                        }
-                    }
-                }
+                "relationships": self.make_relationships_data()
             }
         }
         self.object_url_kwarg = {self.object_key: BASE_ITEM_ID}
@@ -117,20 +104,7 @@ class ReportUnitExperienceTestCase(UnitExperienceTestMixin, APITestCase):
                     "reason": f"{self.my_unit_report.reason}",
                     "item_id": f"{self.my_unit_report.item_id}",
                 },
-                "relationships": {
-                    "author": {
-                        "data": {
-                            "type": "User",
-                            "id": f"{self.user.id}",
-                        }
-                    },
-                    "course_id": {
-                        "data": {
-                            "type": "CourseOverview",
-                            "id": f"{self.my_course.id}",
-                        }
-                    }
-                }
+                "relationships": self.make_relationships_data()
             }
         }
         self.object_url_kwarg = {self.object_key: BASE_ITEM_ID}
@@ -190,20 +164,7 @@ class LikeDislikeCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase
                     "username": f"{self.user.username}",
                     "status": self.my_course_like.status,
                 },
-                "relationships": {
-                    "author": {
-                        "data": {
-                            "type": "User",
-                            "id": f"{self.user.id}",
-                        }
-                    },
-                    "course_id": {
-                        "data": {
-                            "type": "CourseOverview",
-                            "id": f"{self.my_course.id}",
-                        }
-                    }
-                }
+                "relationships": self.make_relationships_data()
             }
         }
 
@@ -244,20 +205,7 @@ class ReportCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
                     "username": f"{self.user.username}",
                     "reason": f"{self.my_course_report.reason}"
                 },
-                "relationships": {
-                    "author": {
-                        "data": {
-                            "type": "User",
-                            "id": f"{self.user.id}"
-                        }
-                    },
-                    "course_id": {
-                        "data": {
-                            "type": "CourseOverview",
-                            "id": f"{self.my_course.id}"
-                        }
-                    }
-                }
+                "relationships": self.make_relationships_data()
             }
         }
 
@@ -315,20 +263,7 @@ class FeedbackCourseExperienceTestCase(CourseExperienceTestMixin, APITestCase):
                     "public": self.my_course_feedback.public,
                     "recommended": self.my_course_feedback.recommended,
                 },
-                "relationships": {
-                    "author": {
-                        "data": {
-                            "type": "User",
-                            "id": f"{self.user.id}"
-                        }
-                    },
-                    "course_id": {
-                        "data": {
-                            "type": "CourseOverview",
-                            "id": f"{self.my_course.id}"
-                        }
-                    }
-                }
+                "relationships": self.make_relationships_data()
             }
         }
 

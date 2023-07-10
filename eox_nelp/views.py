@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""The generic views for the exc-core plugin project"""
+"""The generic views for the eox-nelp plugin project"""
 
 from __future__ import unicode_literals
 

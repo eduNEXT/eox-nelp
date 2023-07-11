@@ -6,7 +6,9 @@ Mixins:
 """
 from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from mock import patch
 from rest_framework import status
@@ -78,6 +80,45 @@ class ExperienceTestMixin:
         for element in response.json()['data']:
             self.assertEqual(element["attributes"]["username"], self.user.username)
             self.assertEqual(element["relationships"]["author"]["data"]["id"], str(self.user.id))
+
+    @override_settings()
+    def test_get_relationships_keys_mapped_for_settings(self):
+        """ Test the course experiences api returns the keys configured via the
+        COURSE_EXPERIENCE_SETTINGS` in settings.
+        Expected behavior:
+            - Return expected content type.
+            - Status code 200.
+            - Check all the elements have the relationship attrs keys presented for course according setting config.
+            - Check all the elements have the relationship attrs keys for user(author) according setting config.
+
+        """
+        url_endpoint = reverse(self.reverse_viewname_list)
+        test_course_experience_settings = {
+            "COURSE_OVERVIEW_EXTRA_FIELD_MAPPING": {
+                "ultra_name": "courseultra",
+                "course_key": "instance__field",
+            },
+            "USER_EXTRA_FIELD_MAPPING": {
+                "mega_name": "userultra",
+                "user_key": "user__field",
+            }
+        }
+        setattr(settings, "COURSE_EXPERIENCE_SETTINGS", test_course_experience_settings)
+
+        response = self.client.get(url_endpoint)
+
+        self.assertIn(response.headers["Content-Type"], RESPONSE_CONTENT_TYPES)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.json()['data'])
+        for element in response.json()['data']:
+            self.assertEqual(
+                element["relationships"]["course_id"]["data"]["attributes"].keys(),
+                test_course_experience_settings["COURSE_OVERVIEW_EXTRA_FIELD_MAPPING"].keys(),
+            )
+            self.assertEqual(
+                element["relationships"]["author"]["data"]["attributes"].keys(),
+                test_course_experience_settings["USER_EXTRA_FIELD_MAPPING"].keys(),
+            )
 
     def test_not_authenticated_user(self):
         """

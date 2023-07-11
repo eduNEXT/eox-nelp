@@ -1,4 +1,5 @@
 """Serializers used for the experience views."""
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework_json_api import serializers
 
@@ -32,9 +33,13 @@ def get_course_extra_attributes(value=None):
     Returns:
         dict: dict object too add course extra fields
     """
-    return {
-        "attributes": map_instance_attributes_to_dict(value, COURSE_OVERVIEW_EXTRA_FIELD_MAPPING)
-    }
+    course_overview_mapping = getattr(
+        settings,
+        "COURSE_EXPERIENCE_SETTINGS",
+        {},
+    ).get("COURSE_OVERVIEW_EXTRA_FIELD_MAPPING", COURSE_OVERVIEW_EXTRA_FIELD_MAPPING)
+
+    return {"attributes": map_instance_attributes_to_dict(value, course_overview_mapping)}
 
 
 def get_user_extra_attributes(value=None):
@@ -46,9 +51,13 @@ def get_user_extra_attributes(value=None):
     Returns:
         dict: dict object too add user extra fields
     """
-    return {
-        "attributes": map_instance_attributes_to_dict(value, USER_EXTRA_FIELD_MAPPING)
-    }
+    user_mapping = getattr(
+        settings,
+        "COURSE_EXPERIENCE_SETTINGS",
+        {},
+    ).get("USER_EXTRA_FIELD_MAPPING", USER_EXTRA_FIELD_MAPPING)
+
+    return {"attributes": map_instance_attributes_to_dict(value, user_mapping)}
 
 
 class ExperienceSerializer(serializers.ModelSerializer):

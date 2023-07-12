@@ -104,6 +104,8 @@ class FeedbackCourseAdmin(BaseAdmin):
         "rating_instructors",
         "recommended",
     )
+    search_fields = ("course_id__id", "author__username", "feedback")
+    list_filter = ("public", "rating_content", "rating_instructors")
 
 
 admin.site.register(LikeDislikeUnit, LikeDislikeUnitAdmin)

@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from django.apps import AppConfig
 
+from eox_nelp.init_pipeline import run_init_pipeline
+
 
 class EoxNelpConfig(AppConfig):
     """
@@ -56,6 +58,7 @@ class EoxNelpConfig(AppConfig):
         # pylint: disable=unused-import, import-error, import-outside-toplevel
         # This is required in order to register the receiver inside handlers module.
         from cms.djangoapps.contentstore.signals import handlers  # noqa: F401
+        run_init_pipeline()
 
 
 class EoxNelpCMSConfig(AppConfig):

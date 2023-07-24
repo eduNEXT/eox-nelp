@@ -12,3 +12,4 @@ backend = import_module(settings.EOX_NELP_STUDENT_BACKEND)
 
 CourseEnrollment = backend.get_course_enrollment_model()
 CourseAccessRole = backend.get_course_access_role_model()
+UserProfile = backend.get_user_profile_model()

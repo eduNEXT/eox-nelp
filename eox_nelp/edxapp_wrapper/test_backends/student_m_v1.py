@@ -16,3 +16,11 @@ def get_course_access_role_model():
         Mock class.
     """
     return Mock()
+
+
+def get_user_profile_model():
+    """Return test Model.
+    Returns:
+        Mock class.
+    """
+    return Mock()

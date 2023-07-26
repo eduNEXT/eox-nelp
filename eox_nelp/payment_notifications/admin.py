@@ -7,10 +7,10 @@ class PaymentNotificationAdmin(admin.ModelAdmin):
     """Admin class for PaymentNotification."""
 
     list_display = (
+        "user_summary",
         "internal_status",
         "cdtrans_amount",
         "cdtrans_date",
-        "user_summary",
         "transaction_summary",
         "msg_cases",
         "redirections_state",
@@ -61,6 +61,8 @@ class PaymentNotificationAdmin(admin.ModelAdmin):
             response_id: {obj.cdtrans_response_id}
             status: {obj.cdtrans_status}
             response_ id: {obj.cdtrans_response_id}
+            amount: {obj.cdtrans_amount}
+            date: {obj.cdtrans_date}
         """
 
     def msg_cases(self, obj):

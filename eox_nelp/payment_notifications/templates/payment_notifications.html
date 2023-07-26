@@ -14,14 +14,13 @@ from django.utils.translation import ugettext as _
       display: none;
     }
 
-    .notifications {
-        margin: 20px;
+    .paynotifications {
     }
-    .notifications p {
+    .paynotifications p {
         margin-bottom: 20px;
         font-size: 1.5em;
     }
-    .notifications button {
+    .paynotifications button {
         margin-bottom: 20px;
     }
 
@@ -39,13 +38,13 @@ from django.utils.translation import ugettext as _
 
 <div class="container">
     <div class="my-courses" id="my-notifications">
-        <div class="notifications">
+        <div class="paynotifications">
 
-            <p class="notifications lang-ar">لديك الإخطارات التالية</p>
-            <p class="notifications lang-en">You have the following notifications</p>
+            <p class="paynotifications lang-ar">لديك الإخطارات التالية</p>
+            <p class="paynotifications lang-en">You have the following notifications</p>
 
-            % for payment_notification in payment_notifications:
-                <div class="payment-notification">
+            <div class="payment-notification">
+                % for payment_notification in payment_notifications:
 
 
                     % if payment_notification.show_msg_case0:
@@ -96,6 +95,9 @@ from django.utils.translation import ugettext as _
                         ${ payment_notification.custom_msg }
                     % endif
 
+                % endfor
+
+                % for payment_notification in payment_notifications:
                     % if payment_notification.show_trans_info:
                         <div class="payment-transaction-info lang-ar">
                             <h4>بيانات المعاملات:</h4>
@@ -116,13 +118,15 @@ from django.utils.translation import ugettext as _
                             </ul>
                         </div>
                     % endif
-                </div>
+                % endfor
 
-                %if payment_notification.call_to_action_3_url:
-                    <a href=${payment_notification.call_to_action_3_url}><button>${ payment_notification.call_to_action_3_msg }</button></a>
-                %endif
+                % for payment_notification in payment_notifications:
+                    %if payment_notification.call_to_action_3_url:
+                        <a href=${payment_notification.call_to_action_3_url}><button>${ payment_notification.call_to_action_3_msg }</button></a>
+                    %endif
+                %endfor
 
-            % endfor
+            </div>
         </div>
 </div>
 

@@ -32,6 +32,9 @@ class PaymentNotificationsView(View):
 
 
 def get_payment_notifications_context(request):
+    """
+    Calculate the notifications for a user.
+    """
     default_context = {
         "payment_notifications": [],
     }

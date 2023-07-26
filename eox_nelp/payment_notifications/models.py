@@ -52,22 +52,22 @@ class PaymentNotification(models.Model):
     cdtrans_extra_data_4 = models.TextField(null=True, blank=True)
 
     # Control surface
-    show_msg_case0 = models.BooleanField(null=True, blank=True, help_text="Not ready")
-    show_msg_case1 = models.BooleanField(null=True, blank=True, help_text="Not ready")
-    show_msg_case2 = models.BooleanField(null=True, blank=True, help_text="Not ready")
+    show_msg_case0 = models.BooleanField(null=True, blank=True, help_text="Will show the case 0 msg to the user")
+    show_msg_case1 = models.BooleanField(null=True, blank=True, help_text="Will show the case 1 msg to the user")
+    show_msg_case2 = models.BooleanField(null=True, blank=True, help_text="Will show the case 2 msg to the user")
 
-    show_trans_info = models.BooleanField(null=True, blank=True, help_text="Not ready")
+    show_trans_info = models.BooleanField(null=True, blank=True, help_text="Will show the transaction details to the user")
 
-    show_msg_custom = models.BooleanField(null=True, blank=True, help_text="Not ready")
-    custom_msg = models.TextField(null=True, blank=True, help_text="Not ready")
+    show_msg_custom = models.BooleanField(null=True, blank=True, help_text="Will show the following html to the user")
+    custom_msg = models.TextField(null=True, blank=True, help_text='Use a "lang-ar" or "lang-en" class to select language')
 
-    call_to_action_1_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
-    call_to_action_2_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
-    call_to_action_3_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
+    call_to_action_1_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Name of the button for case 1")
+    call_to_action_2_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Name of the button for case 2")
+    call_to_action_3_msg = models.CharField(max_length=1000, null=True, blank=True, help_text="Name of the button at the end of the message")
 
-    call_to_action_1_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
-    call_to_action_2_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
-    call_to_action_3_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Not ready")
+    call_to_action_1_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Link of the button for case 1")
+    call_to_action_2_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Link of the button for case 2")
+    call_to_action_3_url = models.CharField(max_length=1000, null=True, blank=True, help_text="Link of the button at the end of the message")
 
     redirect_from_dashboard = models.BooleanField(null=True, blank=True, help_text="Not ready")
     redirect_from_course = models.BooleanField(null=True, blank=True, help_text="Not ready")

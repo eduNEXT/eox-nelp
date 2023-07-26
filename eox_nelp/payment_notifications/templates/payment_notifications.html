@@ -1,21 +1,118 @@
 <style type="text/css">
-    .notifications-lang-ar:lang(en) {
+    .lang-ar:lang(en) {
       display: none;
     }
 
-    .notifications-lang-en:lang(ar) {
+    .lang-en:lang(ar) {
       display: none;
     }
+
+    .notifications {
+        margin: 20px;
+    }
+
+    .notifications p {
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+    .notifications button {
+        margin-bottom: 20px;
+    }
+
+    .payment-message {
+        margin-bottom: 20px;
+    }
+
+    .payment-transaction-info {
+        margin-bottom: 20px;
+    }
+
+    .payment-transaction-info li {
+        margin: 10px;
+    }
+
 </style>
 
 
-<div class="notifications-lang-ar">
-هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص أو شكل توضع الفقرات في الصفحة التي يقرأها. ولذلك يتم استخدام طريقة لوريم إيبسوم لأنها تعطي توزيعاَ طبيعياَ -إلى حد ما- للأحرف عوضاً عن استخدام "هنا يوجد محتوى نصي، هنا يوجد محتوى نصي" فتجعلها تبدو (أي الأحرف) وكأنها نص مقروء. العديد من برامح النشر المكتبي وبرامح تحرير صفحات الويب تستخدم لوريم إيبسوم بشكل إفتراضي كنموذج عن النص، وإذا قمت بإدخال "lorem ipsum" في أي محرك بحث ستظهر العديد من المواقع الحديثة العهد في نتائج البحث. على مدى السنين ظهرت نسخ جديدة ومختلفة من نص لوريم إيبسوم، أحياناً عن طريق الصدفة، وأحياناً عن عمد كإدخال بعض العبارات الفكاهية إليها.
-ما هو "لوريم إيبسوم" ؟
+<div class="notifications lang-ar">
+    <p> وجدنا المشكلات التالية مع دفعتك</p>
+
+    % for payment_notification in payment_notifications:
+        <div class="payment-notification">
+            % if payment_notification.show_trans_info:
+                <div class="payment-transaction-info">
+                    <h4>بيانات المعاملات:</h4>
+                    <ul>
+                        <li>تاريخ: ${payment_notification.cdtrans_date}</li>
+                        <li>كمية: ${payment_notification.cdtrans_amount}</li>
+                        <li>دورة: ${payment_notification.cdtrans_course_id}</li>
+                        <li>رقم المعاملة: ${payment_notification.cdtrans_response_id}</li>
+                    </ul>
+                </div>
+            % endif
+            % if payment_notification.show_msg_case0:
+                <div class="payment-message">
+                    لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي.
+
+                </div>
+            % endif
+            % if payment_notification.show_msg_case1:
+                <div class="payment-message">
+                    و سأعرض مثال حي لهذا، من منا لم يتحمل جهد بدني شاق إلا من أجل الحصول على ميزة أو فائدة؟ ولكن من لديه الحق أن ينتقد شخص ما أراد أن يشعر بالسعادة التي لا تشوبها عواقب أليمة أو آخر أراد أن يتجنب الألم الذي ربما تنجم عنه بعض المتعة ؟
+
+                </div>
+            % endif
+            % if payment_notification.show_msg_case2:
+                <div class="payment-message">
+                    لكن لا بد أن أوضح لك أن كل هذه الأفكار المغلوطة حول استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي.
+                </div>
+            % endif
+
+        </div>
+
+        %if payment_notification.call_to_action_1_url:
+            <a href=${payment_notification.call_to_action_1_url}><button>يدفع</button></a>
+        %endif
+    % endfor
 </div>
 
-<div class="notifications-lang-en">
-What is Lorem Ipsum?
+<div class="notifications lang-en">
 
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+    <p> We found the following issues with your payment</p>
+
+    % for payment_notification in payment_notifications:
+        <div class="payment-notification">
+            % if payment_notification.show_trans_info:
+                <div class="payment-transaction-info">
+                    <h4>Transaction info:</h4>
+                    <ul>
+                        <li>Date: ${payment_notification.cdtrans_date}</li>
+                        <li>Amount: ${payment_notification.cdtrans_amount}</li>
+                        <li>Course: ${payment_notification.cdtrans_course_id}</li>
+                        <li>ID: ${payment_notification.cdtrans_response_id}</li>
+                    </ul>
+                </div>
+            % endif
+            % if payment_notification.show_msg_case0:
+                <div class="payment-message">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Egestas erat imperdiet sed euismod nisi porta lorem mollis aliquam. Neque convallis a cras semper auctor neque. Sit amet justo donec enim diam vulputate ut pharetra sit. Sem viverra aliquet eget sit amet tellus cras adipiscing. Fringilla est ullamcorper eget nulla. Cras tincidunt lobortis feugiat vivamus at augue eget arcu. Mi sit amet mauris commodo quis imperdiet. Netus et malesuada fames ac. Convallis convallis tellus id interdum velit laoreet id donec ultrices.
+                </div>
+            % endif
+            % if payment_notification.show_msg_case1:
+                <div class="payment-message">
+                    Aliquet sagittis id consectetur purus. A diam sollicitudin tempor id. Euismod quis viverra nibh cras pulvinar mattis nunc. Augue eget arcu dictum varius duis at. Nisi lacus sed viverra tellus in. Non sodales neque sodales ut. Arcu non sodales neque sodales ut etiam sit amet nisl. Vel eros donec ac odio tempor orci dapibus ultrices. Odio aenean sed adipiscing diam. Leo vel fringilla est ullamcorper eget. Vitae congue eu consequat ac. Sit amet massa vitae tortor condimentum. Mattis aliquam faucibus purus in massa tempor. Duis convallis convallis tellus id interdum.
+                </div>
+            % endif
+            % if payment_notification.show_msg_case2:
+                <div class="payment-message">
+                    Nunc scelerisque viverra mauris in aliquam sem fringilla. Amet aliquam id diam maecenas ultricies mi eget. Lorem mollis aliquam ut porttitor leo a diam. Integer quis auctor elit sed vulputate mi sit amet. Pellentesque diam volutpat commodo sed. Amet massa vitae tortor condimentum. Tempus imperdiet nulla malesuada pellentesque elit. Pharetra vel turpis nunc eget lorem dolor sed. Pretium quam vulputate dignissim suspendisse in. Mus mauris vitae ultricies leo integer.
+                </div>
+            % endif
+
+        </div>
+
+        %if payment_notification.call_to_action_1_url:
+            <a href=${payment_notification.call_to_action_1_url}><button>Pay</button></a>
+        %endif
+    % endfor
 </div>

@@ -1,7 +1,7 @@
 """
 eox_nelp notifications for payment status
 """
-from django.urls import include, path
+from django.urls import path
 
 from eox_nelp.payment_notifications.views import PaymentNotificationsView
 

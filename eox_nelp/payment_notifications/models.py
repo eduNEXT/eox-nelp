@@ -1,22 +1,9 @@
 """
 eox_nelp model for notifications
 """
-import json
 import logging
 
-import requests
-from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
 from django.db import models
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
-from django.utils.text import slugify
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ugettext_lazy as _
 
 logger = logging.getLogger(__name__)
 

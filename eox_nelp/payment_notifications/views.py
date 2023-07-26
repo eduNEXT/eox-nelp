@@ -39,7 +39,13 @@ def get_payment_notifications_context(request):
     if not getattr(settings, "ENABLE_PAYMENT_NOTIFICATIONS", None):
         return default_context
 
-    all_notifications_for_user = PaymentNotification.objects.filter(cdtrans_lms_user_id=request.user.id)
+    user_id = request.user.id
+
+    # allows staff users to masquerade to debug issues
+    if request.GET.get("showpaymentnotificationsforuser", False) and request.user.is_staff:
+        user_id = request.GET.get("showpaymentnotificationsforuser", user_id)
+
+    all_notifications_for_user = PaymentNotification.objects.filter(cdtrans_lms_user_id=user_id)
 
     context = {
         "payment_notifications": all_notifications_for_user,

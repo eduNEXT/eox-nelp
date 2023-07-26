@@ -26,8 +26,22 @@ class PaymentNotificationsView(View):
         if not getattr(settings, "ENABLE_PAYMENT_NOTIFICATIONS", None):
             raise Http404
 
-        context = {
-            "payment_notifications": PaymentNotification.objects.filter(cdtrans_lms_user_id=request.user.id),
-        }
 
-        return render_to_response("payment_notifications_with_frame.html", context)
+        return render_to_response("payment_notifications_with_frame.html", {})
+
+
+
+def get_payment_notifications_context(request):
+    default_context = {
+        "payment_notifications": [],
+    }
+
+    if not getattr(settings, "ENABLE_PAYMENT_NOTIFICATIONS", None):
+        return default_context
+
+    all_notifications_for_user = PaymentNotification.objects.filter(cdtrans_lms_user_id=request.user.id)
+
+    context = {
+        "payment_notifications": all_notifications_for_user,
+    }
+    return context

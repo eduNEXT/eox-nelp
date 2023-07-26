@@ -71,7 +71,7 @@ from django.utils.translation import ugettext as _
                         </div>
 
                         %if payment_notification.call_to_action_1_url:
-                            <a href=${payment_notification.call_to_action_1_url}><button>&{ payment_notification.call_to_action_1_msg }</button></a>
+                            <a href=${payment_notification.call_to_action_1_url}><button>${ payment_notification.call_to_action_1_msg }</button></a>
                         %endif
 
                     % endif
@@ -88,7 +88,7 @@ from django.utils.translation import ugettext as _
                         </div>
 
                         %if payment_notification.call_to_action_2_url:
-                            <a href=${payment_notification.call_to_action_2_url}><button>&{ payment_notification.call_to_action_2_msg }</button></a>
+                            <a href=${payment_notification.call_to_action_2_url}><button>${ payment_notification.call_to_action_2_msg }</button></a>
                         %endif
                     % endif
 
@@ -119,7 +119,7 @@ from django.utils.translation import ugettext as _
                 </div>
 
                 %if payment_notification.call_to_action_3_url:
-                    <a href=${payment_notification.call_to_action_3_url}><button>&{ payment_notification.call_to_action_3_msg }</button></a>
+                    <a href=${payment_notification.call_to_action_3_url}><button>${ payment_notification.call_to_action_3_msg }</button></a>
                 %endif
 
             % endfor

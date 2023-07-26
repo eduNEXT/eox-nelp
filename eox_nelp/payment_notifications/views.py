@@ -23,8 +23,6 @@ class PaymentNotificationsView(View):
 
     def get(self, request, *args, **kwargs):
 
-        import pudb; pu.db
-
         if not getattr(settings, "ENABLE_PAYMENT_NOTIFICATIONS", None):
             raise Http404
 

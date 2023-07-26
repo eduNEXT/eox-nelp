@@ -1,26 +1,25 @@
 """
 eox_nelp model for notifications
 """
-import requests
 import json
 import logging
 
-from django.db import models
+import requests
 from django.conf import settings
-from django.utils import timezone
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.core.validators import RegexValidator
+from django.db import models
 from django.urls import reverse
-from django.utils.text import slugify
+from django.utils import timezone
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
-
 
 logger = logging.getLogger(__name__)
+
 
 class PaymentNotification(models.Model):
     """
@@ -94,4 +93,3 @@ class PaymentNotification(models.Model):
     internal_notes = models.CharField(max_length=2000, null=True, blank=True)
 
     internal_view_count = models.IntegerField(default=0)
-

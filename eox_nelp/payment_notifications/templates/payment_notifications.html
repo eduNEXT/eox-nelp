@@ -92,7 +92,9 @@ from django.utils.translation import ugettext as _
                         %endif
                     % endif
 
-
+                    % if payment_notification.custom_msg:
+                        ${ payment_notification.custom_msg }
+                    % endif
 
                     % if payment_notification.show_trans_info:
                         <div class="payment-transaction-info lang-ar">

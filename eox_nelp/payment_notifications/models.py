@@ -44,6 +44,8 @@ class PaymentNotification(models.Model):
     cdtrans_ecom_order_id = models.IntegerField(null=True, blank=True)
     cdtrans_ecom_payment_reponse_id = models.IntegerField(null=True, blank=True)
 
+    cdtrans_card_last_4_digits = models.CharField(max_length=10, null=True, blank=True)
+
     cdtrans_extra_data_1 = models.CharField(max_length=1000, null=True, blank=True)
     cdtrans_extra_data_2 = models.CharField(max_length=1000, null=True, blank=True)
     cdtrans_extra_data_3 = models.CharField(max_length=1000, null=True, blank=True)

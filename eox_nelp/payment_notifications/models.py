@@ -92,6 +92,6 @@ class PaymentNotification(models.Model):
         choices=INTERNAL_STATUS,
         default='case_0',
     )
-    internal_notes = models.CharField(max_length=2000, null=True, blank=True)
+    internal_notes = models.TextField(max_length=2000, null=True, blank=True)
 
     internal_view_count = models.IntegerField(default=0)

@@ -44,7 +44,7 @@ class PaymentNotificationsView(View):
                 "something",
             ]
         }
-        return render_to_response("payment_notifications.html", context)
+        return render_to_response("payment_notifications_with_frame.html", context)
 
     def generate_payment_message(self, payment_notification):
         """Generate the message based on the PaymentNotification instance."""

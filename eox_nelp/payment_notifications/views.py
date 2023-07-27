@@ -38,11 +38,29 @@ def get_payment_notifications_context(request):
 
     user_id = request.user.id
 
+    # count the views that belong to real users looking at their dashboard or notifications view
+    count_view = False
+    count_in_paths = [
+        '/dashboard',
+        '/eox-nelp/payment-notifications',
+    ]
+    if any(x in request.path for x in count_in_paths):
+        count_view = True
+    else:
+        # if the view is not part in the list we dont really need to do any query
+        return default_context
+
     # allows staff users to masquerade to debug issues
     if request.GET.get("showpaymentnotificationsforuser", False) and request.user.is_staff:
         user_id = request.GET.get("showpaymentnotificationsforuser", user_id)
+        count_view = False
 
     all_notifications_for_user = PaymentNotification.objects.filter(cdtrans_lms_user_id=user_id)
+
+    if count_view:
+        for notification in all_notifications_for_user:
+            notification.internal_view_count += 1
+            notification.save()
 
     context = {
         "payment_notifications": all_notifications_for_user,

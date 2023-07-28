@@ -59,3 +59,17 @@ def plugin_settings(settings):
         settings.INSTALLED_APPS.append(JSON_API_REST_FRAMEWORK)
     if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
+
+
+    try:
+        payments_notifications_context = 'eox_nelp.payment_notifications.context_processor.payments_notifications_context'
+        if payments_notifications_context not in settings.TEMPLATES[0]['OPTIONS']['context_processors']:
+            settings.TEMPLATES[0]['OPTIONS']['context_processors'].append(payments_notifications_context)
+        if payments_notifications_context not in settings.TEMPLATES[1]['OPTIONS']['context_processors']:
+            settings.TEMPLATES[1]['OPTIONS']['context_processors'].append(payments_notifications_context)
+
+        settings.DEFAULT_TEMPLATE_ENGINE = settings.TEMPLATES[0]
+    except AttributeError:
+        # We must find a way to register this error
+        pass
+

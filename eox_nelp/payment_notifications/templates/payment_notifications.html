@@ -1,0 +1,153 @@
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
+from lms.djangoapps.grades.api import CourseGradeFactory
+from opaque_keys.edx.keys import CourseKey
+
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+
+User = get_user_model()
+%>
+
+% if len(payment_notifications) > 0:
+
+<style type="text/css">
+    .lang-ar:lang(en) {
+      display: none;
+    }
+    .lang-en:lang(ar) {
+      display: none;
+    }
+
+    .paynotifications {
+    }
+    .paynotifications p {
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+    .paynotifications button {
+        margin-bottom: 20px;
+    }
+
+    .payment-message {
+        margin-bottom: 20px;
+    }
+    .payment-transaction-info {
+        margin-bottom: 20px;
+    }
+    .payment-transaction-info li {
+        margin: 10px;
+    }
+</style>
+
+
+<div class="container">
+    <div class="my-courses" id="my-notifications">
+        <div class="paynotifications">
+
+            % if payment_notifications:
+                <p class="paynotifications lang-ar">لديك الإخطارات التالية</p>
+                <p class="paynotifications lang-en">You have the following notifications</p>
+            % endif
+
+            <div class="payment-notification">
+                % for payment_notification in payment_notifications:
+
+                    <%
+                        course_name = ""
+
+                        try:
+                            user = User.objects.get(id=payment_notification.cdtrans_lms_user_id)
+                            course_key = CourseKey.from_string(payment_notification.cdtrans_course_id)
+                            grade = CourseGradeFactory().read(user, course_key=course_key)
+                            course_overview = CourseOverview.objects.get(id=course_key)
+
+                            if grade and grade.passed:
+                                course_name = course_overview.display_name
+                        except:
+                            pass
+                    %>
+
+                    % if payment_notification.show_msg_case0 and course_name:
+                        <div class="payment-message lang-ar">
+                            لقد أتممت دورة <b>${course_name}</b> بنجاح وشهادتك تحت المراجعة. ستصلك رسالة على بريدك الإلكتروني عند إصدارها.
+                        </div>
+                        <div class="payment-message lang-en">
+                            You have passed the <b>${course_name}</b> course and your certificate is being reviewed. You will receive an email message when the certificate is issued.
+                        </div>
+                    % endif
+
+
+                    % if payment_notification.show_msg_case1:
+                        <div class="payment-message lang-ar">
+                            Message Case 1
+                            و سأعرض مثال حي لهذا، من منا لم يتحمل جهد بدني شاق إلا من أجل الحصول على ميزة أو فائدة؟ ولكن من لديه الحق أن ينتقد شخص ما أراد أن يشعر بالسعادة التي لا تشوبها عواقب أليمة أو آخر أراد أن يتجنب الألم الذي ربما تنجم عنه بعض المتعة ؟
+                        </div>
+                        <div class="payment-message lang-en">
+                            Message Case 1
+                            Pellentesque diam volutpat commodo sed. Amet massa vitae tortor condimentum. Tempus imperdiet nulla malesuada pellentesque elit. Pharetra vel turpis nunc eget lorem dolor sed. Pretium quam vulputate dignissim suspendisse in. Mus mauris vitae ultricies leo integer.
+                        </div>
+
+                        %if payment_notification.call_to_action_1_url:
+                            <a href=${payment_notification.call_to_action_1_url}><button>${ payment_notification.call_to_action_1_msg }</button></a>
+                        %endif
+
+                    % endif
+
+
+                    % if payment_notification.show_msg_case2:
+                        <div class="payment-message lang-ar">
+                            Message Case 2
+                            لكن لا بد أن أوضح لك أن كل هذه الأفكار المغلوطة حول استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي.
+                        </div>
+                        <div class="payment-message lang-en">
+                            Message Case 2
+                            Nunc scelerisque viverra mauris in aliquam sem fringilla. Amet aliquam id diam maecenas ultricies mi eget. Lorem mollis aliquam ut porttitor leo a diam. Integer quis auctor elit sed vulputate mi sit amet. Pellentesque diam volutpat commodo sed. Amet massa vitae tortor condimentum. Tempus imperdiet nulla malesuada pellentesque elit. Pharetra vel turpis nunc eget lorem dolor sed. Pretium quam vulputate dignissim suspendisse in. Mus mauris vitae ultricies leo integer.
+                        </div>
+
+                        %if payment_notification.call_to_action_2_url:
+                            <a href=${payment_notification.call_to_action_2_url}><button>${ payment_notification.call_to_action_2_msg }</button></a>
+                        %endif
+                    % endif
+
+                    % if payment_notification.custom_msg:
+                        ${ payment_notification.custom_msg }
+                    % endif
+
+                % endfor
+
+                % for payment_notification in payment_notifications:
+                    % if payment_notification.show_trans_info:
+                        <div class="payment-transaction-info lang-ar">
+                            <h4>بيانات المعاملات:</h4>
+                            <ul>
+                                <li>تاريخ: ${payment_notification.cdtrans_date}</li>
+                                <li>كمية: ${payment_notification.cdtrans_amount}</li>
+                                <li>دورة: ${payment_notification.cdtrans_course_id}</li>
+                                <li>رقم المعاملة: ${payment_notification.cdtrans_response_id}</li>
+                            </ul>
+                        </div>
+                        <div class="payment-transaction-info lang-en">
+                           <h4>Transaction info:</h4>
+                            <ul>
+                                <li>Date: ${payment_notification.cdtrans_date}</li>
+                                <li>Amount: ${payment_notification.cdtrans_amount}</li>
+                                <li>Course: ${payment_notification.cdtrans_course_id}</li>
+                                <li>ID: ${payment_notification.cdtrans_response_id}</li>
+                            </ul>
+                        </div>
+                    % endif
+                % endfor
+
+                % for payment_notification in payment_notifications:
+                    %if payment_notification.call_to_action_3_url:
+                        <a href=${payment_notification.call_to_action_3_url}><button>${ payment_notification.call_to_action_3_msg }</button></a>
+                    %endif
+                %endfor
+
+            </div>
+        </div>
+</div>
+
+% endif

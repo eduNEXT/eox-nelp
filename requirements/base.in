@@ -1,17 +1,18 @@
 # Main requirements of your plugin application.
 -c constraints.txt
 
+bs4
 Django
+django-filter
+djangorestframework
+djangorestframework-jsonapi==5.0.0
+edx-drf-extensions
+edx-i18n-tools
+edx-opaque-keys
 eox-core
 eox-tenant
 eox-theming
-edx-i18n-tools
-django-filter
-djangorestframework
-bs4
 mako
-edx-opaque-keys
+openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 requests-oauthlib
 social-auth-app-django
-djangorestframework-jsonapi==5.0.0
-edx-drf-extensions

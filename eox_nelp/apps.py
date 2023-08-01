@@ -46,6 +46,11 @@ class EoxNelpConfig(AppConfig):
                         'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED',
                         'dispatch_uid': 'course_grade_publisher_receiver',
                     },
+                    {
+                        'receiver_func_name': 'certificate_publisher',
+                        'signal_path': 'openedx_events.learning.signals.CERTIFICATE_CREATED',
+                        'dispatch_uid': 'certificate_publisher_receiver',
+                    },
                 ],
             },
         },

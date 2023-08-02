@@ -36,6 +36,9 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
     settings.FUTUREX_API_CLIENT_SECRET = 'my-test-client-secret'
     settings.FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE  # noqa: F405
+    settings.EXTERNAL_CERTIFICATES_API_URL = 'https://testing.com'
+    settings.EXTERNAL_CERTIFICATES_API_CLIENT_ID = 'my-test-client-id'
+    settings.EXTERNAL_CERTIFICATES_API_CLIENT_SECRET = 'my-test-client-secret'
 
 
 SETTINGS = SettingsClass()

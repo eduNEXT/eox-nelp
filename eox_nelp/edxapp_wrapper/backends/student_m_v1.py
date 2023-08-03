@@ -2,6 +2,7 @@
 This file contains all the necessary student dependencies from
 https://github.com/eduNEXT/edunext-platform/tree/ednx-release/mango.master/common/djangoapps/student
 """
+from common.djangoapps.student import models_api as student_api  # pylint: disable=import-error
 from common.djangoapps.student.models import (  # pylint: disable=import-error
     CourseAccessRole,
     CourseEnrollment,
@@ -34,3 +35,13 @@ def get_user_profile_model():
         UserProfile Model.
     """
     return UserProfile
+
+
+def get_student_api():
+    """Allow to get the student_api module from
+    https://github.com/eduNEXT/edunext-platform/blob/ednx-release/mango.master/common/djangoapps/student/models_api.py
+
+    Returns:
+        models_api module.
+    """
+    return student_api

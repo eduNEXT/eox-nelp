@@ -39,6 +39,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EXTERNAL_CERTIFICATES_API_URL = 'https://testing.com'
     settings.EXTERNAL_CERTIFICATES_USER = 'test-user'
     settings.EXTERNAL_CERTIFICATES_PASSWORD = 'test-password'
+    settings.ENABLE_CERTIFICATE_PUBLISHER = True
 
 
 SETTINGS = SettingsClass()
@@ -97,6 +98,7 @@ EOX_THEMING_CONFIG_SOURCES = [
 
 EOX_CORE_COURSEWARE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.courseware_m_v1"
 EOX_CORE_GRADES_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.grades_m_v1"
+EOX_CORE_CERTIFICATES_BACKEND = "eox_core.edxapp_wrapper.backends.certificates_h_v1_test"
 
 GET_SITE_CONFIGURATION_MODULE = 'eox_tenant.edxapp_wrapper.backends.site_configuration_module_test_v1'
 GET_THEMING_HELPERS = 'eox_tenant.edxapp_wrapper.backends.theming_helpers_test_v1'

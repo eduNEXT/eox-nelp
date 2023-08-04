@@ -5,17 +5,17 @@ Classes:
 """
 from django.conf import settings
 
-from eox_nelp.api_clients import AbstractApiClient
+from eox_nelp.api_clients import AbstractBasicAuthApiClient
 
 
-class ExternalCertificatesApiClient(AbstractApiClient):
+class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
     """Allow to perform multiple external certificates operations."""
 
     def __init__(self):
-        client_id = getattr(settings, "EXTERNAL_CERTIFICATES_API_CLIENT_ID")
-        client_secret = getattr(settings, "EXTERNAL_CERTIFICATES_API_CLIENT_SECRET")
+        self.user = getattr(settings, "EXTERNAL_CERTIFICATES_USER")
+        self.password = getattr(settings, "EXTERNAL_CERTIFICATES_PASSWORD")
 
-        super().__init__(client_id, client_secret)
+        super().__init__()
 
     @property
     def base_url(self):

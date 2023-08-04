@@ -8,10 +8,10 @@ import unittest
 from mock import patch
 
 from eox_nelp.api_clients.futurex import FuturexApiClient, FuturexMissingArguments
-from eox_nelp.api_clients.tests import BasicApiClientMixin
+from eox_nelp.api_clients.tests import TestOauth2ApiClientMixin
 
 
-class TestFuturexApiClient(BasicApiClientMixin, unittest.TestCase):
+class TestFuturexApiClient(TestOauth2ApiClientMixin, unittest.TestCase):
     """Tests FuturexApiClient"""
 
     def setUp(self):

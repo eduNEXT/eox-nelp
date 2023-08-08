@@ -6,13 +6,13 @@ Classes:
 import unittest
 
 from django.utils import timezone
-from mock import patch
+from mock import Mock, patch
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
-from eox_nelp.api_clients.tests import BasicApiClientMixin
+from eox_nelp.api_clients.tests import TestBasicAuthApiClientMixin
 
 
-class TestExternalCertificatesApiClient(BasicApiClientMixin, unittest.TestCase):
+class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.TestCase):
     """Tests ExternalCertificatesApiClient"""
 
     def setUp(self):
@@ -20,14 +20,13 @@ class TestExternalCertificatesApiClient(BasicApiClientMixin, unittest.TestCase):
         self.api_class = ExternalCertificatesApiClient
 
     @patch.object(ExternalCertificatesApiClient, "make_post")
-    @patch.object(ExternalCertificatesApiClient, "_authenticate")
-    def test_create_certificate(self, auth_mock, post_mock):
+    @patch.object(ExternalCertificatesApiClient, "_authenticate", Mock)
+    def test_create_certificate(self, post_mock):
         """Test successful post request.
 
         Expected behavior:
             - Response is the expected value
         """
-        auth_mock.return_value = {}
         expected_value = {
             "status": {"success": True, "message": "successful", "code": 1}
         }
@@ -51,14 +50,13 @@ class TestExternalCertificatesApiClient(BasicApiClientMixin, unittest.TestCase):
 
         self.assertDictEqual(response, expected_value)
 
-    @patch.object(ExternalCertificatesApiClient, "_authenticate")
-    def test_failed_create_certificate(self, auth_mock):
+    @patch.object(ExternalCertificatesApiClient, "_authenticate", Mock)
+    def test_failed_create_certificate(self):
         """Test when the mandatory fields has not been sent.
 
         Expected behavior:
             - Raise KeyError exception.
         """
-        auth_mock.return_value = {}
         data = {}
         api_client = ExternalCertificatesApiClient()
 

@@ -20,6 +20,8 @@ LOGGER = logging.getLogger(__name__)
 class AbstractApiClient(ABC):
     """Abstract api client class, this implement a basic authentication method and defines methods POST and GET"""
 
+    extra_headers_key = None
+
     @property
     @abstractmethod
     def base_url(self):
@@ -31,11 +33,23 @@ class AbstractApiClient(ABC):
         Abstract ApiClient creator, this will set the session based on the authenticate result.
         """
         self.session = self._authenticate()
+        self.session.headers.update(self._get_extra_headers())
 
     @abstractmethod
     def _authenticate(self):
         """Abstract method that should return a requests Session instance in its implementation."""
         raise NotImplementedError
+
+    def _get_extra_headers(self):
+        """This verify the extra_headers_key attribute and returns its value from the django settings.
+
+        Returns
+            Dict: The extra_headers_key must be set a dictionary.
+        """
+        if self.extra_headers_key:
+            return getattr(settings, self.extra_headers_key, {})
+
+        return {}
 
     def make_post(self, path, data):
         """This method uses the session attribute to perform a POST request based on the

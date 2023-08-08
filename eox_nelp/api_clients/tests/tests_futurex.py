@@ -5,6 +5,7 @@ Classes:
 """
 import unittest
 
+import requests
 from mock import patch
 
 from eox_nelp.api_clients.futurex import FuturexApiClient, FuturexMissingArguments
@@ -27,7 +28,7 @@ class TestFuturexApiClient(TestOauth2ApiClientMixin, unittest.TestCase):
             - Response is the expected value
             - make_post was called with the right values.
         """
-        auth_mock.return_value = {}
+        auth_mock.return_value = requests.Session()
         expected_value = {
             "status": {"success": True, "message": "successful", "code": 1}
         }
@@ -55,7 +56,7 @@ class TestFuturexApiClient(TestOauth2ApiClientMixin, unittest.TestCase):
         Expected behavior:
             - Raise FuturexMissingArguments exception
         """
-        auth_mock.return_value = {}
+        auth_mock.return_value = requests.Session()
         data = {
             "courseId": "course-v1:lms152",
             "userId": 52,

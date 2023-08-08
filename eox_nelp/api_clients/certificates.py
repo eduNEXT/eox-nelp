@@ -11,6 +11,8 @@ from eox_nelp.api_clients import AbstractBasicAuthApiClient
 class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
     """Allow to perform multiple external certificates operations."""
 
+    extra_headers_key = "EXTERNAL_CERTIFICATES_EXTRA_HEADERS"
+
     def __init__(self):
         self.user = getattr(settings, "EXTERNAL_CERTIFICATES_USER")
         self.password = getattr(settings, "EXTERNAL_CERTIFICATES_PASSWORD")

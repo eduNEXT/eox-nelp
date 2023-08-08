@@ -5,7 +5,9 @@ Classes:
 """
 import unittest
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils import timezone
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -63,6 +65,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             name="",
         )
 
+    @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
     @patch("eox_nelp.signals.utils.GeneratedCertificate")
     def test_generate_certificate_data(self, generate_certificate_mock, passing_mock):
@@ -85,6 +88,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             "expiration_date": time + timezone.timedelta(days=365),
             "grade": self.certificate_data.grade,
             "is_passing": True,
+            "group_code": settings.EXTERNAL_CERTIFICATES_GROUP_CODES[str(self.certificate_data.course.course_key)],
             "user": {
                 "national_id": self.user.username,
                 "english_name": self.certificate_data.user.pii.name,
@@ -103,3 +107,22 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             self.user,
             str(self.certificate_data.course.course_key)
         )
+
+    @patch("eox_nelp.signals.utils._user_has_passing_grade")
+    @patch("eox_nelp.signals.utils.GeneratedCertificate")
+    def test_invalid_group_codes(self, generate_certificate_mock, passing_mock):
+        """This tests when the EXTERNAL_CERTIFICATES_GROUP_CODES value has not been set.
+
+        Expected behavior:
+            - Raise KeyError
+        """
+        certificate = Mock()
+        certificate.id = 85
+        generate_certificate_mock.objects.get.return_value = certificate
+        passing_mock.return_value = True
+        data = {
+            "timestamp": timezone.now(),
+            "certificate_data": self.certificate_data,
+        }
+
+        self.assertRaises(KeyError, _generate_external_certificate_data, **data)

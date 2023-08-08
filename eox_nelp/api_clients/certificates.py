@@ -30,6 +30,7 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
             expiration_date <mandatory>: when the certificate expires.
             grade <mandatory>: The associated grade with the certificate.
             is_passing <mandatory>: Boolean value that represent if the user has passed the course.
+            group_code ,mandatory>: String, this is a value provided by the client.
             user <mandatory>: Dictionary with the following data:
                 national_id: User National identifier.
                 englishs_name <optional>: User name in English.
@@ -57,7 +58,7 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
                 "id": user["national_id"],
                 "id_type": "saudi",
             },
-            "group_code": "fail",  # This is not clear
+            "group_code": certificate_data["group_code"],
             "certificate_type": "completion",  # What types do we have ?
             "metadata": {
                 "degree": certificate_data["grade"],

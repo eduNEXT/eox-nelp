@@ -43,6 +43,7 @@ class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.Te
             "grade": 10,
             "is_passing": True,
             "user": user,
+            "group_code": "ABC123",
         }
         api_client = self.api_class()
 

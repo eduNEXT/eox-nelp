@@ -4,6 +4,7 @@ Functions:
     _generate_external_certificate_data: Generates dict data from CertificateData.
     _user_has_passing_grade: Determines if the user has a passing grade
 """
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from eox_core.edxapp_wrapper.certificates import get_generated_certificate
@@ -24,6 +25,10 @@ def _generate_external_certificate_data(timestamp, certificate_data):
             https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
             and will provide of the user certificate data.
 
+    Raises:
+        KeyError: if the current course has not been set with its group code the method will raise
+            this exception.
+
     Returns:
         Dict: certificate data
     """
@@ -32,6 +37,8 @@ def _generate_external_certificate_data(timestamp, certificate_data):
         user=user,
         course_id=certificate_data.course.course_key,
     )
+    group_codes = getattr(settings, "EXTERNAL_CERTIFICATES_GROUP_CODES", {})
+    course_id = str(certificate_data.course.course_key)
     extra_info = getattr(user, "extrainfo", None)
 
     return {
@@ -40,7 +47,8 @@ def _generate_external_certificate_data(timestamp, certificate_data):
         # Certificate doesn't have an expiration date, so this is a thing that the client must define.
         "expiration_date": timestamp + timezone.timedelta(days=365),
         "grade": certificate_data.grade,
-        "is_passing": _user_has_passing_grade(user, str(certificate_data.course.course_key)),
+        "is_passing": _user_has_passing_grade(user, course_id),
+        "group_code": group_codes[course_id],
         "user": {
             "national_id": user.username,
             "english_name": certificate_data.user.pii.name,

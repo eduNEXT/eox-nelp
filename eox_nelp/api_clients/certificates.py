@@ -44,7 +44,7 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
         Raise:
             KeyError: This will be raised when the mandatory are excluded in the certificate data.
         """
-        path = "certificates"  # This is not clear at all
+        path = "Certificates"
         user = certificate_data["user"]
         payload = {
             "reference_id": certificate_data["id"],

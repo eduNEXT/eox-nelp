@@ -107,7 +107,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
 
     @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
     @patch("eox_nelp.signals.receivers.create_external_certificate")
-    def test_inactive_behavior(self, mock_task):
+    def test_inactive_behavior(self, create_external_certificate_mock):
         """Test that the asynchronous task wont' be called when the setting is not active.
 
         Expected behavior:
@@ -115,10 +115,10 @@ class CertificatePublisherTestCase(unittest.TestCase):
         """
         certificate_publisher(self.certificate_data, self.metadata)
 
-        mock_task.delay.assert_not_called()
+        create_external_certificate_mock.delay.assert_not_called()
 
     @patch("eox_nelp.signals.receivers.create_external_certificate")
-    def test_invalid_mode(self, mock_task):
+    def test_invalid_mode(self, create_external_certificate_mock):
         """Test when the certificate data has an invalid mode.
 
         Expected behavior:
@@ -154,14 +154,14 @@ class CertificatePublisherTestCase(unittest.TestCase):
         with self.assertLogs(receivers.__name__, level="INFO") as logs:
             certificate_publisher(certificate_data, self.metadata)
 
-        mock_task.delay.assert_not_called()
+        create_external_certificate_mock.delay.assert_not_called()
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
         ])
 
     @patch("eox_nelp.signals.receivers._generate_external_certificate_data")
     @patch("eox_nelp.signals.receivers.create_external_certificate")
-    def test_create_call(self, mock_task, generate_data_mock):
+    def test_create_call(self, create_external_certificate_mock, generate_data_mock):
         """Test when the certificate mode is valid and the asynchronous task is called
 
         Expected behavior:
@@ -185,7 +185,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
             timestamp=self.metadata.time,
             certificate_data=self.certificate_data,
         )
-        mock_task.delay.assert_called_with(
+        create_external_certificate_mock.delay.assert_called_with(
             external_certificate_data=generate_data_mock()
         )
         self.assertEqual(logs.output, [
@@ -195,7 +195,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
     @override_settings(CERTIFICATE_PUBLISHER_VALID_MODES=["another-mode"])
     @patch("eox_nelp.signals.receivers._generate_external_certificate_data")
     @patch("eox_nelp.signals.receivers.create_external_certificate")
-    def test_alternative_mode(self, mock_task, generate_data_mock):
+    def test_alternative_mode(self, create_external_certificate_mock, generate_data_mock):
         """Test when the certificate data has an alternative mode.
 
         Expected behavior:
@@ -236,7 +236,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
             timestamp=self.metadata.time,
             certificate_data=certificate_data,
         )
-        mock_task.delay.assert_called_with(
+        create_external_certificate_mock.delay.assert_called_with(
             external_certificate_data=generate_data_mock()
         )
         self.assertEqual(logs.output, [

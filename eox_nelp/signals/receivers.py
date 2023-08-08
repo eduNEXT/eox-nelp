@@ -13,7 +13,8 @@ import logging
 from django.conf import settings
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
-from eox_nelp.signals.tasks import dispatch_futurex_progress
+from eox_nelp.signals.tasks import create_external_certificate, dispatch_futurex_progress
+from eox_nelp.signals.utils import _generate_external_certificate_data
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ def create_course_notifications(course_key, **kwargs):  # pylint: disable=unused
     create_course_notifications_task.delay(course_id=str(course_key))
 
 
-def certificate_publisher(certificate, **kwargs):  # pylint: disable=unused-argument
+def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=unused-argument
     """
     Receiver that is connected to the CERTIFICATE_CREATED signal from 'openedx_events.learning.signals'.
 
@@ -78,6 +79,8 @@ def certificate_publisher(certificate, **kwargs):  # pylint: disable=unused-argu
         certificate<CertificateData>: This an instance of the class defined in this link
             https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
             and will provide of the user certificate data.
+        metadata <EventsMetadata>: Instance of the class defined in this link
+            https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/data.py#L29
     """
     if not getattr(settings, "ENABLE_CERTIFICATE_PUBLISHER", False):
         return
@@ -95,9 +98,15 @@ def certificate_publisher(certificate, **kwargs):  # pylint: disable=unused-argu
             certificate.user.pii.username,
             certificate.course.course_key,
         )
+        create_external_certificate.delay(
+            external_certificate_data=_generate_external_certificate_data(
+                timestamp=metadata.time,
+                certificate_data=certificate,
+            )
+        )
     else:
         LOGGER.info(
-            "The %s certificate associated with the user <%s> and course <%s>"
+            "The %s certificate associated with the user <%s> and course <%s> "
             "doesn't have a valid mode and therefore its data won't be published.",
             certificate.mode,
             certificate.user.pii.username,

@@ -19,32 +19,13 @@ from eox_nelp.signals.tasks import (
     _generate_progress_enrollment_data,
     _get_completion_summary,
     _post_futurex_progress,
-    _user_has_passing_grade,
+    create_external_certificate,
     dispatch_futurex_progress,
 )
 
 User = get_user_model()
 FALSY_ACTIVATION_VALUES = [0, "", None, [], False, {}, ()]
 TRUTHY_ACTIVATION_VALUES = [1, "true", "activated", ["activated"], True, {"activated": "true"}]
-
-
-class UserHasPassingGradeTestCase(unittest.TestCase):
-    """Test class for function `_user_has_passing_grade`"""
-
-    @patch("eox_nelp.signals.tasks.CourseGradeFactory")
-    def test_call_user_has_passing_grade(self, course_grade_factory_mock):
-        """Test when `_user_has_passing_grade` is called
-        with the required parameters. Check the functions inside are called with
-        their desired values.
-
-        Expected behavior:
-            - CourseGradeFactory class is used with the right values.
-        """
-        user, _ = User.objects.get_or_create(username="vader")
-        course_id = "course-v1:test+Cx105+2022_T4"
-
-        _user_has_passing_grade(user, course_id)
-        course_grade_factory_mock().read.assert_called_with(user, course_key=CourseKey.from_string(course_id))
 
 
 @ddt
@@ -359,3 +340,26 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
             f"ERROR:{tasks.__name__}:{log_error}"
         ])
         self.assertDictEqual(expected_data, progress_data)
+
+
+class CreateExternalCertificateTestCase(unittest.TestCase):
+    """Test class for create_external_certificate function"""
+
+    @patch("eox_nelp.signals.tasks.ExternalCertificatesApiClient")
+    def test_certificate_creation(self, api_mock):
+        """Test standard call with the required parameters.
+
+        Expected behavior:
+            - api_mock was called once.
+            - create_external_certificate was called with the rigth parameters.
+        """
+        certificate_data = {
+            "this": "is_a_test",
+        }
+
+        create_external_certificate(certificate_data)
+
+        api_mock.assert_called_once()
+        api_mock.return_value.create_external_certificate.assert_called_once_with(
+            certificate_data
+        )

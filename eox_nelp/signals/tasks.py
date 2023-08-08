@@ -12,29 +12,15 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
-from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.futurex import FuturexApiClient
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+from eox_nelp.signals.utils import _user_has_passing_grade
 
 courses = get_courseware_courses()
-CourseGradeFactory = get_course_grade_factory()
 logger = logging.getLogger(__name__)
-
-
-def _user_has_passing_grade(user, course_id):
-    """Determines if a user has passed a course based on the grading policies.
-
-    Args:
-        user<User>: Instace of Django User model.
-        course_id<str>: Unique course identifier.
-    Returns:
-        course_grade.passed<bool>: True if the user has passed the course, otherwise False
-    """
-    course_grade = CourseGradeFactory().read(user, course_key=CourseKey.from_string(course_id))
-
-    return course_grade.passed
 
 
 @shared_task
@@ -148,3 +134,17 @@ def _generate_progress_enrollment_data(user, course_id, user_has_passing_grade):
         progress_enrollment_data,
     )
     return progress_enrollment_data
+
+
+@shared_task
+def create_external_certificate(external_certificate_data):
+    """This will create an external NELP certificate base on the input data
+
+    Args:
+        timestamp<Datetime>: Date when the certificate was created.
+        certificate<CertificateData>: This an instance of the class defined in this link
+            https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
+            and will provide of the user certificate data.
+    """
+    api_client = ExternalCertificatesApiClient()
+    api_client.create_external_certificate(external_certificate_data)

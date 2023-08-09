@@ -5,6 +5,7 @@ Classes:
 """
 import unittest
 
+from django.test import override_settings
 from django.utils import timezone
 from mock import Mock, patch
 
@@ -59,6 +60,17 @@ class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.Te
             - Raise KeyError exception.
         """
         data = {}
-        api_client = ExternalCertificatesApiClient()
+        api_client = self.api_class()
 
         self.assertRaises(KeyError, api_client.create_external_certificate, data)
+
+    @override_settings(EXTERNAL_CERTIFICATES_EXTRA_HEADERS={"HTTP_CUSTOM_HEADER": "ABC123"})
+    def test_extra_headers(self):
+        """Test if the extra header has been added to the session
+
+        Expected behavior:
+            - Custom Header in session headers.
+        """
+        api_client = self.api_class()
+
+        self.assertEqual(api_client.session.headers["HTTP_CUSTOM_HEADER"], "ABC123")

@@ -182,7 +182,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
             certificate_publisher(self.certificate_data, self.metadata)
 
         generate_data_mock.assert_called_with(
-            timestamp=self.metadata.time,
+            time=self.metadata.time,
             certificate_data=self.certificate_data,
         )
         create_external_certificate_mock.delay.assert_called_with(
@@ -233,7 +233,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
             certificate_publisher(certificate_data, self.metadata)
 
         generate_data_mock.assert_called_with(
-            timestamp=self.metadata.time,
+            time=self.metadata.time,
             certificate_data=certificate_data,
         )
         create_external_certificate_mock.delay.assert_called_with(

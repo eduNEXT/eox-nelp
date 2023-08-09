@@ -51,12 +51,12 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
         payload = {
             "reference_id": certificate_data["id"],
             "date": {
-                "issuance": str(certificate_data["created_at"]),
-                "expiration": str(certificate_data["expiration_date"]),
+                "issuance": certificate_data["created_at"],
+                "expiration": None,
             },
             "individual": {
-                "name_en": user.get("english_name", ""),
-                "name_ar": user.get("arabic_name", ""),
+                "name_en": user["english_name"],
+                "name_ar": user["arabic_name"],
                 "id": user["national_id"],
                 "id_type": "saudi",
             },
@@ -64,7 +64,7 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
             "certificate_type": "completion",  # What types do we have ?
             "metadata": {
                 "degree": certificate_data["grade"],
-                "FAIL": certificate_data["is_passing"],
+                "FAIL": not certificate_data["is_passing"],
             }
         }
 

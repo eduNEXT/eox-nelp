@@ -100,7 +100,7 @@ def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=u
         )
         create_external_certificate.delay(
             external_certificate_data=_generate_external_certificate_data(
-                timestamp=metadata.time,
+                time=metadata.time,
                 certificate_data=certificate,
             )
         )

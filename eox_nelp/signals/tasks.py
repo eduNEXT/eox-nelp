@@ -147,4 +147,10 @@ def create_external_certificate(external_certificate_data):
             and will provide of the user certificate data.
     """
     api_client = ExternalCertificatesApiClient()
-    api_client.create_external_certificate(external_certificate_data)
+    response = api_client.create_external_certificate(external_certificate_data)
+
+    logger.info(
+        "The data %s was sent to the external certificate service. The response was: %s",
+        external_certificate_data,
+        response,
+    )

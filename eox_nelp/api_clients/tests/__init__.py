@@ -28,6 +28,7 @@ class TestApiClientMixin:
             - POST was called with the given data and right url.
         """
         response = Mock()
+        response.ok = True
         response.status_code = 200
         expected_value = {
             "status": {"success": True, "message": "successful", "code": 1}
@@ -58,12 +59,14 @@ class TestApiClientMixin:
             - Error was logged.
         """
         response = Mock()
+        response.ok = False
         response.status_code = 400
         response.json.return_value = {"test": True}
         requests_mock.Session.return_value.post.return_value = response
         data = {"testing": True, "application": "futurex"}
         log_error = (
-            "An error has occurred trying to make post request to https://testing.com/fake/path with status code 400"
+            "An error has occurred trying to make post request to https://testing.com/fake/path with status code 400 "
+            f"and message {response.json()}"
         )
         with patch.object(self.api_class, "_authenticate") as auth_mock:
             auth_mock.return_value = requests_mock.Session()
@@ -90,6 +93,7 @@ class TestApiClientMixin:
             - GET was called with the given data and right url.
         """
         response = Mock()
+        response.ok = True
         response.status_code = 200
         expected_value = {
             "status": {"success": True, "message": "successful", "code": 1}
@@ -119,12 +123,14 @@ class TestApiClientMixin:
             - Error was logged.
         """
         response = Mock()
+        response.ok = False
         response.status_code = 404
         response.json.return_value = {"test": True}
         requests_mock.Session.return_value.get.return_value = response
         params = {"format": "json"}
         log_error = (
-            "An error has occurred trying to make a get request to https://testing.com/fake/path with status code 404"
+            "An error has occurred trying to make a get request to https://testing.com/fake/path with status code 404 "
+            f"and message {response.json()}"
         )
         with patch.object(self.api_class, "_authenticate") as auth_mock:
             auth_mock.return_value = requests_mock.Session()

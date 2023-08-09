@@ -59,7 +59,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
                 course_key=CourseKey.from_string("course-v1:test+Cx105+2022_T4"),
             ),
             mode="audit",
-            grade=15,
+            grade=0.85,
             current_status="non-passing",
             download_url="",
             name="",
@@ -84,9 +84,9 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
 
         expected_value = {
             "id": certificate.id,
-            "created_at": time,
-            "expiration_date": time + timezone.timedelta(days=365),
-            "grade": self.certificate_data.grade,
+            "created_at": str(time.date()),
+            "expiration_date": None,
+            "grade": self.certificate_data.grade * 100,
             "is_passing": True,
             "group_code": settings.EXTERNAL_CERTIFICATES_GROUP_CODES[str(self.certificate_data.course.course_key)],
             "user": {
@@ -121,7 +121,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         generate_certificate_mock.objects.get.return_value = certificate
         passing_mock.return_value = True
         data = {
-            "timestamp": timezone.now(),
+            "time": timezone.now(),
             "certificate_data": self.certificate_data,
         }
 

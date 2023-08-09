@@ -6,7 +6,6 @@ Functions:
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from opaque_keys.edx.keys import CourseKey
@@ -16,11 +15,11 @@ GeneratedCertificate = get_generated_certificate()
 User = get_user_model()
 
 
-def _generate_external_certificate_data(timestamp, certificate_data):
+def _generate_external_certificate_data(time, certificate_data):
     """This generates a dictionary from a CertificateData class
 
     Args:
-        timestamp<Datetime>: Date when the certificate was created.
+        time<Datetime>: Date when the certificate was created.
         certificate<CertificateData>: This an instance of the class defined in this link
             https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
             and will provide of the user certificate data.
@@ -43,10 +42,9 @@ def _generate_external_certificate_data(timestamp, certificate_data):
 
     return {
         "id": certificate.id,
-        "created_at": timestamp,
-        # Certificate doesn't have an expiration date, so this is a thing that the client must define.
-        "expiration_date": timestamp + timezone.timedelta(days=365),
-        "grade": certificate_data.grade,
+        "created_at": str(time.date()),
+        "expiration_date": None,
+        "grade": float(certificate_data.grade) * 100,
         "is_passing": _user_has_passing_grade(user, course_id),
         "group_code": group_codes[course_id],
         "user": {

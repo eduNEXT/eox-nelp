@@ -12,7 +12,6 @@ from django.core.cache import cache
 from oauthlib.oauth2 import BackendApplicationClient
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
-from rest_framework import status
 
 LOGGER = logging.getLogger(__name__)
 
@@ -67,13 +66,14 @@ class AbstractApiClient(ABC):
 
         response = self.session.post(url=url, json=data)
 
-        if response.status_code == status.HTTP_200_OK:
+        if response.ok:
             return response.json()
 
         LOGGER.error(
-            "An error has occurred trying to make post request to %s with status code %s",
+            "An error has occurred trying to make post request to %s with status code %s and message %s",
             url,
             response.status_code,
+            response.json(),
         )
 
         return {
@@ -97,13 +97,14 @@ class AbstractApiClient(ABC):
 
         response = self.session.get(url=url, params=payload)
 
-        if response.status_code == status.HTTP_200_OK:
+        if response.ok:
             return response.json()
 
         LOGGER.error(
-            "An error has occurred trying to make a get request to %s with status code %s",
+            "An error has occurred trying to make a get request to %s with status code %s and message %s",
             url,
             response.status_code,
+            response.json(),
         )
 
         return {

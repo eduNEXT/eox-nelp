@@ -62,10 +62,11 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
             },
             "group_code": certificate_data["group_code"],
             "certificate_type": "completion",  # What types do we have ?
-            "metadata": {
-                "degree": certificate_data["grade"],
-                "FAIL": not certificate_data["is_passing"],
-            }
+            "score": {
+                "value": certificate_data["grade"],
+                "type": "percentage"
+            },
+            "metadata": getattr(settings, "EXTERNAL_CERTIFICATES_METADATA", {}),
         }
 
         return self.make_post(path, payload)

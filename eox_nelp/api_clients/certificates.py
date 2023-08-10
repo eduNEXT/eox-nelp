@@ -7,6 +7,13 @@ from django.conf import settings
 
 from eox_nelp.api_clients import AbstractBasicAuthApiClient
 
+try:
+    from eox_audit_model.decorators import audit_method
+except ImportError:
+    def audit_method(action):  # pylint: disable=unused-argument
+        """Identity audit_method"""
+        return lambda x: x
+
 
 class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
     """Allow to perform multiple external certificates operations."""
@@ -46,27 +53,31 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
         Raise:
             KeyError: This will be raised when the mandatory are excluded in the certificate data.
         """
-        path = "Certificates"
-        user = certificate_data["user"]
-        payload = {
-            "reference_id": f"nelc-openedx-lms-cert-{certificate_data['id']}",
-            "date": {
-                "issuance": certificate_data["created_at"],
-                "expiration": None,
-            },
-            "individual": {
-                "name_en": user["english_name"],
-                "name_ar": user["arabic_name"],
-                "id": user["national_id"],
-                "id_type": "saudi",
-            },
-            "group_code": certificate_data["group_code"],
-            "certificate_type": "completion",  # What types do we have ?
-            "score": {
-                "value": certificate_data["grade"],
-                "type": "percentage"
-            },
-            "metadata": getattr(settings, "EXTERNAL_CERTIFICATES_METADATA", {}),
-        }
+        @audit_method(action="Create External Certificate")
+        def create_external_certificate_request(certificate_data):
+            """This is a wrapper that allows to make audit-able the create_external_certificate method."""
+            path = "Certificates"
+            user = certificate_data["user"]
+            payload = {
+                "reference_id": f"nelc-openedx-lms-cert-{certificate_data['id']}",
+                "date": {
+                    "issuance": certificate_data["created_at"],
+                    "expiration": None,
+                },
+                "individual": {
+                    "name_en": user["english_name"],
+                    "name_ar": user["arabic_name"],
+                    "id": user["national_id"],
+                    "id_type": "saudi",
+                },
+                "group_code": certificate_data["group_code"],
+                "certificate_type": "completion",  # What types do we have ?
+                "score": {
+                    "value": certificate_data["grade"],
+                    "type": "percentage"
+                },
+                "metadata": getattr(settings, "EXTERNAL_CERTIFICATES_METADATA", {}),
+            }
+            return self.make_post(path, payload)
 
-        return self.make_post(path, payload)
+        return create_external_certificate_request(certificate_data)

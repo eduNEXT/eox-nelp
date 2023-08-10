@@ -49,7 +49,7 @@ class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
         path = "Certificates"
         user = certificate_data["user"]
         payload = {
-            "reference_id": certificate_data["id"],
+            "reference_id": f"nelc-openedx-lms-cert-{certificate_data['id']}",
             "date": {
                 "issuance": certificate_data["created_at"],
                 "expiration": None,

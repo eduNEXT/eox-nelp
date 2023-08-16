@@ -1,5 +1,6 @@
 <%namespace name='static' file='/static_content.html'/>
 <%!
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.auth import get_user_model
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -7,6 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 
+payment_links = getattr(settings, "PAYMENT_LINKS_BY_COURSE", {})
 User = get_user_model()
 %>
 
@@ -55,21 +57,21 @@ User = get_user_model()
                 % for payment_notification in payment_notifications:
 
                     <%
-                        course_name = ""
+                        passed = False
 
                         try:
+                            payment_link = payment_links.get(payment_notification.cdtrans_course_id, "link-not-set")
                             user = User.objects.get(id=payment_notification.cdtrans_lms_user_id)
                             course_key = CourseKey.from_string(payment_notification.cdtrans_course_id)
                             grade = CourseGradeFactory().read(user, course_key=course_key)
                             course_overview = CourseOverview.objects.get(id=course_key)
-
-                            if grade and grade.passed:
-                                course_name = course_overview.display_name
+                            course_name = course_overview.display_name
+                            passed = grade and grade.passed
                         except:
                             pass
                     %>
 
-                    % if payment_notification.show_msg_case0 and course_name:
+                    % if payment_notification.show_msg_case0 and passed and payment_notification.internal_status == "case_0":
                         <div class="payment-message lang-ar">
                             لقد أتممت دورة <b>${course_name}</b> بنجاح وشهادتك تحت المراجعة. ستصلك رسالة على بريدك الإلكتروني عند إصدارها.
                         </div>
@@ -79,14 +81,15 @@ User = get_user_model()
                     % endif
 
 
-                    % if payment_notification.show_msg_case1:
+                    % if payment_notification.show_msg_case1 and payment_notification.internal_status == "case_1":
                         <div class="payment-message lang-ar">
-                            Message Case 1
-                            و سأعرض مثال حي لهذا، من منا لم يتحمل جهد بدني شاق إلا من أجل الحصول على ميزة أو فائدة؟ ولكن من لديه الحق أن ينتقد شخص ما أراد أن يشعر بالسعادة التي لا تشوبها عواقب أليمة أو آخر أراد أن يتجنب الألم الذي ربما تنجم عنه بعض المتعة ؟
+                            <b>مهم:</b> حصلت مشكلة في عملية الدفع للدورة <b>${course_name}</b> ولذلك تم إيقاف تسجيلك في فيها. يرجى الدفع الآن <a href=${payment_link}>هنا</a> للتسجيل مرة أخرى فيها.
+                            بعد ذلك، يمكنك المتابعة في الدورة وتقديم الإختبارات للحصول على شهادتك. للأستفسارات يرجى مراسلة الدعم الفني.
                         </div>
                         <div class="payment-message lang-en">
-                            Message Case 1
-                            Pellentesque diam volutpat commodo sed. Amet massa vitae tortor condimentum. Tempus imperdiet nulla malesuada pellentesque elit. Pharetra vel turpis nunc eget lorem dolor sed. Pretium quam vulputate dignissim suspendisse in. Mus mauris vitae ultricies leo integer.
+                            <b>Attention:</b> There has been a problem with your payment process for <b>${course_name}</b>. Therefore, your enrollment has been paused in the course.
+                            Please try to pay again <a href=${payment_link}>here</a> to re-enroll in the course.
+                            After the payment is completed, you can continue your learning progress, submit exams and earn your certificate. If you have a question, please contact our support.
                         </div>
 
                         %if payment_notification.call_to_action_1_url:

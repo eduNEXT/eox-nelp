@@ -13,6 +13,7 @@ import logging
 from django.conf import settings
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
+from eox_nelp.payment_notifications.models import PaymentNotification
 from eox_nelp.signals.tasks import create_external_certificate, dispatch_futurex_progress
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
@@ -112,3 +113,34 @@ def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=u
             certificate.user.pii.username,
             certificate.course.course_key,
         )
+
+
+def update_payment_notifications(instance, **kwargs):
+    """This update the internal status of a payment notification record,
+    if the enrollment is active an have the no-id-professional mode this will set
+    the internal status as resolution_by_case_1
+    """
+    if not instance.is_active or instance.mode != "no-id-professional":
+        return
+
+    user = instance.user
+    course_key = instance.course_id
+
+    try:
+        payment_notification = PaymentNotification.objects.exclude(
+            internal_status="resolution_by_case_1",
+        ).get(
+            cdtrans_lms_user_id=user.id,
+            cdtrans_course_id=str(course_key),
+        )
+    except PaymentNotification.DoesNotExist:
+        return
+
+    payment_notification.internal_status = "resolution_by_case_1"
+    payment_notification.save()
+
+    LOGGER.info(
+        "The internal status of the payment notification with id %s has been updated to %s",
+        payment_notification.id,
+        payment_notification.internal_status,
+    )

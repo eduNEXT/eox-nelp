@@ -2,7 +2,9 @@
 This file contains all the necessary certificates dependencies from
 https://github.com/eduNEXT/edunext-platform/tree/master/lms/djangoapps/certificates
 """
-from lms.djangoapps.certificates import admin  # pylint: disable=import-error
+from django.apps import apps
+from django.contrib import admin
+from lms.djangoapps import certificates  # pylint: disable=import-error
 
 
 def get_generated_certificates_admin():
@@ -12,4 +14,7 @@ def get_generated_certificates_admin():
     Returns:
         GeneratedCertificateAdmin class.
     """
-    return admin.GeneratedCertificateAdmin
+    if apps.is_installed(certificates.models.__package__):
+        return certificates.admin.GeneratedCertificateAdmin
+
+    return admin.ModelAdmin

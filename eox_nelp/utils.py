@@ -1,5 +1,8 @@
 """Utils that can be used for the plugin project"""
+import re
 from copy import copy
+
+NATIONAL_ID_REGEX = r"^[1-2]\d{9}$"
 
 
 def map_instance_attributes_to_dict(instance, attributes_mapping):
@@ -38,3 +41,40 @@ def map_instance_attributes_to_dict(instance, attributes_mapping):
         instance_dict[extra_field] = extra_value
 
     return instance_dict
+
+
+def check_regex(string, regex):
+    """Checks if the string matches the regex.
+
+    Args:
+        string: The string to check.
+        regex: The regex to match against.
+
+    Returns:
+        True if the string matches the regex, False otherwise.
+    """
+    pattern = re.compile(regex)
+
+    return pattern.match(string) is not None
+
+
+def is_valid_national_id(national_id, raise_exception=False):
+    """Validate if a national_id has the shape of a national_id
+
+    Args:
+        national_id: The string of national_id to check.
+
+    Returns:
+        True if the national_id is ok, False otherwise.
+
+    Raise:
+    ValueError: This will be raised when the username are excluded dont match national Id regex.
+    """
+    check_national_id = check_regex(national_id, NATIONAL_ID_REGEX)
+
+    if raise_exception and not check_national_id:
+        raise ValueError(
+            f"The username or national_id: {national_id} doesnt match national ID regex ({NATIONAL_ID_REGEX})",
+        )
+
+    return check_national_id

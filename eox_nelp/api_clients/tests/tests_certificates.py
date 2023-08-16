@@ -11,6 +11,7 @@ from mock import Mock, patch
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.tests import TestBasicAuthApiClientMixin
+from eox_nelp.signals.utils import generate_reference_id
 
 
 class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.TestCase):
@@ -33,12 +34,14 @@ class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.Te
         }
         post_mock.return_value = expected_value
         user = {
-            "national_id": "10224587",
+            "national_id": "1222555888",
             "english_name": " Testing",
             "arabic_name": "اختبارات",
         }
+        course_id = "course-v1:FutureX+guide+2023"
         data = {
             "id": "124ABC",
+            "reference_id": generate_reference_id(user["national_id"], course_id),
             "created_at": timezone.now(),
             "expiration_date": timezone.now() + timezone.timedelta(days=365),
             "grade": 10,

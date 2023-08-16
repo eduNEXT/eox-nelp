@@ -10,6 +10,8 @@ from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.utils import is_valid_national_id
+
 CourseGradeFactory = get_course_grade_factory()
 GeneratedCertificate = get_generated_certificate()
 User = get_user_model()
@@ -39,16 +41,18 @@ def _generate_external_certificate_data(time, certificate_data):
     group_codes = getattr(settings, "EXTERNAL_CERTIFICATES_GROUP_CODES", {})
     course_id = str(certificate_data.course.course_key)
     extra_info = getattr(user, "extrainfo", None)
+    national_id = user.username[:10]  # saml association extra filter
 
     return {
         "id": certificate.id,
+        "reference_id": generate_reference_id(national_id, course_id),
         "created_at": str(time.date()),
         "expiration_date": None,
         "grade": float(certificate_data.grade) * 100,
         "is_passing": _user_has_passing_grade(user, course_id),
         "group_code": group_codes[course_id],
         "user": {
-            "national_id": user.username,
+            "national_id": national_id,
             "english_name": certificate_data.user.pii.name,
             "arabic_name": extra_info.arabic_name if extra_info else "",
         }
@@ -67,3 +71,20 @@ def _user_has_passing_grade(user, course_id):
     course_grade = CourseGradeFactory().read(user, course_key=CourseKey.from_string(course_id))
 
     return course_grade.passed
+
+
+def generate_reference_id(national_id, course_id):
+    """Generate string of reference_id shape.
+    Args:
+        national_id<string>: Username of the user(national_id).
+        course_id<str>: Unique course identifier.
+
+    Returns:
+        reference_id<str>: The string of reference_id representation.
+
+    Raise:
+        ValueError: National Id is not valid.
+    """
+    is_valid_national_id(national_id, raise_exception=True)
+
+    return f"{national_id}~{course_id}"

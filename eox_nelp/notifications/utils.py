@@ -16,6 +16,8 @@ def send_email_multialternative(
     html_msg=None,
     recipient_emails=None,
     from_email=None,
+    connection=None,
+    bcc=None,
 ):
     """
     Function to send emails with plaintext msg and html msg.
@@ -23,7 +25,7 @@ def send_email_multialternative(
         (int): Number of emails sent.
     """
     logger.info("------Sending email with subject: %s -------", subject)
-    msg = EmailMultiAlternatives(subject, plaintext_msg, from_email, recipient_emails)
+    msg = EmailMultiAlternatives(subject, plaintext_msg, from_email, recipient_emails, connection=connection, bcc=bcc)
     msg.attach_alternative(html_msg, "text/html")
     return msg.send()
 

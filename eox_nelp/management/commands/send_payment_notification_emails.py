@@ -119,7 +119,7 @@ def get_notification_data_from_payment_notification(payment_notification):
     return {
         "course_name": course_overview.display_name,
         "learner_name": learner_name,
-        "payment_date": payment_notification.cdtrans_date, #check format
+        "payment_date": payment_notification.cdtrans_date.strftime("%d-%m-%Y"), #check format to manage this datetime
         "invoice_total_amount": payment_notification.cdtrans_amount,
         "payment_url": f"https://srei.ecommerce.futurex.sa/basket/add/?sku={payment_notification.cdtrans_sku}",
         "support_email": "srei.care@elc.edu.sa",

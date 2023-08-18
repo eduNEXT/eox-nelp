@@ -90,15 +90,6 @@ class Command(BaseCommand):
             delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
                 internal_status="case_1",
             )
-        emails_list = []
-        """_
-            message1 = (
-                "Subject here",
-                "Here is the message",
-                "from@example.com",
-                ["first@example.com", "other@example.com"],
-            )
-        """
         correct_payment_notifications = []
         failed_payment_notifications = []
         logger.info('----Preparing to send %s emails-----, you have 5 seconds to cancel', len(delivery_qs))
@@ -114,13 +105,10 @@ class Command(BaseCommand):
                 logger.error("There was an error processing payment notification %s",payment_notification.id)
                 logger.error(e)
                 failed_payment_notifications.append(payment_notification.id)
-        emails = tuple(emails_list)
-        logger.info('----Start sendig mass email: approx %s-----', len(correct_payment_notifications))
 
-        emails_sent = send_mass_mail(emails, fail_silently=False)
         logger.info('----Sending summary emails to managers-----')
         mail_connection.close()
-        send_summary_email(correct_payment_notifications, failed_payment_notifications, emails_sent=emails_sent)
+        send_summary_email(correct_payment_notifications, failed_payment_notifications)
         end_time = datetime.now()
         script_runtime = end_time - start_time
         logger.info('----The command run with a time of approx %s-----', str(script_runtime))
@@ -148,12 +136,11 @@ def get_notification_data_from_payment_notification(payment_notification):
     }
 
 
-def send_summary_email(correct, failed, emails_sent=None):
+def send_summary_email(correct, failed):
     """send refund summarry order email."""
     correct_total = len(correct)
     failed_total = len(failed)
     msg = f"""
-    Emails sent: {emails_sent}
     Number correct_processed: {correct_total}
     Number failed_processed {failed_total}
     Correct payment notifications processed: {correct}

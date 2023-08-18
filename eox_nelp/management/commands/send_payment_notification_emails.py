@@ -62,14 +62,26 @@ CASE_1_EMAIL_HTML_BODY = """
 
 class Command(BaseCommand):
     """Class command to send case 1 payment notifications."""
-    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
-
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--payment_notifications_ids',
+            nargs="+",
+            type=int,
+            required=False,
+            help='Indicate specific payment notification to sent id'
+        )
+    def handle(self, *args, **kwargs):  # lint-amnesty, pylint: disable=too-many-statements
         logger.info('----Processing payment notifications to send email-----')
         start_time = datetime.now()
-
-        delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
-            internal_status="case_1",
-        )
+        specific_payment_notifications_ids = kwargs.get('--payment_notifications_ids', None)
+        if specific_payment_notifications_ids:
+            delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
+                id__in=specific_payment_notifications_ids,
+            )
+        else:
+            delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
+                internal_status="case_1",
+            )
         emails_list = []
         """_
             message1 = (

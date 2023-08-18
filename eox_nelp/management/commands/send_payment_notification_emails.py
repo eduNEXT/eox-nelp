@@ -70,10 +70,17 @@ class Command(BaseCommand):
             required=False,
             help='Indicate specific payment notification to sent id'
         )
+        parser.add_argument(
+            '--bcc',
+            nargs="+",
+            required=False,
+            help='Indicate secret bcc to send emails'
+        )
     def handle(self, *args, **kwargs):  # lint-amnesty, pylint: disable=too-many-statements
         logger.info('----Processing payment notifications to send email-----')
         start_time = datetime.now()
         payment_notifications_ids = kwargs.get('payment_notifications_ids')
+        bcc = kwargs.get('bcc')
         if payment_notifications_ids:
             delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
                 id__in=payment_notifications_ids,
@@ -98,7 +105,7 @@ class Command(BaseCommand):
         for payment_notification in delivery_qs:
             try:
                 email_multialternative_data = generate_email_multialternative_data(payment_notification)
-                send_email_multialternative(**email_multialternative_data, connection=mail_connection)
+                send_email_multialternative(**email_multialternative_data, connection=mail_connection, bcc=bcc)
                 correct_payment_notifications.append(payment_notification.id)
             except Exception as e:
                 logger.error("There was an error processing payment notification %s",payment_notification.id)

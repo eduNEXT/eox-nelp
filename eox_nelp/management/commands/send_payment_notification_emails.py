@@ -5,6 +5,7 @@ To run it use:
 """
 
 import logging
+import time
 from datetime import datetime
 from django.conf import settings
 from django.core.management import BaseCommand
@@ -100,6 +101,8 @@ class Command(BaseCommand):
         """
         correct_payment_notifications = []
         failed_payment_notifications = []
+        logger.info('----Preparing to send %s emails-----, you have 5 seconds to cancel', len(delivery_qs))
+        time.sleep(5)
         mail_connection = mail.get_connection()
         mail_connection.open()
         for payment_notification in delivery_qs:

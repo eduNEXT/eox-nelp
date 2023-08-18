@@ -73,10 +73,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):  # lint-amnesty, pylint: disable=too-many-statements
         logger.info('----Processing payment notifications to send email-----')
         start_time = datetime.now()
-        specific_payment_notifications_ids = kwargs.get('--payment_notifications_ids', None)
-        if specific_payment_notifications_ids:
+        payment_notifications_ids = kwargs.get('payment_notifications_ids')
+        if payment_notifications_ids:
             delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member
-                id__in=specific_payment_notifications_ids,
+                id__in=payment_notifications_ids,
             )
         else:
             delivery_qs = PaymentNotification.objects.filter(  # pylint: disable=no-member

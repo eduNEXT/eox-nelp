@@ -10,6 +10,8 @@ from django.conf import settings
 from django.core.management import BaseCommand
 from django.utils import timezone
 from django.core.mail import send_mail, send_mass_mail
+from django.core import mail
+from eox_nelp.notifications.utils import send_email_multialternative
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from django.contrib.auth import get_user_model
 from eox_nelp.payment_notifications.models import PaymentNotification
@@ -20,7 +22,8 @@ logger = logging.getLogger(__name__)
 
 CASE_1_EMAIL_SUBJECT = "[مهم] مشكلة في الدفع لدورة {course_name} في المعهد العقاري السعودي"
 
-CASE_1_EMAIL_BODY = """السلام عليكم،
+CASE_1_EMAIL_BODY = """
+السلام عليكم،
 
 إلى {learner_name} مع التحية،
 
@@ -39,7 +42,23 @@ CASE_1_EMAIL_BODY = """السلام عليكم،
 
 --
 
-فريق المعهد العقاري السعودي على منصة FutureX.sa"""
+فريق المعهد العقاري السعودي على منصة FutureX.sa
+"""
+CASE_1_EMAIL_HTML_BODY = """
+<div style="direction:rtl;">
+<p>السلام عليكم،</p>
+<p>إلى {learner_name} مع التحية،</p>
+<p>هذه الرسالة بخصوص مشكلة في عميلة الدفع لتسجيلكم في دورة "{course_name}" في المعهد السعودي العقاري.</p>
+<p>حصل خطأ في الدفعة التي جرت بتاريخ {payment_date} وقيمتها {invoice_total_amount} ريال سعودي ولم يتم استيفاء الرسوم المترتبة على الانضمام للدورة.</p>
+<p>يرجى الدخول إلى حسابكم في المنصة التعليمية للمعهد وإعادة الدفع: https://srei.futurex.sa/dashboard</p>
+<p>أو يمكنكم الدفع مباشرة بالذهاب لهذا الرابط: {payment_url}</p>
+<p>إذا كنت متأكداً بأن عملية الدفع الخاصة بك قد تمت بنجاح، الرجاء مراسلتنا على البريد التالي مع إرفاق صورة عن إثبات الدفع مثل كشف الحساب من بطاقة الإتمان أو بطاقة مدى على الإيميل</p>
+<p>{support_email}</p>
+<p>مع فائق الشكر،</p>
+<p>--</p>
+<p>فريق المعهد العقاري السعودي على منصة FutureX.sa</p>
+</div>
+"""
 
 class Command(BaseCommand):
     """Class command to send case 1 payment notifications."""
@@ -62,17 +81,12 @@ class Command(BaseCommand):
         """
         correct_payment_notifications = []
         failed_payment_notifications = []
+        mail_connection = mail.get_connection()
+        mail_connection.open()
         for payment_notification in delivery_qs:
             try:
-                notification_data = get_notification_data_from_payment_notification(payment_notification)
-                emails_list.append(
-                    (
-                        CASE_1_EMAIL_SUBJECT.format(**notification_data),
-                        CASE_1_EMAIL_BODY.format(**notification_data),
-                        None,
-                        [payment_notification.cdtrans_email]
-                    )
-                )
+                email_multialternative_data = generate_email_multialternative_data(payment_notification)
+                send_email_multialternative(**email_multialternative_data, connection=mail_connection)
                 correct_payment_notifications.append(payment_notification.id)
             except Exception as e:
                 logger.error("There was an error processing payment notification %s",payment_notification.id)
@@ -83,7 +97,7 @@ class Command(BaseCommand):
 
         emails_sent = send_mass_mail(emails, fail_silently=False)
         logger.info('----Sending summary emails to managers-----')
-
+        mail_connection.closed()
         send_summary_email(correct_payment_notifications, failed_payment_notifications, emails_sent=emails_sent)
         end_time = datetime.now()
         script_runtime = end_time - start_time
@@ -108,7 +122,7 @@ def get_notification_data_from_payment_notification(payment_notification):
         "payment_date": payment_notification.cdtrans_date, #check format
         "invoice_total_amount": payment_notification.cdtrans_amount,
         "payment_url": f"https://srei.ecommerce.futurex.sa/basket/add/?sku={payment_notification.cdtrans_sku}",
-        "support_email": settings.CONTACT_EMAIL,
+        "support_email": "srei.care@elc.edu.sa",
     }
 
 
@@ -130,3 +144,16 @@ def send_summary_email(correct, failed, emails_sent=None):
         ["johan.castiblanco@edunext.co", "andrey.canon@edunext.co"],
         fail_silently=False,
     )
+
+
+def generate_email_multialternative_data(payment_notification):
+    """generate dict data to sent email multialternative"""
+    notification_data = get_notification_data_from_payment_notification(payment_notification)
+
+    return {
+        "subject": CASE_1_EMAIL_SUBJECT.format(**notification_data),
+        "plaintext_msg": CASE_1_EMAIL_BODY.format(**notification_data),
+        "html_msg": CASE_1_EMAIL_HTML_BODY.format(**notification_data),
+        "recipient_emails": [payment_notification.cdtrans_email]
+
+    }

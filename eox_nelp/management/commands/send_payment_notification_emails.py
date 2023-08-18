@@ -97,7 +97,7 @@ class Command(BaseCommand):
 
         emails_sent = send_mass_mail(emails, fail_silently=False)
         logger.info('----Sending summary emails to managers-----')
-        mail_connection.closed()
+        mail_connection.close()
         send_summary_email(correct_payment_notifications, failed_payment_notifications, emails_sent=emails_sent)
         end_time = datetime.now()
         script_runtime = end_time - start_time

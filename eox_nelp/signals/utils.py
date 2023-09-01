@@ -6,14 +6,12 @@ Functions:
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.utils import is_valid_national_id
 
 CourseGradeFactory = get_course_grade_factory()
-GeneratedCertificate = get_generated_certificate()
 User = get_user_model()
 
 
@@ -34,17 +32,12 @@ def _generate_external_certificate_data(time, certificate_data):
         Dict: certificate data
     """
     user = User.objects.get(id=certificate_data.user.id)
-    certificate = GeneratedCertificate.objects.get(
-        user=user,
-        course_id=certificate_data.course.course_key,
-    )
     group_codes = getattr(settings, "EXTERNAL_CERTIFICATES_GROUP_CODES", {})
     course_id = str(certificate_data.course.course_key)
     extra_info = getattr(user, "extrainfo", None)
     national_id = user.username[:10]  # saml association extra filter
 
     return {
-        "id": certificate.id,
         "reference_id": generate_reference_id(national_id, course_id),
         "created_at": str(time.date()),
         "expiration_date": None,

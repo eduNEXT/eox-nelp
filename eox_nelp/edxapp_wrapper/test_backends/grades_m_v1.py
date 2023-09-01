@@ -8,4 +8,4 @@ def get_course_grade_factory():
     Returns:
         Mock class.
     """
-    return Mock
+    return Mock()

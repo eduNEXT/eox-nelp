@@ -7,7 +7,8 @@ import unittest
 
 from django.contrib.auth import get_user_model
 from django.test import override_settings
-from mock import patch
+from django.utils import timezone
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.data import EventsMetadata
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
@@ -18,7 +19,9 @@ from eox_nelp.signals.receivers import (
     block_completion_progress_publisher,
     certificate_publisher,
     course_grade_changed_progress_publisher,
+    enrollment_publisher,
 )
+from eox_nelp.tests.utils import set_key_values
 
 User = get_user_model()
 
@@ -234,6 +237,180 @@ class CertificatePublisherTestCase(unittest.TestCase):
 
         generate_data_mock.assert_called_with(
             time=self.metadata.time,
+            certificate_data=certificate_data,
+        )
+        create_external_certificate_mock.delay.assert_called_with(
+            external_certificate_data=generate_data_mock()
+        )
+        self.assertEqual(logs.output, [
+            f"INFO:{receivers.__name__}:{log_info}"
+        ])
+
+
+class EnrollmentPublisherTestCase(unittest.TestCase):
+    """Test class for enrollment_publisher."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.user, _ = User.objects.update_or_create(
+            username="Newt",
+            email="newt@example.com"
+        )
+        self.course_key = CourseKey.from_string("course-v1:test+Cx105+2022_T4")
+        profile_data = {
+            "name": "Newt Scamander"
+        }
+        setattr(self.user, "profile", set_key_values(profile_data))
+        course_enrollment_data = {
+            "user": self.user,
+            "created": timezone.now(),
+            "mode": "no-id-professional",
+            "course_id": self.course_key
+        }
+        self.course_enrollment = set_key_values(course_enrollment_data)
+
+    @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
+    @patch("eox_nelp.signals.receivers.create_external_certificate")
+    def test_inactive_behavior(self, create_external_certificate_mock):
+        """Test that the asynchronous task wont' be called when the setting is not active.
+
+        Expected behavior:
+            - create_external_certificate is not called
+        """
+        enrollment_publisher(self.course_enrollment)
+
+        create_external_certificate_mock.delay.assert_not_called()
+
+    @patch("eox_nelp.signals.receivers.create_external_certificate")
+    def test_invalid_mode(self, create_external_certificate_mock):
+        """Test when the course enrollment has an invalid mode.
+
+        Expected behavior:
+            - create_external_certificate is not called.
+            - Invalid error was logged.
+        """
+        invalid_mode = "audit"
+        log_info = (
+            f"The {invalid_mode} enrollment associated with the user <{self.user.username}>"
+            f" and course <{self.course_key}> doesn't have a valid mode and therefore its data won't be published."
+        )
+        invalid_course_enrollment = self.course_enrollment
+
+        setattr(invalid_course_enrollment, "mode", "audit")
+
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            enrollment_publisher(invalid_course_enrollment)
+
+        create_external_certificate_mock.delay.assert_not_called()
+        self.assertEqual(logs.output, [
+            f"INFO:{receivers.__name__}:{log_info}"
+        ])
+
+    @patch("eox_nelp.signals.receivers.CourseGradeFactory")
+    @patch("eox_nelp.signals.receivers._generate_external_certificate_data")
+    @patch("eox_nelp.signals.receivers.create_external_certificate")
+    def test_create_call(self, create_external_certificate_mock, generate_data_mock, course_grade_factory_mock):
+        """Test when the enrollment mode is valid and the asynchronous task is called
+
+        Expected behavior:
+            - _generate_external_certificate_data is called with the right parameters.
+            - create_external_certificate is called with the _generate_external_certificate_data output.
+            - Info was logged.
+        """
+        generate_data_mock.return_value = {
+            "test": True,
+        }
+        log_info = (
+            f"The no-id-professional enrollment associated with the user <{self.user.username}> and "
+            f"course <{self.course_key}> has been already generated and its data will be sent "
+            "to the NELC certificate service."
+        )
+        certificate_data = CertificateData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course_key,
+            ),
+            mode=self.course_enrollment.mode,
+            grade=0,
+            current_status='not-passing',
+            download_url='',
+            name='',
+        )
+        course_grade_factory = Mock()
+        course_grade_factory.read.return_value = set_key_values({"passed": False, "percent": 0})
+        course_grade_factory_mock.return_value = course_grade_factory
+
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            enrollment_publisher(self.course_enrollment)
+
+        generate_data_mock.assert_called_with(
+            time=self.course_enrollment.created,
+            certificate_data=certificate_data,
+        )
+        create_external_certificate_mock.delay.assert_called_with(
+            external_certificate_data=generate_data_mock()
+        )
+        self.assertEqual(logs.output, [
+            f"INFO:{receivers.__name__}:{log_info}"
+        ])
+
+    @override_settings(CERTIFICATE_PUBLISHER_VALID_MODES=["another-mode"])
+    @patch("eox_nelp.signals.receivers.CourseGradeFactory")
+    @patch("eox_nelp.signals.receivers._generate_external_certificate_data")
+    @patch("eox_nelp.signals.receivers.create_external_certificate")
+    def test_alternative_mode(self, create_external_certificate_mock, generate_data_mock, course_grade_factory_mock):
+        """Test when the CERTIFICATE_PUBLISHER_VALID_MODES setting has an alternative mode.
+
+        Expected behavior:
+            - _generate_external_certificate_data is called with the right parameters.
+            - create_external_certificate is called with the _generate_external_certificate_data output.
+            - Info was logged.
+        """
+        alternative_mode = "another-mode"
+        log_info = (
+            f"The {alternative_mode} enrollment associated with the user <{self.user.username}> and "
+            f"course <{self.course_key}> has been already generated and its data will be sent "
+            "to the NELC certificate service."
+        )
+        certificate_data = CertificateData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course_key,
+            ),
+            mode=alternative_mode,
+            grade=0,
+            current_status='not-passing',
+            download_url='',
+            name='',
+        )
+        alternative_course_enrollment = self.course_enrollment
+        setattr(alternative_course_enrollment, "mode", alternative_mode)
+
+        course_grade_factory = Mock()
+        course_grade_factory.read.return_value = set_key_values({"passed": False, "percent": 0})
+        course_grade_factory_mock.return_value = course_grade_factory
+
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            enrollment_publisher(alternative_course_enrollment)
+
+        generate_data_mock.assert_called_with(
+            time=self.course_enrollment.created,
             certificate_data=certificate_data,
         )
         create_external_certificate_mock.delay.assert_called_with(

@@ -51,6 +51,12 @@ class EoxNelpConfig(AppConfig):
                         'signal_path': 'openedx_events.learning.signals.CERTIFICATE_CREATED',
                         'dispatch_uid': 'certificate_publisher_receiver',
                     },
+                    {
+                        'receiver_func_name': 'enrollment_publisher',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'enrollment_publisher_receiver',
+                        'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
+                    },
                 ],
             },
         },

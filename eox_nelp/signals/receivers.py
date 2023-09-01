@@ -11,12 +11,15 @@ Functions:
 import logging
 
 from django.conf import settings
+from eox_core.edxapp_wrapper.grades import get_course_grade_factory
+from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.signals.tasks import create_external_certificate, dispatch_futurex_progress
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
 LOGGER = logging.getLogger(__name__)
+CourseGradeFactory = get_course_grade_factory()
 
 
 def block_completion_progress_publisher(instance, **kwargs):  # pylint: disable=unused-argument
@@ -111,4 +114,74 @@ def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=u
             certificate.mode,
             certificate.user.pii.username,
             certificate.course.course_key,
+        )
+
+
+def enrollment_publisher(instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receiver that is connected to the course enrollment post_save signal and this will generate certificate
+    data to publish it to the external service. That behavior is controlled by the following settings:
+
+    - ENABLE_CERTIFICATE_PUBLISHER<boolean>: If this is true the receiver will publish the certificate data,
+    default is False.
+    - CERTIFICATE_PUBLISHER_VALID_MODES<list[string]>: List of valid modes, default ['no-id-professional']
+
+    Note: This keeps the same certificate receiver settings since this will create an external certificate at
+    the beginning of the course, then the certificate receiver will update the grade.
+
+    Args:
+        instance<CourseEnrollment>: This an instance of the model CourseEnrollment.
+    """
+    if not getattr(settings, "ENABLE_CERTIFICATE_PUBLISHER", False):
+        return
+
+    default_modes = [
+        "no-id-professional",
+    ]
+    valid_modes = getattr(settings, "CERTIFICATE_PUBLISHER_VALID_MODES", default_modes)
+
+    if instance.mode in valid_modes:
+        LOGGER.info(
+            "The %s enrollment associated with the user <%s> and course <%s> has been already generated "
+            "and its data will be sent to the NELC certificate service.",
+            instance.mode,
+            instance.user.username,
+            instance.course_id,
+        )
+        time = instance.created
+        user = instance.user
+        course_grade = CourseGradeFactory().read(user, course_key=instance.course_id)
+        certificate = CertificateData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=user.username,
+                    email=user.email,
+                    name=user.profile.name,
+                ),
+                id=user.id,
+                is_active=user.is_active,
+            ),
+            course=CourseData(
+                course_key=instance.course_id,
+            ),
+            mode=instance.mode,
+            grade=course_grade.percent,
+            current_status='downloadable' if course_grade.passed else 'not-passing',
+            download_url='',
+            name='',
+        )
+
+        create_external_certificate.delay(
+            external_certificate_data=_generate_external_certificate_data(
+                time=time,
+                certificate_data=certificate,
+            )
+        )
+    else:
+        LOGGER.info(
+            "The %s enrollment associated with the user <%s> and course <%s> "
+            "doesn't have a valid mode and therefore its data won't be published.",
+            instance.mode,
+            instance.user.username,
+            instance.course_id,
         )

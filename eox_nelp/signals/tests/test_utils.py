@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils import timezone
-from mock import Mock, patch
+from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
@@ -72,8 +72,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
 
     @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
-    @patch("eox_nelp.signals.utils.GeneratedCertificate")
-    def test_generate_certificate_data(self, generate_certificate_mock, passing_mock):
+    def test_generate_certificate_data(self, passing_mock):
         """This tests the normal behavior of the method `_generate_external_certificate_data`
 
         Expected behavior:
@@ -82,13 +81,9 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             - _user_has_passing_grade is called with the right parameters.
         """
         time = timezone.now()
-        certificate = Mock()
-        certificate.id = 85
-        generate_certificate_mock.objects.get.return_value = certificate
         passing_mock.return_value = True
 
         expected_value = {
-            "id": certificate.id,
             'reference_id': '1333666888~course-v1:test+Cx105+2022_T4',
             "created_at": str(time.date()),
             "expiration_date": None,
@@ -105,26 +100,18 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         result = _generate_external_certificate_data(time, self.certificate_data)
 
         self.assertEqual(result, expected_value)
-        generate_certificate_mock.objects.get.assert_called_once_with(
-            user=self.user,
-            course_id=self.certificate_data.course.course_key,
-        )
         passing_mock.assert_called_once_with(
             self.user,
             str(self.certificate_data.course.course_key)
         )
 
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
-    @patch("eox_nelp.signals.utils.GeneratedCertificate")
-    def test_invalid_group_codes(self, generate_certificate_mock, passing_mock):
+    def test_invalid_group_codes(self, passing_mock):
         """This tests when the EXTERNAL_CERTIFICATES_GROUP_CODES value has not been set.
 
         Expected behavior:
             - Raise KeyError
         """
-        certificate = Mock()
-        certificate.id = 85
-        generate_certificate_mock.objects.get.return_value = certificate
         passing_mock.return_value = True
         external_certificate_data = {
             "time": timezone.now(),
@@ -135,17 +122,13 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
 
     @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
-    @patch("eox_nelp.signals.utils.GeneratedCertificate")
     @data(*WRONG_NATIONAL_IDS)
-    def test_invalid_mational_id(self, wrong_national_id, generate_certificate_mock, passing_mock):
+    def test_invalid_national_id(self, wrong_national_id, passing_mock):
         """This tests when the user has an invalid NationalId.
 
         Expected behavior:
             - Raise ValueError
         """
-        certificate = Mock()
-        certificate.id = 85
-        generate_certificate_mock.objects.get.return_value = certificate
         passing_mock.return_value = True
         wrong_user, _ = User.objects.get_or_create(
             username=wrong_national_id,
@@ -183,12 +166,10 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
 
     @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
-    @patch("eox_nelp.signals.utils.GeneratedCertificate")
     @data(*SAML_EXTRA_ASSOCIATIONS_LIST)
     def test_generate_certificate_data_saml_extra_association(
         self,
         saml_extra_association,
-        generate_certificate_mock,
         passing_mock
     ):
         """This tests the normal behavior ofa user with saml_extra_association
@@ -200,9 +181,6 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             - _user_has_passing_grade is called with the right parameters.
         """
         time = timezone.now()
-        certificate = Mock()
-        certificate.id = 99
-        generate_certificate_mock.objects.get.return_value = certificate
         passing_mock.return_value = True
         saml_association_user, _ = User.objects.get_or_create(
             username=saml_extra_association,
@@ -229,7 +207,6 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         national_id = saml_association_user.username[:10]
 
         expected_value = {
-            "id": certificate.id,
             'reference_id': f'{national_id}~course-v1:test+Cx105+2022_T4',
             "created_at": str(time.date()),
             "expiration_date": None,
@@ -246,10 +223,6 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         result = _generate_external_certificate_data(time, certificate_data)
 
         self.assertEqual(result, expected_value)
-        generate_certificate_mock.objects.get.assert_called_once_with(
-            user=saml_association_user,
-            course_id=certificate_data.course.course_key,
-        )
         passing_mock.assert_called_once_with(
             saml_association_user,
             str(certificate_data.course.course_key)

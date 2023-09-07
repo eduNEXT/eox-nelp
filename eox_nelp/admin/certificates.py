@@ -7,7 +7,7 @@ Classes:
 Functions:
     create_external_certificate_action: Allow to create external certificates.
 """
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
@@ -31,34 +31,49 @@ def create_external_certificate_action(modeladmin, request, queryset):  # pylint
         request: Current django request.
         queryset: Selected records.
     """
+    errors = {}
 
     for certificate in queryset:
-        certificate_data = CertificateData(
-            user=UserData(
-                pii=UserPersonalData(
-                    username=certificate.user.username,
-                    email=certificate.user.email,
-                    name=certificate.user.profile.name,
+        try:
+            certificate_data = CertificateData(
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=certificate.user.username,
+                        email=certificate.user.email,
+                        name=certificate.user.profile.name,
+                    ),
+                    id=certificate.user.id,
+                    is_active=certificate.user.is_active,
                 ),
-                id=certificate.user.id,
-                is_active=certificate.user.is_active,
-            ),
-            course=CourseData(
-                course_key=certificate.course_id,
-            ),
-            mode=certificate.mode,
-            grade=certificate.grade,
-            current_status=certificate.status,
-            download_url=certificate.download_url,
-            name=certificate.name,
-        )
-        time = certificate.modified_date.astimezone(timezone.utc)
-
-        create_external_certificate.delay(
-            external_certificate_data=_generate_external_certificate_data(
-                time=time,
-                certificate_data=certificate_data,
+                course=CourseData(
+                    course_key=certificate.course_id,
+                ),
+                mode=certificate.mode,
+                grade=certificate.grade,
+                current_status=certificate.status,
+                download_url=certificate.download_url,
+                name=certificate.name,
             )
+            time = certificate.modified_date.astimezone(timezone.utc)
+
+            create_external_certificate.delay(
+                external_certificate_data=_generate_external_certificate_data(
+                    time=time,
+                    certificate_data=certificate_data,
+                )
+            )
+        except Exception as exc:  # pylint: disable=broad-exception-caught
+            errors_by_class = errors.get(exc.__class__.__name__, {})
+            ids = errors_by_class.get("ids", [])
+            ids.append(certificate.id)
+            errors_by_class["ids"] = ids
+            errors_by_class["total"] = errors_by_class.get("total", 0) + 1
+            errors[exc.__class__.__name__] = errors_by_class
+
+    for key, value in errors.items():
+        messages.error(
+            request,
+            f"There were {value['total']} errors of the type {key} for the certificates with ids {value['ids']}",
         )
 
 

@@ -63,12 +63,11 @@ def create_external_certificate_action(modeladmin, request, queryset):  # pylint
                 )
             )
         except Exception as exc:  # pylint: disable=broad-exception-caught
-            errors_by_class = errors.get(exc.__class__.__name__, {})
-            ids = errors_by_class.get("ids", [])
-            ids.append(certificate.id)
-            errors_by_class["ids"] = ids
-            errors_by_class["total"] = errors_by_class.get("total", 0) + 1
-            errors[exc.__class__.__name__] = errors_by_class
+            if exc.__class__.__name__ in errors:
+                errors[exc.__class__.__name__]['ids'].append(certificate.id)
+                errors[exc.__class__.__name__]['total'] = errors[exc.__class__.__name__]['total'] + 1
+            else:
+                errors[exc.__class__.__name__] = {"ids": [certificate.id], "total": 1}
 
     for key, value in errors.items():
         messages.error(

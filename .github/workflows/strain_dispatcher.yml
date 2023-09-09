@@ -1,5 +1,10 @@
 name: Strain Repo Dispatch 📜
-on: pull_request
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - closed
 #strain_property go in json_path format.
 jobs:
   strain-dispatch:

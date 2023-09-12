@@ -24,4 +24,7 @@ Usage
 #####
 
 Extend `edx-platform` for Nelp requirements without changing base platform code.
-Test
+
+Teststrains
+
+Teststrain2

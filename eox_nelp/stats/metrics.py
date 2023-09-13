@@ -6,14 +6,18 @@ functions:
     get_learners_metric: Return number of learners, for the visible courses.
     get_instructors_metric: Return number of instructors, for the visible courses.
     get_courses_metrics: Return metrics for the visible courses.
+    get_course_certificates_metric: Return a dict metric representin the certificates of a course.
 """
 from django.conf import settings
+from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 
 from eox_nelp.edxapp_wrapper.branding import get_visible_courses
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
 from eox_nelp.edxapp_wrapper.student import CourseAccessRole, CourseEnrollment
 from eox_nelp.stats.decorators import cache_method
+
+GeneratedCertificate = get_generated_certificate()
 
 
 @cache_method
@@ -70,6 +74,7 @@ def get_course_metrics(course_key):
         user__is_staff=False,
         user__is_superuser=False
     ).values('user').distinct().count()
+    certificates = get_course_certificates_metric(course_key)
 
     return {
         "id": str(course_key),
@@ -79,7 +84,8 @@ def get_course_metrics(course_key):
         "sections": len(chapters),
         "sub_sections": len(sequentials),
         "units": len(verticals),
-        "components": components
+        "components": components,
+        "certificates": certificates,
     }
 
 
@@ -134,3 +140,52 @@ def get_courses_metrics(tenant):
     metrics = [get_course_metrics(course.id) for course in courses]
 
     return {"total_courses": courses.count(), "metrics": metrics}
+
+
+def get_course_certificates_metric(course_key):
+    """
+    Returns the total of certificates in a course.
+
+    Args:
+        course_key<opaque-key>: Course identifier.
+
+    Return:
+        <Dictionary>: Contains certificates of course metric.
+        {
+                "verified": {...},
+                "honor": {...},
+                "audit": {},
+                "professional": {...},
+                "no-id-professional": {
+                    "downloadable": 5,
+                    "notpassing": 4,
+                },
+                "masters": {...},
+                "executive-education": {...}
+                "paid-executive-education":{...},
+                "paid-bootcamp": {...},
+                "total": 0
+        }
+    """
+    certificates = {}
+    course_certificates_qs = GeneratedCertificate.objects.filter(
+        course_id=course_key,
+    )
+    cert_statuses = [cert["status"] for cert in course_certificates_qs.values("status").distinct()]
+
+    for mode in GeneratedCertificate.MODES:
+        db_mode = mode[0]
+        human_mode = mode[1]
+        certificates[human_mode] = {
+            cert_status: course_certificates_qs.filter(
+                mode=db_mode,
+                status=cert_status,
+            ).values("user").distinct().count()
+            for cert_status in cert_statuses
+        }
+    certificates["total"] = {
+        cert_status: course_certificates_qs.filter(status=cert_status).values("user").distinct().count()
+        for cert_status in cert_statuses
+    }
+
+    return certificates

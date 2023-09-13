@@ -47,7 +47,9 @@ class GeneralTenantStatsViewTestCase(APITestCase):
         response = self.client.get(url_endpoint)
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertTrue(["learners", "courses", "instructors", "components"] == list(response.data.keys()))
+        self.assertTrue(
+            ["learners", "courses", "instructors", "components", "certificates"] == list(response.data.keys())
+        )
 
     @override_settings(
         MIDDLEWARE=["eox_tenant.middleware.CurrentSiteMiddleware"],
@@ -84,6 +86,56 @@ class GeneralTenantStatsViewTestCase(APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(expected_components, response.data["components"])
+        mock_metrics.get_courses_metrics.assert_called_once_with("testserver")
+
+    @override_settings(
+        MIDDLEWARE=["eox_tenant.middleware.CurrentSiteMiddleware"],
+    )
+    @patch("eox_nelp.stats.api.v1.views.metrics")
+    def test_total_certificates(self, mock_metrics):
+        """
+        Test that the view will calculate the total of certificates based on the metrics values
+
+        Expected behavior:
+            - Status code 200.
+            - Components total values are the expected.
+            - get_courses_metrics is called once.
+        """
+        total_courses = 4
+        fake_metric = {
+            "certificates": {
+                "verified": {"downloadable": 0, "notpassing": 0},
+                "honor": {"downloadable": 0, "notpassing": 0},
+                "audit": {"downloadable": 0, "notpassing": 0},
+                "professional": {"downloadable": 0, "notpassing": 0},
+                "no-id-professional": {"downloadable": 5, "notpassing": 4},
+                "masters": {"downloadable": 10, "notpassing": 0},
+                "executive-education": {"downloadable": 0, "notpassing": 1},
+                "paid-executive-education": {"downloadable": 0, "notpassing": 0},
+                "paid-bootcamp": {"downloadable": 0, "notpassing": 0},
+                "total": {
+                    "downloadable": 15,
+                    "notpassing": 5,
+                }
+            },
+        }
+
+        mock_metrics.get_learners_metric.return_value = 5
+        mock_metrics.get_instructors_metric.return_value = 4875
+        mock_metrics.get_courses_metrics.return_value = {
+            "total_courses": total_courses,
+            "metrics": [fake_metric for c in range(total_courses)],
+        }
+        expected_certificates = {
+            "downloadable": fake_metric["certificates"]["total"]["downloadable"] * total_courses,
+            "notpassing": fake_metric["certificates"]["total"]["notpassing"] * total_courses,
+        }
+        url_endpoint = reverse("stats-api:v1:general-stats")
+
+        response = self.client.get(url_endpoint)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected_certificates, response.data["certificates"])
         mock_metrics.get_courses_metrics.assert_called_once_with("testserver")
 
     @override_settings(MIDDLEWARE=["eox_tenant.middleware.CurrentSiteMiddleware"])
@@ -174,7 +226,8 @@ class GeneralCourseStatsViewTestCase(APITestCase):
                 "openassessment": 0,
                 "problem": 49,
                 "video": 0
-            }
+            },
+            "certificates": 12
         }
         url_endpoint = reverse("stats-api:v1:course-stats", args=[course_id])
 

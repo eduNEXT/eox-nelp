@@ -40,6 +40,10 @@ class GeneralTenantStatsView(APIView):
             "openassessment": 0,
             "problem": 49,
             "video": 0
+        },
+        "certiticates": {
+            "downloadable": 5,
+            "notpassing": 4
         }
     }
     ```
@@ -50,18 +54,22 @@ class GeneralTenantStatsView(APIView):
         tenant = request.site.domain
         courses = metrics.get_courses_metrics(tenant)
         components = {}
-
+        certificates = {}
         for metric in courses.get("metrics", []):
             course_components = metric.get("components", {})
+            certificates_components = metric.get("certificates", {}).get("total", {})
 
             for key, value in course_components.items():
                 components[key] = components.get(key, 0) + value
+            for key, value in certificates_components.items():
+                certificates[key] = certificates.get(key, 0) + value
 
         return Response({
             "learners": metrics.get_learners_metric(tenant),
             "courses": courses.get("total_courses", 0),
             "instructors": metrics.get_instructors_metric(tenant),
-            "components": components
+            "components": components,
+            "certificates": certificates,
         })
 
 
@@ -98,6 +106,22 @@ class GeneralCourseStatsView(APIView):
                     "openassessment": 0,
                     "problem": 49,
                     "video": 0
+                },
+                "certificates" : {
+                    "verified": {},
+                    "honor": {},
+                    "audit": {},
+                    "professional": {},
+                    "no-id-professional": {
+                        "downloadable": 5,
+                        "notpassing": 4,
+                    },
+                    "masters": {},
+                    "executive-education": {},
+                    "total": {
+                        "downloadable": 5,
+                        "notpassing": 4
+                    }
                 }
             },
             ...
@@ -124,6 +148,24 @@ class GeneralCourseStatsView(APIView):
             "openassessment": 0,
             "problem": 49,
             "video": 0
+        },
+        "certificates" : {
+            "verified": {...},
+            "honor": {...},
+            "audit": {...},
+            "professional": {},
+            "no-id-professional": {
+                "downloadable": 5,
+                "notpassing": 4...
+            },
+            "masters": {...},
+            "executive-education": {...},
+            "paid-executive-education": {...},
+            "paid-bootcamp": {...},
+            "total": {
+                "downloadable": 5,
+                "notpassing": 4
+            }
         }
     }
     ```

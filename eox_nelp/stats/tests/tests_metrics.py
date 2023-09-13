@@ -9,8 +9,10 @@ Classes:
 """
 import unittest
 
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import override_settings
+from eox_core.edxapp_wrapper.certificates import get_generated_certificate
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
@@ -26,6 +28,9 @@ from eox_nelp.stats.metrics import (
     get_learners_metric,
 )
 from eox_nelp.tests.utils import generate_list_mock_data
+
+User = get_user_model()
+GeneratedCertificate = get_generated_certificate()
 
 
 class TestGetCachedCourses(unittest.TestCase):
@@ -261,6 +266,33 @@ class TestGetCourseMetrics(unittest.TestCase):
         distinct_result = values_result.distinct.return_value
         distinct_result.count.return_value = self.expected_returned_roles
 
+        # this block use the GeneratedCertificates django test model defined
+        user, _ = User.objects.get_or_create(username="vader")
+        user2, _ = User.objects.get_or_create(username="vader2")
+        GeneratedCertificate.objects.get_or_create(**{
+            'user': user,
+            'course_id': CourseKey.from_string("course-v1:test+Cx105+2022_T4"),
+            'grade': '71.0',
+            'status': 'downloadable',
+            'mode': 'no-id-professional',
+
+        })
+        GeneratedCertificate.objects.get_or_create(**{
+            'user': user2,
+            'course_id': CourseKey.from_string("course-v1:test+Cx105+2022_T4"),
+            'grade': '59.0',
+            'status': 'notpassing',
+            'mode': 'honor',
+
+        })
+        GeneratedCertificate.objects.get_or_create(**{
+            'user': user,
+            'course_id': CourseKey.from_string("course-v1:test2+Cx105+2022_T4"),
+            'grade': '90.0',
+            'status': 'downloadable',
+            'mode': 'honor',
+        })
+
     def tearDown(self):
         """Clean cache and restarts mocks"""
         # This line just verifies that de get_course modulestore method cwas called with the right parameter
@@ -352,6 +384,58 @@ class TestGetCourseMetrics(unittest.TestCase):
         course = get_course_metrics(self.course_key)
 
         self.assertFalse(course["components"])
+
+    def test_right_certificates_metric(self):
+        """Based on the initial conditions, this check that the course metrics has the expected certificates value.
+
+        Expected behavior:
+            - Certificates dict is the expected.
+        """
+        cert_dict = {
+            "verified": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "honor": {
+                "downloadable": 0,
+                "notpassing": 1,
+            },
+            "audit": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "professional": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "no-id-professional": {
+                "downloadable": 1,
+                "notpassing": 0
+            },
+            "masters": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "executive-education": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "paid-executive-education": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "paid-bootcamp": {
+                "downloadable": 0,
+                "notpassing": 0
+            },
+            "total": {
+                "downloadable": 1,
+                "notpassing": 1
+            },
+        }
+        course = get_course_metrics(self.course_key)
+
+        self.assertDictEqual(course["certificates"], cert_dict)
 
     @override_settings(STATS_SETTINGS={"API_XBLOCK_TYPES": ["html", "problem", "video"]})
     def test_set_allowed_components(self):

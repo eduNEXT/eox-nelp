@@ -95,6 +95,17 @@ class Migration(migrations.Migration):
                 ('org', models.CharField(blank=True, max_length=500, null=True))
             ],
         ),
+        migrations.CreateModel(
+            name='GeneratedCertificate',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('course_id', opaque_keys.edx.django.models.CourseKeyField(default=None, max_length=255, blank=True)),
+                ('grade', models.CharField(default='', max_length=5, blank=True)),
+                ('status', models.CharField(default='unavailable', max_length=32)),
+                ('mode', models.CharField(default='honor', max_length=32, choices=[('verified', 'verified'), ('honor', 'honor'), ('audit', 'audit'), ('professional', 'professional'), ('no-id-professional', 'no-id-professional')])),
+            ],
+        ),
     ]
 
     if getattr(settings, 'TESTING_MIGRATIONS', False):

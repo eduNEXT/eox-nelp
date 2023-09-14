@@ -17,6 +17,7 @@ function LaunchStatsContainer() {
         showProblems={showProblems}
         showLearners={showLearners}
         showInstructors={showInstructors}
+        showCertificates={showCertificates}
       />
     </IntlProvider>
   );

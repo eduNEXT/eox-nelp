@@ -15,7 +15,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/edunext/eox-nelp#readme",
   "dependencies": {
-    "@edunext/frontend-essentials": "^1.6.1",
+    "@edunext/frontend-essentials": "^1.7.0",
     "@edx/brand": "github:nelc/brand-openedx#ednx-release/mango.nelp",
     "@edx/frontend-platform": "npm:@edunext/frontend-platform@^3.3.1",
     "@edx/paragon": "npm:@edunext/paragon@^20.22.48",

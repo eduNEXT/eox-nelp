@@ -13,6 +13,7 @@ STATS_QUERY_PARAMS = [
     "show_problems",
     "show_learners",
     "show_instructors",
+    "show_certificates",
 ]
 
 
@@ -40,6 +41,8 @@ def get_tenant_stats(request):
         | show_instructors |   true  |  Show the instructors stats |
 
         |  show_problems   |   true  |   Show the problems stats   |
+
+        | show_certificates|   true  | Show the certificates stats |
     """
     context = {query_param: "true" for query_param in STATS_QUERY_PARAMS}
     context.update(request.GET.dict())

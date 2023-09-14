@@ -1,4 +1,5 @@
 <%namespace name='static' file='static_content.html'/>
+<%page args="show_videos, show_courses, show_problems, show_learners, show_instructors, show_certificates"/>
 <html>
 <head>
     <meta charset="utf-8">
@@ -13,6 +14,7 @@
       var showProblems = "true" === "${show_problems}";
       var showLearners = "true" === "${show_learners}";
       var showInstructors = "true" === "${show_instructors}";
+      var showCertificates = "true" === "${show_certificates}";
     </script>
     <script src="${static.url('tenant_stats/js/tenant_stats.js')}"></script>
 </body>

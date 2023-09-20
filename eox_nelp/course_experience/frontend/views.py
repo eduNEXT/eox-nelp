@@ -8,7 +8,7 @@ classes:
 """
 from django.views import View
 
-from eox_nelp.templates_config import render_to_response
+from eox_nelp.edxapp_wrapper.edxmako import edxmako
 
 
 class FeedbackCoursesTemplate(View):
@@ -19,4 +19,4 @@ class FeedbackCoursesTemplate(View):
 
     def get(self, request):  # pylint: disable=unused-argument
         """Render start html"""
-        return render_to_response("feedback_courses.html", {})
+        return edxmako.shortcuts.render_to_response("feedback_courses.html", {}, "main", request)

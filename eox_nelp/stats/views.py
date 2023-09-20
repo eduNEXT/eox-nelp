@@ -5,7 +5,7 @@ Contains all the views for stats
 classes:
     get_tenant_stats: function based view.
 """
-from eox_nelp.templates_config import render_to_response
+from eox_nelp.edxapp_wrapper.edxmako import edxmako
 
 STATS_QUERY_PARAMS = [
     "show_courses",
@@ -47,4 +47,4 @@ def get_tenant_stats(request):
     context = {query_param: "true" for query_param in STATS_QUERY_PARAMS}
     context.update(request.GET.dict())
 
-    return render_to_response("tenant_stats.html", context)
+    return edxmako.shortcuts.render_to_response("tenant_stats.html", context, "main", request)

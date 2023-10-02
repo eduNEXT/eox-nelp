@@ -15,6 +15,7 @@ from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
+from eox_nelp.payment_notifications.models import PaymentNotification
 from eox_nelp.signals.tasks import create_external_certificate, dispatch_futurex_progress
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
@@ -184,4 +185,32 @@ def enrollment_publisher(instance, **kwargs):  # pylint: disable=unused-argument
             instance.mode,
             instance.user.username,
             instance.course_id,
+        )
+
+
+def update_payment_notifications(instance, **kwargs):  # pylint: disable=unused-argument
+    """This update the internal status of a payment notification record,
+    if the enrollment is active an have the no-id-professional mode this will set
+    the internal status as resolution_by_case_1
+    """
+    if not instance.is_active or instance.mode != "no-id-professional":
+        return
+
+    user = instance.user
+    course_key = instance.course_id
+
+    payment_notifications = PaymentNotification.objects.filter(  # pylint: disable=no-member
+        cdtrans_lms_user_id=user.id,
+        cdtrans_course_id=str(course_key),
+        internal_status="case_1",
+    )
+
+    for payment_notification in payment_notifications:
+        payment_notification.internal_status = "resolution_by_case_1"
+        payment_notification.save()
+
+        LOGGER.info(
+            "The internal status of the payment notification with id %s has been updated to %s",
+            payment_notification.id,
+            payment_notification.internal_status,
         )

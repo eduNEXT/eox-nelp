@@ -1,0 +1,210 @@
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.conf import settings
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from django.contrib.auth import get_user_model
+from lms.djangoapps.grades.api import CourseGradeFactory
+from opaque_keys.edx.keys import CourseKey
+
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+
+payment_links = getattr(settings, "PAYMENT_LINKS_BY_COURSE", {})
+User = get_user_model()
+%>
+
+% if len(payment_notifications) > 0:
+
+<style type="text/css">
+    .lang-ar:lang(en) {
+      display: none;
+    }
+    .lang-en:lang(ar) {
+      display: none;
+    }
+
+    .paynotifications {
+        font-family: 'DIN Next LT Arabic' !important;
+    }
+    .paynotifications p {
+        margin-bottom: 20px;
+        font-size: 1.5em;
+    }
+    .paynotifications button {
+        margin-bottom: 20px;
+    }
+
+    .payment-message {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: top;
+      line-height: 2em;
+    }
+    .payment-transaction-info {
+        margin-bottom: 20px;
+    }
+    .payment-transaction-info li {
+        margin: 10px;
+    }
+
+    .payment-notification {
+      padding: 30px;
+      color: #1c355e;
+      border: 1px solid #d4d4d4;
+    }
+
+    .payment-notification-icon {
+      flex-shrink: 0;
+      margin-top: 4px;
+      width: 1.4em;
+      height: 1.4em;
+      margin-left: 7px;
+    }
+
+    .course-about-link {
+      color: #529dc2 !important;
+      font-weight: bold;
+    }
+
+    .payment-action {
+      border: 1px solid #529dc2 !important;
+      color: #529dc2 !important;
+      text-decoration: none;
+      border-radius: 4px;
+      padding: 0px 8px 4px 8px;
+      font-size: 0.95em;
+      margin-right: 5px;
+      background-color: #529dc229;
+      display: inline-block;
+    }
+
+
+</style>
+
+
+<div class="container">
+    <div class="my-courses" id="my-notifications">
+        <div class="paynotifications">
+
+            % if payment_notifications:
+                <p class="paynotifications lang-ar">لديك الإخطارات التالية</p>
+                <p class="paynotifications lang-en">You have the following notifications</p>
+            % endif
+
+            <div class="payment-notification">
+                % for payment_notification in payment_notifications:
+
+                    <%
+                        passed = False
+
+                        try:
+                            payment_link = payment_links.get(payment_notification.cdtrans_course_id, "link-not-set")
+                            user = User.objects.get(id=payment_notification.cdtrans_lms_user_id)
+                            course_key = CourseKey.from_string(payment_notification.cdtrans_course_id)
+                            grade = CourseGradeFactory().read(user, course_key=course_key)
+                            course_overview = CourseOverview.objects.get(id=course_key)
+                            course_name = course_overview.display_name
+                            passed = grade and grade.passed
+                            course_about_link = reverse('about_course', args=[payment_notification.cdtrans_course_id])
+                        except:
+                            pass
+                    %>
+
+                    % if payment_notification.show_msg_case0 and passed and payment_notification.internal_status == "case_0":
+                        <div class="payment-message lang-ar">
+                            لقد أتممت دورة <b>${course_name}</b> بنجاح وشهادتك تحت المراجعة. ستصلك رسالة على بريدك الإلكتروني عند إصدارها.
+                        </div>
+                        <div class="payment-message lang-en">
+                            You have passed the <b>${course_name}</b> course and your certificate is being reviewed. You will receive an email message when the certificate is issued.
+                        </div>
+                    % endif
+
+
+                    % if payment_notification.show_msg_case1 and payment_notification.internal_status == "case_1":
+                        <div class="payment-message lang-ar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="payment-notification-icon">
+                                <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                            يؤسفنا إبلاغك بأن عملية الدفع لم تتم ولم يتم خصم رسوم دورة <b><a href=${course_about_link} class="course-about-link">${course_name}</a></b>، للإستمرار في الدورة والحصول على الشهادة يمكنك إكمال عملية الدفع من خلال الرابط التالي
+
+                            %if payment_notification.call_to_action_1_url:
+                                <a href=${payment_notification.call_to_action_1_url} class="payment-action">${ payment_notification.call_to_action_1_msg }</a>
+                            %endif
+                            </div>
+
+
+                        </div>
+
+                        <div class="payment-message lang-en">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="payment-notification-icon">
+                                <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                            </svg>
+                            <div>
+                            We regret to inform you that the payment process was not completed and the <b><a href=${course_about_link} class="course-about-link">${course_name}</a></b> course fees were not deducted. On the certificate you can complete the payment process through the following link.
+
+                            %if payment_notification.call_to_action_1_url:
+                                <a href=${payment_notification.call_to_action_1_url} class="payment-action">${ payment_notification.call_to_action_1_msg }</a>
+                            %endif
+                            </div>
+
+
+                        </div>
+                    % endif
+
+
+                    % if payment_notification.show_msg_case2:
+                        <div class="payment-message lang-ar">
+                            Message Case 2
+                            لكن لا بد أن أوضح لك أن كل هذه الأفكار المغلوطة حول استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي.
+                        </div>
+                        <div class="payment-message lang-en">
+                            Message Case 2
+                            Nunc scelerisque viverra mauris in aliquam sem fringilla. Amet aliquam id diam maecenas ultricies mi eget. Lorem mollis aliquam ut porttitor leo a diam. Integer quis auctor elit sed vulputate mi sit amet. Pellentesque diam volutpat commodo sed. Amet massa vitae tortor condimentum. Tempus imperdiet nulla malesuada pellentesque elit. Pharetra vel turpis nunc eget lorem dolor sed. Pretium quam vulputate dignissim suspendisse in. Mus mauris vitae ultricies leo integer.
+                        </div>
+
+                        %if payment_notification.call_to_action_2_url:
+                            <a href=${payment_notification.call_to_action_2_url}><button>${ payment_notification.call_to_action_2_msg }</button></a>
+                        %endif
+                    % endif
+
+                    % if payment_notification.custom_msg:
+                        ${ payment_notification.custom_msg }
+                    % endif
+
+                % endfor
+
+                % for payment_notification in payment_notifications:
+                    % if payment_notification.show_trans_info:
+                        <div class="payment-transaction-info lang-ar">
+                            <h4>بيانات المعاملات:</h4>
+                            <ul>
+                                <li>تاريخ: ${payment_notification.cdtrans_date}</li>
+                                <li>كمية: ${payment_notification.cdtrans_amount}</li>
+                                <li>دورة: ${payment_notification.cdtrans_course_id}</li>
+                                <li>رقم المعاملة: ${payment_notification.cdtrans_response_id}</li>
+                            </ul>
+                        </div>
+                        <div class="payment-transaction-info lang-en">
+                           <h4>Transaction info:</h4>
+                            <ul>
+                                <li>Date: ${payment_notification.cdtrans_date}</li>
+                                <li>Amount: ${payment_notification.cdtrans_amount}</li>
+                                <li>Course: ${payment_notification.cdtrans_course_id}</li>
+                                <li>ID: ${payment_notification.cdtrans_response_id}</li>
+                            </ul>
+                        </div>
+                    % endif
+                % endfor
+
+                % for payment_notification in payment_notifications:
+                    %if payment_notification.call_to_action_3_url:
+                        <a href=${payment_notification.call_to_action_3_url}><button>${ payment_notification.call_to_action_3_msg }</button></a>
+                    %endif
+                %endfor
+
+            </div>
+        </div>
+</div>
+
+% endif

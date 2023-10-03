@@ -57,6 +57,12 @@ class EoxNelpConfig(AppConfig):
                         'dispatch_uid': 'enrollment_publisher_receiver',
                         'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
                     },
+                    {
+                        'receiver_func_name': 'update_payment_notifications',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'update_payment_notifications_receiver',
+                        'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
+                    },
                 ],
             },
         },
@@ -69,6 +75,7 @@ class EoxNelpConfig(AppConfig):
         # pylint: disable=unused-import, import-error, import-outside-toplevel
         # This is required in order to register the receiver inside handlers module.
         from cms.djangoapps.contentstore.signals import handlers  # noqa: F401
+
         run_init_pipeline()
 
 

@@ -30,4 +30,5 @@ urlpatterns = [  # pylint: disable=invalid-name
     ),
     path('api/stats/', include('eox_nelp.stats.api.urls', namespace='stats-api')),
     path('stats/', include('eox_nelp.stats.urls', namespace='stats')),
+    path('payment-notifications/', include('eox_nelp.payment_notifications.urls', namespace='payment-notifications')),
 ]

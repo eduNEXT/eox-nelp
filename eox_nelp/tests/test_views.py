@@ -5,7 +5,7 @@ Test views file.
 from os.path import dirname, realpath
 from subprocess import CalledProcessError, check_output
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from mock import patch
 from rest_framework import status
@@ -73,3 +73,14 @@ class EOXInfoTestCase(TestCase):
         )
         self.assertEqual(expected_result, content)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    @override_settings(ROOT_URLCONF='eox_nelp.cms_urls')
+    def test_cms_view_info_accesible(self):
+        """
+        For the studio urls.
+        This method tests the same behavior of the test function `test_view_info_accesible`
+        but using the cms url config. This ensure that the cms urls has the eox-info view accesible.
+        Expected behavior:
+            - Same expected  behaviour of `test_view_info_accesible`.
+        """
+        self.test_view_info_accesible()

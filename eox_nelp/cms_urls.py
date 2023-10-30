@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import path, include
     2. Add a URL to urlpatterns:  path(r'^blog/', include('blog.urls'))
 """
-from django.urls import path
+from django.urls import include, path
 
 from eox_nelp import views
 
@@ -21,4 +21,6 @@ app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
 urlpatterns = [  # pylint: disable=invalid-name
     path('eox-info/', views.info_view, name='eox-info'),
+    path('api/', include('eox_nelp.cms.api.urls', namespace='cms-api')),
+
 ]

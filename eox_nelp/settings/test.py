@@ -32,6 +32,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_EDXMAKO_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.edxmako_m_v1'
     settings.EOX_NELP_BRANDING_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.branding_m_v1'
     settings.EOX_NELP_CERTIFICATES_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.certificates_m_v1'
+    settings.EOX_NELP_CMS_API_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.cms_api_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'

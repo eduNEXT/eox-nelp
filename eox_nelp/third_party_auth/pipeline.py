@@ -5,6 +5,7 @@ functions:
     invalidate_current_user: Sets to None the current user.
 """
 from django.conf import settings
+from django.contrib.auth import logout
 from social_core.pipeline.social_auth import social_details as social_core_details
 
 
@@ -31,7 +32,7 @@ def social_details(backend, details, response, *args, **kwargs):
     return details
 
 
-def invalidate_current_user(*args, user=None, **kwargs):  # pylint: disable=unused-argument
+def invalidate_current_user(request, *args, user=None, **kwargs):  # pylint: disable=unused-argument
     """This pipeline sets to None the current user in order to avoid invalid associations.
 
     This was implemented due to an unexpected behavior when a user is logged and a different
@@ -47,6 +48,8 @@ def invalidate_current_user(*args, user=None, **kwargs):  # pylint: disable=unus
          was deactivated.
     """
     if user:
+        logout(request)
+
         return {
             "user": None
         }

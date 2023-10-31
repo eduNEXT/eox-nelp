@@ -32,7 +32,7 @@ def social_details(backend, details, response, *args, **kwargs):
     return details
 
 
-def invalidate_current_user(request, *args, user=None, **kwargs):  # pylint: disable=unused-argument
+def invalidate_current_user(*args, user=None, **kwargs):  # pylint: disable=unused-argument
     """This pipeline sets to None the current user in order to avoid invalid associations.
 
     This was implemented due to an unexpected behavior when a user is logged and a different
@@ -48,10 +48,20 @@ def invalidate_current_user(request, *args, user=None, **kwargs):  # pylint: dis
          was deactivated.
     """
     if user:
-        logout(request)
-
         return {
             "user": None
         }
+
+    return {}
+
+
+def close_active_session(request, *args, user=None, **kwargs):  # pylint: disable=unused-argument
+    """This pipeline closes the current session if the pipeline user doesn't match with the session user.
+
+    This ensures that the browser session will show the right account, when a user tries to authenticate
+    in a device that has a logged account.
+    """
+    if request.user != user:
+        logout(request)
 
     return {}

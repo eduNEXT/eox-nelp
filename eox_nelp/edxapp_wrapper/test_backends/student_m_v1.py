@@ -24,3 +24,11 @@ def get_user_profile_model():
         Mock class.
     """
     return Mock()
+
+
+def get_student_roles():
+    """Return test class.
+    Returns:
+        Mock class.
+    """
+    return Mock()

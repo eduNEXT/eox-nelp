@@ -1,4 +1,5 @@
 """Backend test abstraction."""
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -57,3 +58,6 @@ class TestCourseRunsViewSet(GenericViewSet):
 
     def list(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         return Response(COURSE_RUN_TEST_RESPONSE)
+
+    def create(self, request, *args, **kwargs):  # pylint: disable=unused-argument
+        return Response(request.data, status=status.HTTP_201_CREATED)

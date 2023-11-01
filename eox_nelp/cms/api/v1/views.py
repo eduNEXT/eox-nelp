@@ -3,6 +3,8 @@ CMS API v1 Views
 """
 from eox_nelp.edxapp_wrapper.cms_api import CourseRunViewSet
 
+from .permissions import NelpCourseRunPermission
+
 
 class NelpCourseRunViewSet(CourseRunViewSet):
     """
@@ -10,3 +12,5 @@ class NelpCourseRunViewSet(CourseRunViewSet):
     To got it you could use the following path.
     {studio_url}/eox-nelp/api/v1/course_runs/
     """
+
+    permission_classes = (NelpCourseRunPermission, )

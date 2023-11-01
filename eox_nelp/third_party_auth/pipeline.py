@@ -55,7 +55,7 @@ def invalidate_current_user(*args, user=None, **kwargs):  # pylint: disable=unus
     return {}
 
 
-def close_active_session(request, *args, user=None, **kwargs):  # pylint: disable=unused-argument
+def close_mismatch_session(request, *args, user=None, **kwargs):  # pylint: disable=unused-argument
     """This pipeline closes the current session if the pipeline user doesn't match with the session user.
 
     This ensures that the browser session will show the right account, when a user tries to authenticate

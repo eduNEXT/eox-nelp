@@ -8,6 +8,8 @@ from django.conf import settings
 from django.contrib.auth import logout
 from social_core.pipeline.social_auth import social_details as social_core_details
 
+from eox_nelp.third_party_auth.exceptions import EoxNelpAuthException
+
 
 def social_details(backend, details, response, *args, **kwargs):
     """This is an extension of `social_core.pipeline.social_auth.social_details` that allows
@@ -65,3 +67,36 @@ def close_mismatch_session(request, *args, user=None, **kwargs):  # pylint: disa
         logout(request)
 
     return {}
+
+
+def safer_associate_username_by_uid(  # pylint: disable=unused-argument
+    backend, details, response, *args, user=None, **kwargs,
+):
+    """Pipeline to retrieve user if possible matching uid with the username of a user.
+    The uid is based in the configuration of the saml with the field `attr_user_permanent_id`:
+    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L49
+
+    This is using the idp and the uid inspired in:
+    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L296C23-L297
+    Raises:
+        EoxNelpAuthException: If someone tries to have staff or superuser permission using tpa.
+
+    Returns:
+        dict: Dict with user if matches, if not return None.
+    """
+    if user:
+        return None
+
+    idp = backend.get_idp(response["idp_name"])
+    uid = idp.get_user_permanent_id(response["attributes"])
+    user_match = backend.strategy.storage.user.get_user(username=uid)
+
+    if not user_match:
+        return None
+    if user_match.is_staff or user_match.is_superuser:
+        raise EoxNelpAuthException(backend, "It is not allowed to auto associate staff or admin users")
+
+    return {
+        "user": user_match,
+        "is_new": False,
+    }

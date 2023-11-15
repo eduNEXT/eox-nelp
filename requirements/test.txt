@@ -4,10 +4,14 @@
 #
 #    make upgrade
 #
-amqp==5.1.1
+amqp==5.2.0
     # via
     #   -r requirements/base.txt
     #   kombu
+aniso8601==9.0.1
+    # via
+    #   -r requirements/base.txt
+    #   tincan
 appdirs==1.4.4
     # via
     #   -r requirements/base.txt
@@ -16,7 +20,7 @@ asgiref==3.7.2
     # via
     #   -r requirements/base.txt
     #   django
-astroid==2.15.6
+astroid==3.0.1
     # via pylint
 attrs==23.1.0
     # via
@@ -26,13 +30,13 @@ beautifulsoup4==4.12.2
     # via
     #   -r requirements/base.txt
     #   bs4
-billiard==4.1.0
+billiard==4.2.0
     # via
     #   -r requirements/base.txt
     #   celery
 bs4==0.0.1
     # via -r requirements/base.txt
-celery==5.3.1
+celery==5.3.5
     # via
     #   -r requirements/base.txt
     #   eox-core
@@ -41,16 +45,16 @@ certifi==2023.7.22
     # via
     #   -r requirements/base.txt
     #   requests
-cffi==1.15.1
+cffi==1.16.0
     # via
     #   -r requirements/base.txt
     #   cryptography
     #   pynacl
-charset-normalizer==3.2.0
+charset-normalizer==3.3.2
     # via
     #   -r requirements/base.txt
     #   requests
-click==8.1.6
+click==8.1.7
     # via
     #   -r requirements/base.txt
     #   celery
@@ -71,17 +75,17 @@ click-repl==0.3.0
     # via
     #   -r requirements/base.txt
     #   celery
-coverage==7.2.7
+coverage==7.3.2
     # via -r requirements/test.in
-cryptography==41.0.2
+cryptography==41.0.5
     # via
     #   -r requirements/base.txt
     #   jwcrypto
     #   pyjwt
     #   social-auth-core
-ddt==1.6.0
+ddt==1.7.0
     # via -r requirements/test.in
-defusedxml==0.7.1
+defusedxml==0.8.0rc2
     # via
     #   -r requirements/base.txt
     #   python3-openid
@@ -92,7 +96,7 @@ deprecated==1.2.14
     #   jwcrypto
 dill==0.3.7
     # via pylint
-django==3.2.20
+django==3.2.23
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
@@ -116,6 +120,7 @@ django==3.2.20
     #   event-tracking
     #   jsonfield
     #   openedx-events
+    #   openedx-filters
     #   social-auth-app-django
 django-crum==0.7.9
     # via
@@ -129,7 +134,7 @@ django-filter==21.1
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
     #   eox-core
-django-ipware==5.0.0
+django-ipware==5.0.2
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -146,7 +151,7 @@ django-oauth2-provider==0.2.6.1
     # via
     #   -r requirements/base.txt
     #   eox-core
-django-simple-history==3.3.0
+django-simple-history==3.4.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -188,7 +193,7 @@ edx-api-doc-tools==1.7.0
     # via
     #   -r requirements/base.txt
     #   eox-core
-edx-django-utils==5.6.0
+edx-django-utils==5.8.0
     # via
     #   -r requirements/base.txt
     #   edx-drf-extensions
@@ -201,7 +206,7 @@ edx-drf-extensions==8.0.0
     #   -r requirements/base.txt
     #   edx-proctoring
     #   edx-when
-edx-i18n-tools==1.0.0
+edx-i18n-tools==1.3.0
     # via -r requirements/base.txt
 edx-opaque-keys[django]==2.3.0
     # via
@@ -211,11 +216,11 @@ edx-opaque-keys[django]==2.3.0
     #   edx-when
     #   eox-core
     #   openedx-events
-edx-proctoring==4.16.0
+edx-proctoring==4.16.1
     # via
     #   -r requirements/base.txt
     #   eox-core
-edx-rest-api-client==5.6.0
+edx-rest-api-client==5.6.1
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -231,11 +236,11 @@ eox-tenant==9.2.1
     #   eox-theming
 eox-theming==5.0.0
     # via -r requirements/base.txt
-event-tracking==2.1.0
+event-tracking==2.2.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-fastavro==1.8.2
+fastavro==1.9.0
     # via
     #   -r requirements/base.txt
     #   openedx-events
@@ -268,18 +273,19 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/base.txt
     #   django-oauth-toolkit
-kombu==5.3.1
+kombu==5.3.3
     # via
     #   -r requirements/base.txt
     #   celery
-lazy-object-proxy==1.9.0
-    # via astroid
 lxml==4.9.3
     # via
     #   -r requirements/base.txt
+    #   edx-i18n-tools
     #   xblock
-mako==1.2.4
-    # via -r requirements/base.txt
+mako==1.3.0
+    # via
+    #   -r requirements/base.txt
+    #   xblock
 markupsafe==2.1.3
     # via
     #   -r requirements/base.txt
@@ -291,7 +297,7 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.in
-newrelic==8.9.0
+newrelic==9.1.2
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -305,7 +311,9 @@ openedx-events==0.13.0
     # via
     #   -r requirements/base.txt
     #   eox-core
-packaging==23.1
+openedx-filters==1.6.0
+    # via -r requirements/base.txt
+packaging==23.2
     # via
     #   -r requirements/base.txt
     #   drf-yasg
@@ -316,25 +324,25 @@ path==16.7.1
     #   path-py
 path-py==12.5.0
     # via -r requirements/test.in
-pbr==5.11.1
+pbr==6.0.0
     # via
     #   -r requirements/base.txt
     #   stevedore
-platformdirs==3.10.0
+platformdirs==4.0.0
     # via pylint
 polib==1.2.0
     # via
     #   -r requirements/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.39
+prompt-toolkit==3.0.41
     # via
     #   -r requirements/base.txt
     #   click-repl
-psutil==5.9.5
+psutil==5.9.6
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
-pycodestyle==2.11.0
+pycodestyle==2.11.1
     # via
     #   -r requirements/test.in
     #   flake8
@@ -342,7 +350,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pycryptodomex==3.18.0
+pycryptodomex==3.19.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -361,7 +369,7 @@ pyjwt[crypto]==2.8.0
     #   edx-proctoring
     #   edx-rest-api-client
     #   social-auth-core
-pylint==2.17.5
+pylint==3.0.2
     # via -r requirements/test.in
 pymongo==3.13.0
     # via
@@ -383,13 +391,14 @@ python3-openid==3.2.0
     # via
     #   -r requirements/base.txt
     #   social-auth-core
-pytz==2023.3
+pytz==2023.3.post1
     # via
     #   -r requirements/base.txt
     #   django
     #   drf-yasg
     #   edx-proctoring
     #   event-tracking
+    #   tincan
     #   xblock
 pyyaml==6.0.1
     # via
@@ -423,6 +432,10 @@ shortuuid==1.0.11
     # via
     #   -r requirements/base.txt
     #   django-oauth2-provider
+simplejson==3.19.2
+    # via
+    #   -r requirements/base.txt
+    #   xblock
 six==1.16.0
     # via
     #   -r requirements/base.txt
@@ -437,13 +450,13 @@ slumber==0.7.1
     # via
     #   -r requirements/base.txt
     #   edx-rest-api-client
-social-auth-app-django==5.2.0
+social-auth-app-django==5.4.0
     # via -r requirements/base.txt
-social-auth-core==4.4.2
+social-auth-core==4.5.0
     # via
     #   -r requirements/base.txt
     #   social-auth-app-django
-soupsieve==2.4.1
+soupsieve==2.5
     # via
     #   -r requirements/base.txt
     #   beautifulsoup4
@@ -456,13 +469,15 @@ stevedore==5.1.0
     #   -r requirements/base.txt
     #   edx-django-utils
     #   edx-opaque-keys
-testfixtures==7.1.0
+testfixtures==7.2.2
     # via -r requirements/test.in
+tincan==1.0.0
+    # via -r requirements/base.txt
 tomli==2.0.1
     # via pylint
-tomlkit==0.12.1
+tomlkit==0.12.3
     # via pylint
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r requirements/base.txt
     #   asgiref
@@ -475,21 +490,21 @@ uritemplate==4.1.1
     # via
     #   -r requirements/base.txt
     #   drf-yasg
-urllib3==2.0.4
+urllib3==2.1.0
     # via
     #   -r requirements/base.txt
     #   requests
-vine==5.0.0
+vine==5.1.0
     # via
     #   -r requirements/base.txt
     #   amqp
     #   celery
     #   kombu
-wcwidth==0.2.6
+wcwidth==0.2.10
     # via
     #   -r requirements/base.txt
     #   prompt-toolkit
-web-fragments==2.0.0
+web-fragments==2.1.0
     # via
     #   -r requirements/base.txt
     #   xblock
@@ -497,12 +512,11 @@ webob==1.8.7
     # via
     #   -r requirements/base.txt
     #   xblock
-wrapt==1.15.0
+wrapt==1.16.0
     # via
     #   -r requirements/base.txt
-    #   astroid
     #   deprecated
-xblock==1.6.2
+xblock==1.8.1
     # via
     #   -r requirements/base.txt
     #   edx-when

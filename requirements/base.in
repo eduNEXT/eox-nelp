@@ -14,5 +14,7 @@ eox-tenant
 eox-theming
 mako
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-filters
 requests-oauthlib
 social-auth-app-django
+tincan

@@ -2,12 +2,16 @@
 
 Filters:
     XApiActorFilter: Modifies the standard ACtor in order to include the name attribute.
+    XApiBaseEnrollmentFilter: Updates enrollment object definition.
 """
 from django.contrib.auth import get_user_model
 from openedx_filters import PipelineStep
-from tincan import Agent
+from tincan import Agent, LanguageMap
+
+from eox_nelp.utils import extract_course_id_from_string, get_course_from_id
 
 User = get_user_model()
+DEFAULT_LANGUAGE = "en"
 
 
 class XApiActorFilter(PipelineStep):
@@ -47,6 +51,50 @@ class XApiActorFilter(PipelineStep):
             )
         except User.DoesNotExist:
             pass
+
+        return {
+            "result": result
+        }
+
+
+class XApiBaseEnrollmentFilter(PipelineStep):
+    """This filter is designed to modify object attributes of an enrollment event, this will add
+    the description field and will change the name based on the course language.
+
+    How to set:
+        OPEN_EDX_FILTERS_CONFIG = {
+            "event_routing_backends.processors.xapi.enrollment_events.base_enrollment.get_object": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiBaseEnrollmentFilter"],
+                "fail_silently": False,
+            },
+        }
+    """
+
+    def run_filter(self, result):  # pylint: disable=arguments-differ
+        """Modifies name and description attributes of the activity's definition.
+
+        Arguments:
+            result <Activity>: Object activity for events related to enrollments.
+
+        Returns:
+            Activity: Modified activity.
+        """
+        course_id = extract_course_id_from_string(result.id)
+
+        if course_id:
+            # Get course course data
+            course = get_course_from_id(course_id)
+            display_name = course["display_name"]
+            description = course["short_description"]
+            course_language = course["language"] or DEFAULT_LANGUAGE  # Set default value if language is not found
+
+            # Create new attributes based on the course properties
+            definition_name = LanguageMap(**({course_language: display_name} if display_name is not None else {}))
+            description = LanguageMap(**({course_language: description} if description is not None else {}))
+
+            # Updates current result
+            result.definition.name = definition_name
+            result.definition.description = description
 
         return {
             "result": result

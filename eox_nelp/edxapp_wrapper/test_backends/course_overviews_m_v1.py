@@ -1,5 +1,6 @@
 """Test backend for course overviews module."""
 from django.db import models
+from mock import Mock
 from opaque_keys.edx.django.models import CourseKeyField
 
 from eox_nelp.edxapp_wrapper.test_backends import create_test_model
@@ -19,3 +20,11 @@ def get_course_overview_model():
     return create_test_model(
         "CourseOverview", "eox_nelp", __package__, course_overview_fields
     )
+
+
+def get_course_overviews_method():
+    """Return test function.
+    Returns:
+        Mock class.
+    """
+    return Mock()

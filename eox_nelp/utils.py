@@ -2,7 +2,12 @@
 import re
 from copy import copy
 
+from opaque_keys.edx.keys import CourseKey
+
+from eox_nelp.edxapp_wrapper.course_overviews import get_course_overviews
+
 NATIONAL_ID_REGEX = r"^[1-2]\d{9}$"
+COURSE_ID_REGEX = r'(course-v1:[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 
 
 def map_instance_attributes_to_dict(instance, attributes_mapping):
@@ -78,3 +83,39 @@ def is_valid_national_id(national_id, raise_exception=False):
         )
 
     return check_national_id
+
+
+def extract_course_id_from_string(string):
+    """This return a sub-string that matches the course_ir regex
+
+    Arguments:
+        string: This is a string that could contains a sub-string that matches with the course_id form.
+
+    Returns:
+        course_id <string>: Returns course id or an empty string.
+    """
+    matches = re.search(COURSE_ID_REGEX, string)
+
+    if matches:
+        return matches.group()
+
+    return ""
+
+
+def get_course_from_id(course_id):
+    """
+    Get Course object using the `course_id`.
+
+    Arguments:
+        course_id (str) :   ID of the course
+
+    Returns:
+        Course
+    """
+    course_key = CourseKey.from_string(course_id)
+    course_overviews = get_course_overviews([course_key])
+
+    if course_overviews:
+        return course_overviews[0]
+
+    raise ValueError(f"Course with id {course_id} does not exist.")

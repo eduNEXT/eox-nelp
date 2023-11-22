@@ -6,7 +6,7 @@ Classes:
 """
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from mock import patch
+from mock import Mock, patch
 from tincan import Activity, ActivityDefinition, Agent, LanguageMap
 
 from eox_nelp.openedx_filters.xapi.filters import DEFAULT_LANGUAGE, XApiActorFilter, XApiBaseEnrollmentFilter
@@ -38,7 +38,7 @@ class XApiActorFilterTestCase(TestCase):
             mbox=email,
         )
 
-        actor = self.filter.run_filter(result=actor)["result"]
+        actor = self.filter.run_filter(transformer=Mock(), result=actor)["result"]
 
         self.assertEqual(f"mailto:{email}", actor.mbox)
 
@@ -66,7 +66,7 @@ class XApiActorFilterTestCase(TestCase):
             mbox=self.email,
         )
 
-        actor = self.filter.run_filter(result=actor)["result"]
+        actor = self.filter.run_filter(transformer=Mock(), result=actor)["result"]
 
         self.assertEqual(f"mailto:{self.email}", actor.mbox)
         self.assertEqual(self.username, actor.name)
@@ -92,7 +92,7 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
             id="https://example.com/course/course-v1-invalid-edx+CS105+2023-T3",
         )
 
-        returned_activity = self.filter.run_filter(result=activity)["result"]
+        returned_activity = self.filter.run_filter(transformer=Mock(), result=activity)["result"]
 
         self.assertEqual(activity, returned_activity)
 
@@ -120,7 +120,7 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
             ),
         )
 
-        returned_activity = self.filter.run_filter(result=activity)["result"]
+        returned_activity = self.filter.run_filter(transformer=Mock(), result=activity)["result"]
 
         self.assertEqual({course['language']: course["display_name"]}, returned_activity.definition.name)
         self.assertEqual({course['language']: course["short_description"]}, returned_activity.definition.description)
@@ -150,7 +150,7 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
             ),
         )
 
-        returned_activity = self.filter.run_filter(result=activity)["result"]
+        returned_activity = self.filter.run_filter(transformer=Mock(), result=activity)["result"]
 
         self.assertEqual({DEFAULT_LANGUAGE: course["display_name"]}, returned_activity.definition.name)
         self.assertEqual({DEFAULT_LANGUAGE: course["short_description"]}, returned_activity.definition.description)

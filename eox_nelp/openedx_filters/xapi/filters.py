@@ -30,7 +30,7 @@ class XApiActorFilter(PipelineStep):
         }
     """
 
-    def run_filter(self, result):  # pylint: disable=arguments-differ
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
         """Extracts the email for the given result in order to get the user and returns
         new Agent with email a name.
 
@@ -70,7 +70,7 @@ class XApiBaseEnrollmentFilter(PipelineStep):
         }
     """
 
-    def run_filter(self, result):  # pylint: disable=arguments-differ
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
         """Modifies name and description attributes of the activity's definition.
 
         Arguments:

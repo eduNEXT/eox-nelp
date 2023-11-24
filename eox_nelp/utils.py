@@ -119,3 +119,26 @@ def get_course_from_id(course_id):
         return course_overviews[0]
 
     raise ValueError(f"Course with id {course_id} does not exist.")
+
+
+def get_item_label(item):
+    """By definition the label of a Problem is the text between double greater and lees than
+    symbols, example, >>label<<, this method extracts and returns that information from the item
+    markdown value.
+
+    Arguments:
+        item <XModuleDescriptor>: This is a specification for an element of a course.
+            This case should be a problem.
+    Returns:
+        label <string>: Label data if it's found otherwise empty string.
+    """
+    if not hasattr(item, "markdown"):
+        return ""
+
+    regex = re.compile(r'>>\s*(.*?)\s*<<')
+    matches = regex.search(item.markdown)
+
+    if matches:
+        return matches.group(1)
+
+    return ""

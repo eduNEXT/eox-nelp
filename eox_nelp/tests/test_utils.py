@@ -6,10 +6,10 @@ Classes:
 """
 from ddt import data, ddt
 from django.test import TestCase
-from mock import patch
+from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from eox_nelp.utils import extract_course_id_from_string, get_course_from_id
+from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
 
 
 @ddt
@@ -99,3 +99,80 @@ class GetCourseFromIdTestCase(TestCase):
 
         self.assertEqual(expected_course, course)
         course_overviews_mock.assert_called_once_with([CourseKey.from_string(course_id)])
+
+
+class GetItemLabelTestCase(TestCase):
+    """Test class for the get_item_lable method."""
+
+    def test_item_does_not_have_markdown(self):
+        """ Test when the item doesn't have any markdown attribute.
+
+        Expected behavior:
+            - Returns an empty string
+        """
+        fake_item = object()
+
+        label = get_item_label(fake_item)
+
+        self.assertEqual("", label)
+
+    def test_returns_label(self):
+        """ Test that the method finds and returns the label for the given item.
+
+        Expected behavior:
+            - Returns expected label
+        """
+        expected_label = "This is a great label"
+        markdown = f"""
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eleifend odio elit. Etiam lacus quam,
+            ultrices in ullamcorper a, ullamcorper eu ante. Nulla risus ante, congue sed tellus id, interdum accumsan
+            purus. Nunc malesuada eget >>{expected_label}<< urna placerat gravida. Aliquam justo nunc, porttitor nec
+            placerat non, gravida id arcu. Pellentesque condimentum sodales hendrerit.
+        """
+        fake_item = Mock()
+        fake_item.markdown = markdown
+
+        label = get_item_label(fake_item)
+
+        self.assertEqual(expected_label, label)
+
+    def test_returns_first_label(self):
+        """ Test that the method returns the first label found.
+
+        Expected behavior:
+            - Returns expected label
+        """
+        expected_label = "This is a great label"
+        wrong_label = "Wrong label"
+        markdown = f"""
+            Lorem ipsum dolor sit amet, >>{expected_label}<< consectetur adipiscing elit. Aenean eleifend odio elit.
+            Etiam lacus quam, >>{wrong_label}<< ultrices in ullamcorper a, ullamcorper eu ante. Nulla risus ante,
+            congue sed tellus id, interdum accumsan >>{wrong_label}<< purus. Nunc malesuada eget urna placerat
+            gravida. Aliquam justo nunc, porttitor nec >>{wrong_label}<< placerat non, gravida id arcu.
+            Pellentesque condimentum sodales hendrerit.
+        """
+        fake_item = Mock()
+        fake_item.markdown = markdown
+
+        label = get_item_label(fake_item)
+
+        self.assertEqual(expected_label, label)
+
+    def test_label_not_found(self):
+        """ Test when the method doesn't find any labels.
+
+        Expected behavior:
+            - Returns an empty string
+        """
+        markdown = """
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eleifend odio elit. Etiam lacus quam,
+            ultrices in ullamcorper a, ullamcorper eu ante. Nulla risus ante, congue sed tellus id, interdum accumsan
+            purus. Nunc malesuada eget urna placerat gravida. Aliquam justo nunc, porttitor nec
+            placerat non, gravida id arcu. Pellentesque condimentum sodales hendrerit.
+        """
+        fake_item = Mock()
+        fake_item.markdown = markdown
+
+        label = get_item_label(fake_item)
+
+        self.assertEqual("", label)

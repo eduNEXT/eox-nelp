@@ -5,10 +5,12 @@ Filters:
     XApiBaseEnrollmentFilter: Updates enrollment object definition.
 """
 from django.contrib.auth import get_user_model
+from opaque_keys.edx.keys import UsageKey
 from openedx_filters import PipelineStep
 from tincan import Agent, LanguageMap
 
-from eox_nelp.utils import extract_course_id_from_string, get_course_from_id
+from eox_nelp.edxapp_wrapper.modulestore import modulestore
+from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
 
 User = get_user_model()
 DEFAULT_LANGUAGE = "en"
@@ -35,6 +37,7 @@ class XApiActorFilter(PipelineStep):
         new Agent with email a name.
 
         Arguments:
+            transformer <XApiTransformer>: Transformer instance.
             result <Agent>: default Actor agent of event-routing-backends
 
         Returns:
@@ -74,6 +77,7 @@ class XApiBaseEnrollmentFilter(PipelineStep):
         """Modifies name and description attributes of the activity's definition.
 
         Arguments:
+            transformer <XApiTransformer>: Transformer instance.
             result <Activity>: Object activity for events related to enrollments.
 
         Returns:
@@ -95,6 +99,57 @@ class XApiBaseEnrollmentFilter(PipelineStep):
             # Updates current result
             result.definition.name = definition_name
             result.definition.description = description
+
+        return {
+            "result": result
+        }
+
+
+class XApiBaseProblemsFilter(PipelineStep):
+    """This filter is designed to modify object attributes of an event which transformer class
+    is a child of BaseProblemsTransformer, this will add the description field and will change
+    the name based on the course language.
+
+    How to set:
+        OPEN_EDX_FILTERS_CONFIG = {
+            "event_routing_backends.processors.xapi.problem_interaction_events.base_problems.get_object": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiBaseProblemsFilter"],
+                "fail_silently": False,
+            },
+        }
+    """
+
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ
+        """Modifies name and description attributes of the activity's definition.
+
+        Arguments:
+            transformer <XApiTransformer>: Transformer instance.
+            result <Activity>: Object activity for events related to enrollments.
+
+        Returns:
+            Activity: Modified activity.
+        """
+        # Following line is hard-coded since this logic has not been tested with other events.
+        if transformer.event["name"] != "edx.grades.problem.submitted":
+            return {
+                "result": result
+            }
+
+        display_name = transformer.get_data('display_name')
+
+        # Get label from module descriptor block.
+        usage_key = UsageKey.from_string(transformer.get_data("data.problem_id"))
+        item = modulestore().get_item(usage_key)
+        label = get_item_label(item)
+
+        # Get course languge block.
+        course = get_course_from_id(transformer.get_data('course_id'))
+        course_language = course.get("language") or DEFAULT_LANGUAGE  # Set default value if language is not found
+
+        if display_name:
+            result.definition.name = LanguageMap({course_language: display_name})
+
+        result.definition.description = LanguageMap(**({course_language: label} if label else {}))
 
         return {
             "result": result

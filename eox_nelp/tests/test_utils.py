@@ -101,6 +101,7 @@ class GetCourseFromIdTestCase(TestCase):
         course_overviews_mock.assert_called_once_with([CourseKey.from_string(course_id)])
 
 
+@ddt
 class GetItemLabelTestCase(TestCase):
     """Test class for the get_item_lable method."""
 
@@ -111,6 +112,20 @@ class GetItemLabelTestCase(TestCase):
             - Returns an empty string
         """
         fake_item = object()
+
+        label = get_item_label(fake_item)
+
+        self.assertEqual("", label)
+
+    @data(None, 14, object)
+    def test_invalid_markdown_type(self, markdown):
+        """ Test when the markdown attribute is different from a string type.
+
+        Expected behavior:
+            - Returns an empty string
+        """
+        fake_item = Mock()
+        fake_item.markdown = markdown
 
         label = get_item_label(fake_item)
 

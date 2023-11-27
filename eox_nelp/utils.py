@@ -132,7 +132,7 @@ def get_item_label(item):
     Returns:
         label <string>: Label data if it's found otherwise empty string.
     """
-    if not hasattr(item, "markdown"):
+    if not (hasattr(item, "markdown") and isinstance(item.markdown, str)):
         return ""
 
     regex = re.compile(r'>>\s*(.*?)\s*<<')

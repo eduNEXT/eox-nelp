@@ -12,6 +12,7 @@ import logging
 
 from django.conf import settings
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
+from eventtracking import tracker
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
@@ -34,6 +35,29 @@ def block_completion_progress_publisher(instance, **kwargs):  # pylint: disable=
         course_id=str(instance.context_key),
         user_id=instance.user_id,
     )
+
+
+def emit_initialized_course_event(instance, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the post_save BlockCompletion signal
+    and this checks how many BlockCompletion records exists, if there is only one record
+    the `nelc.eox_nelp.initialized.course` event will be emitted.
+
+    Args:
+        instance<Blockcompletion>: Instance of BlockCompletion model.
+    """
+    completion_blocks = instance.user_learning_context_completion_queryset(instance.user, instance.context_key)
+
+    if len(completion_blocks) == 1:
+        tracker.emit(
+            "nelc.eox_nelp.initialized.course",
+            {
+                "user_id": instance.user_id,
+                "course_id": str(instance.context_key),
+                "block_id": str(instance.block_key),
+                "modified": instance.modified,
+                "created": instance.created,
+            }
+        )
 
 
 def course_grade_changed_progress_publisher(

@@ -18,6 +18,7 @@ def run_init_pipeline():
     """
     patch_user_gender_choices()
     set_mako_templates()
+    register_xapi_transformers()
 
 
 def patch_user_gender_choices():
@@ -56,3 +57,9 @@ def set_mako_templates():
 
         if path_to_templates not in edxmako.LOOKUP['main'].directories:
             edxmako.paths.add_lookup('main', path_to_templates)
+
+
+def register_xapi_transformers():
+    """This method just import the event transformers in order to register all of them."""
+    # pylint: disable=import-outside-toplevel, unused-import
+    from eox_nelp.processors.xapi import event_transformers as xapi_event_transformers  # noqa: F401

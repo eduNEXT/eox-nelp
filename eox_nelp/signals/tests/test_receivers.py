@@ -19,6 +19,7 @@ from eox_nelp.signals.receivers import (
     block_completion_progress_publisher,
     certificate_publisher,
     course_grade_changed_progress_publisher,
+    emit_initialized_course_event,
     enrollment_publisher,
 )
 from eox_nelp.tests.utils import set_key_values
@@ -419,3 +420,64 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
         ])
+
+
+class EmitInitializedCourseEventTestCase(unittest.TestCase):
+    """Test class for emit_initialized_course_event method."""
+
+    @patch("eox_nelp.signals.receivers.tracker")
+    def test_event_is_not_emitted(self, tracker_mock):
+        """
+        This when the user has completed more than one component
+        therefore the event is not emitted.
+
+        Expected behavior:
+            - user_learning_context_completion_queryset is called with the right values.
+            - tracking.emit method is not called.
+        """
+        instance = Mock()
+        instance.user_learning_context_completion_queryset.return_value = [
+            "fake_record",
+            "fake_record",
+            "fake_record",
+        ]
+
+        emit_initialized_course_event(instance)
+
+        instance.user_learning_context_completion_queryset.assert_called_once_with(
+            instance.user,
+            instance.context_key,
+        )
+        tracker_mock.emit.assert_not_called()
+
+    @patch("eox_nelp.signals.receivers.tracker")
+    def test_event_is_emitted(self, tracker_mock):
+        """
+        This when the user has completed more than one component
+        therefore the event is not emitted.
+
+        Expected behavior:
+            - user_learning_context_completion_queryset is called with the right values.
+            - tracking.emit method is called with the right values.
+        """
+        block = Mock()
+        block.user_learning_context_completion_queryset.return_value = [
+            "fake_record",
+        ]
+
+        emit_initialized_course_event(block)
+
+        block.user_learning_context_completion_queryset.assert_called_once_with(
+            block.user,
+            block.context_key,
+        )
+        tracker_mock.emit.assert_called_once_with(
+            "nelc.eox_nelp.initialized.course",
+            {
+                "user_id": block.user_id,
+                "course_id": str(block.context_key),
+                "block_id": str(block.block_key),
+                "modified": block.modified,
+                "created": block.created,
+            }
+        )

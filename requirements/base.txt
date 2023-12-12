@@ -170,7 +170,9 @@ eox-tenant==9.2.1
 eox-theming==5.0.0
     # via -r requirements/base.in
 event-tracking==2.2.0
-    # via edx-proctoring
+    # via
+    #   -r requirements/base.in
+    #   edx-proctoring
 fastavro==1.9.0
     # via openedx-events
 fs==2.4.16

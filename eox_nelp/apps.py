@@ -42,6 +42,12 @@ class EoxNelpConfig(AppConfig):
                         'sender_path': 'completion.models.BlockCompletion',
                     },
                     {
+                        'receiver_func_name': 'emit_initialized_course_event',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'emit_initialized_course_event_receviver',
+                        'sender_path': 'completion.models.BlockCompletion',
+                    },
+                    {
                         'receiver_func_name': 'course_grade_changed_progress_publisher',
                         'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED',
                         'dispatch_uid': 'course_grade_publisher_receiver',

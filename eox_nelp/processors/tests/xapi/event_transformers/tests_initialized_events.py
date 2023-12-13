@@ -4,7 +4,7 @@ Classes:
     InitializedCourseTransformerTestCase: Tests cases for InitializedCourseTransformer class.
 """
 from django.test import TestCase
-from mock import Mock, patch
+from mock import patch
 from tincan import ActivityDefinition, LanguageMap
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
@@ -14,14 +14,6 @@ from eox_nelp.processors.xapi.event_transformers import InitializedCourseTransfo
 
 class InitializedCourseTransformerTestCase(TestCase):
     """Test class for InitializedCourseTransformer class."""
-
-    def setUp(self):
-        """Setup common conditions for every test case"""
-        self.get_data_mock = Mock()
-        self.get_object_iri_mock = Mock()
-
-        InitializedCourseTransformer.get_data = self.get_data_mock
-        InitializedCourseTransformer.get_object_iri = self.get_object_iri_mock
 
     def test_verb_attribute(self):
         """ Test case that checks that the _verb attribute has the right values.
@@ -49,9 +41,9 @@ class InitializedCourseTransformerTestCase(TestCase):
 
         """
         course_id = "course-v1:edx+CS105+2023-T3"
-        self.get_data_mock.return_value = course_id
-        object_id = f"http://exemple.com/course/{course_id}"
-        self.get_object_iri_mock.return_value = object_id
+        InitializedCourseTransformer.get_data.return_value = course_id
+        object_id = f"http://example.com/course/{course_id}"
+        InitializedCourseTransformer.get_object_iri.return_value = object_id
         course = {
             "display_name": "great-course",
             "language": "fr",
@@ -62,8 +54,8 @@ class InitializedCourseTransformerTestCase(TestCase):
 
         activity = transformer.get_object()
 
-        self.get_data_mock.assert_called_once_with("data.course_id", True)
-        self.get_object_iri_mock.assert_called_once_with("course", course_id)
+        InitializedCourseTransformer.get_data.assert_called_once_with("data.course_id", True)
+        InitializedCourseTransformer.get_object_iri.assert_called_once_with("course", course_id)
         get_course_mock.assert_called_once_with(course_id)
         self.assertEqual(object_id, activity.id)
         self.assertEqual(

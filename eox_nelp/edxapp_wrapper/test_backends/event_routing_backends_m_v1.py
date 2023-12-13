@@ -38,4 +38,10 @@ def get_xapi_transformer():
     Returns:
         Object type.
     """
-    return object
+    class XApiTransformer:
+        pass
+
+    setattr(XApiTransformer, "get_data", Mock())
+    setattr(XApiTransformer, "get_object_iri", Mock())
+
+    return XApiTransformer

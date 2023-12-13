@@ -6,9 +6,11 @@ functions:
 """
 from django.conf import settings
 from django.contrib.auth import logout
+from django.http import HttpResponseForbidden
+from django.utils.translation import gettext_lazy as _
 from social_core.pipeline.social_auth import social_details as social_core_details
 
-from eox_nelp.third_party_auth.exceptions import EoxNelpAuthException
+from eox_nelp.edxapp_wrapper.edxmako import edxmako
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -70,7 +72,7 @@ def close_mismatch_session(request, *args, user=None, **kwargs):  # pylint: disa
 
 
 def safer_associate_username_by_uid(  # pylint: disable=unused-argument
-    backend, details, response, *args, user=None, **kwargs,
+    request, backend, details, response, *args, user=None, **kwargs,
 ):
     """Pipeline to retrieve user if possible matching uid with the username of a user.
     The uid is based in the configuration of the saml with the field `attr_user_permanent_id`:
@@ -94,8 +96,20 @@ def safer_associate_username_by_uid(  # pylint: disable=unused-argument
     if not user_match:
         return None
     if user_match.is_staff or user_match.is_superuser:
-        raise EoxNelpAuthException(backend, "It is not allowed to auto associate staff or admin users")
-
+        return HttpResponseForbidden(
+            edxmako.shortcuts.render_to_string(
+                "static_templates/server-error.html",
+                {
+                    "page_header": _("It is not allowed to auto associate staff or admin users"),
+                    "page_content": _(
+                        "You are trying to access with a user that already exists with privileged permissions."
+                        " Please try to authenticate on the site where you registered for the first time "
+                        "or contact support to change permissions."
+                    ),
+                },
+                request=request,
+            )
+        )
     return {
         "user": user_match,
         "is_new": False,

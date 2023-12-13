@@ -26,3 +26,17 @@ msgstr "أدخل"
 #: eox_nelp/middleware.py:111
 msgid "Enter your"
 msgstr "حدد"
+
+#: eox_nelp/third_party_auth/pipeline.py:99
+msgid "It is not allowed to auto associate staff or admin users"
+msgstr "لا يجوز ربط الموظفين أو المستخدمين الإداريين تلقائيًا"
+
+#: eox_nelp/third_party_auth/pipeline.py:99
+msgid ""
+"You are trying to access with a user that already exists with privileged permissions."
+" Please try to authenticate on the site where you registered for the first time "
+"or contact support to change permissions."
+msgstr ""
+"أنت تحاول الوصول مع مستخدم موجود بالفعل بأذونات مميزة."
+"يرجى محاولة المصادقة على الموقع الذي قمت بالتسجيل فيه لأول مرة"
+"أو اتصل بالدعم لتغيير الأذونات."

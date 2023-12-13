@@ -14,6 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'social_django',
     'eox_nelp',
+    'eventtracking.django.apps.EventTrackingConfig',
 ]
 
 COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'

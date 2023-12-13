@@ -87,7 +87,7 @@ REST_FRAMEWORK = {
         'registration_validation': '30/minute',
     },
 }
-
+EVENT_TRACKING_ENABLED = True
 
 # ------------external plugins configuration backends----------------
 

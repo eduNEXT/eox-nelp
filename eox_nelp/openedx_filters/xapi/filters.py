@@ -10,10 +10,10 @@ from openedx_filters import PipelineStep
 from tincan import Agent, LanguageMap
 
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
+from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
 from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
 
 User = get_user_model()
-DEFAULT_LANGUAGE = "en"
 
 
 class XApiActorFilter(PipelineStep):

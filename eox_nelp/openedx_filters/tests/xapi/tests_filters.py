@@ -12,12 +12,8 @@ from mock import Mock, patch
 from tincan import Activity, ActivityDefinition, Agent, LanguageMap
 
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
-from eox_nelp.openedx_filters.xapi.filters import (
-    DEFAULT_LANGUAGE,
-    XApiActorFilter,
-    XApiBaseEnrollmentFilter,
-    XApiBaseProblemsFilter,
-)
+from eox_nelp.openedx_filters.xapi.filters import XApiActorFilter, XApiBaseEnrollmentFilter, XApiBaseProblemsFilter
+from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
 
 User = get_user_model()
 

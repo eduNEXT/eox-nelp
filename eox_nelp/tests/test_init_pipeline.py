@@ -19,9 +19,15 @@ from eox_nelp.stats import templates as stats_templates
 class RunInitPipelineTestCase(TestCase):
     """Test class for run_init_pipeline method."""
 
+    @patch("eox_nelp.init_pipeline.register_xapi_transformers")
     @patch("eox_nelp.init_pipeline.patch_user_gender_choices")
     @patch("eox_nelp.init_pipeline.set_mako_templates")
-    def test_pipeline_execute_expected_methods(self, set_mako_templates_mock, patch_user_gender_choices_mock):
+    def test_pipeline_execute_expected_methods(
+        self,
+        set_mako_templates_mock,
+        patch_user_gender_choices_mock,
+        register_xapi_transformers_mock,
+    ):
         """ Test that method calls the expected methods during the pipeline execution.
 
         Expected behavior:
@@ -32,6 +38,7 @@ class RunInitPipelineTestCase(TestCase):
 
         set_mako_templates_mock.assert_called_once()
         patch_user_gender_choices_mock.assert_called_once()
+        register_xapi_transformers_mock.assert_called_once()
 
 
 class SetMakoTemplatesTestCase(TestCase):

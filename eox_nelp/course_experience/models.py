@@ -9,9 +9,11 @@ Models:
 """
 from django.contrib.auth import get_user_model
 from django.db import models
+from eventtracking import tracker
 from opaque_keys.edx.django.models import UsageKeyField
 
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+from eox_nelp.utils import camel_to_snake
 
 User = get_user_model()
 
@@ -93,6 +95,25 @@ class BaseFeedback(models.Model):
     class Meta:
         """Set model abstract"""
         abstract = True
+
+    def save(self, *args, **kwargs):
+        """Overrides save method in order to add extra functionalities."""
+        super().save(*args, **kwargs)
+
+        self.emit_feedback_event()
+
+    def emit_feedback_event(self):
+        """Emit event base on the instance attributes."""
+        class_name = camel_to_snake(self.__class__.__name__)
+        event_name = f"nelc.eox_nelp.course_experience.{class_name}"
+        private_fields = {"id"}
+        event_data = {
+            field.name: field.value_to_string(self)
+            for field in self._meta.fields  # pylint: disable=no-member
+            if field.name not in private_fields
+        }
+
+        tracker.emit(event_name, event_data)
 
 
 class LikeDislikeUnit(BaseLikeDislike):

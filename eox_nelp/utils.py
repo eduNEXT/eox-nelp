@@ -142,3 +142,15 @@ def get_item_label(item):
         return matches.group(1)
 
     return ""
+
+
+def camel_to_snake(string):
+    """Convert string from camel case to snake case.
+
+    Args:
+        string: String in camel case format.
+
+    Returns:
+        String in snake case.
+    """
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()

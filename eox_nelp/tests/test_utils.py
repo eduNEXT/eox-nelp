@@ -9,7 +9,7 @@ from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
+from eox_nelp.utils import camel_to_snake, extract_course_id_from_string, get_course_from_id, get_item_label
 
 
 @ddt
@@ -191,3 +191,34 @@ class GetItemLabelTestCase(TestCase):
         label = get_item_label(fake_item)
 
         self.assertEqual("", label)
+
+
+@ddt
+class CamelToSnakeTestCase(TestCase):
+    """Test class for the camel_to_snake method."""
+    @data(
+        ("CamelToSnake", "camel_to_snake"),
+        ("This_isAMix", "this_is_a_mix"),
+        ("not_camel_case", "not_camel_case"),
+        ("ABGTET", "a_b_g_t_e_t"),
+        ("58Yolo", "58_yolo"),
+    )
+    def test_camel_to_snake(self, test_data):
+        """ Test right functionality.
+
+        Expected behavior:
+            - Returned value is the expected value.
+        """
+        input_value = test_data[0]
+        expected_result = test_data[1]
+
+        self.assertEqual(expected_result, camel_to_snake(input_value))
+
+    @data(None, 14, object)
+    def test_invalid_input(self, input_value):
+        """ Test when the input is not a string.
+
+        Expected behavior:
+            - TypeError is raised
+        """
+        self.assertRaises(TypeError, camel_to_snake, input_value)

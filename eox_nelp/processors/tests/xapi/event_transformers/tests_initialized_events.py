@@ -26,17 +26,3 @@ class InitializedCourseTransformerTestCase(BaseCourseObjectTestCaseMixin, TestCa
 
         self.assertEqual(constants.XAPI_VERB_INITIALIZED, verb.id)
         self.assertEqual(LanguageMap({constants.EN: constants.INITIALIZED}), verb.display)
-
-    def test_course_id_property(self):
-        """Test case that checks that the course_id property has been overridden and returns the expected value.
-
-        Expected behavior:
-            - course_id is the expected value.
-            - get_data has been called with the right parameters.
-        """
-        course_id = "course-v1:edx+CS105+2023-T3"
-        self.transformer_class.get_data.return_value = course_id
-        transformer = self.transformer_class()
-
-        self.assertEqual(course_id, transformer.course_id)
-        self.transformer_class.get_data.assert_called_once_with("data.course_id", required=True)

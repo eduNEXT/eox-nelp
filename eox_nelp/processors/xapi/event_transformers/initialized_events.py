@@ -5,15 +5,15 @@ Classes:
     InitializedCourseTransformer: Transformer for the event nelc.eox_nelp.initialized.course
 """
 
-from tincan import Activity, ActivityDefinition, LanguageMap, Verb
+from django.utils.functional import cached_property
+from tincan import LanguageMap, Verb
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import XApiTransformer, XApiTransformersRegistry, constants
-from eox_nelp.processors.xapi import constants as eox_nelp_constants
-from eox_nelp.utils import get_course_from_id
+from eox_nelp.processors.xapi.mixins import BaseCourseObjectTransformerMixin
 
 
 @XApiTransformersRegistry.register("nelc.eox_nelp.initialized.course")
-class InitializedCourseTransformer(XApiTransformer):
+class InitializedCourseTransformer(BaseCourseObjectTransformerMixin, XApiTransformer):
     """
     Transformers for event generated when an student start a course.
     """
@@ -22,26 +22,10 @@ class InitializedCourseTransformer(XApiTransformer):
         display=LanguageMap({constants.EN: constants.INITIALIZED}),
     )
 
-    def get_object(self):
+    @cached_property
+    def course_id(self):
         """
-        Get object for xAPI transformed event.
-
-        Returns:
-            `Activity`
+        Transformer's property that returns the associated
+        course id for the `nelc.eox_nelp.initialized.course` event.
         """
-        course_id = self.get_data('data.course_id', True)
-        object_id = self.get_object_iri('course', course_id)
-        course = get_course_from_id(course_id)
-        display_name = course["display_name"]
-        description = course["short_description"]
-        # Set default value if language is not found
-        course_language = course["language"] or eox_nelp_constants.DEFAULT_LANGUAGE
-
-        return Activity(
-            id=object_id,
-            definition=ActivityDefinition(
-                type=eox_nelp_constants.XAPI_ACTIVITY_COURSE,
-                name=LanguageMap(**({course_language: display_name} if display_name is not None else {})),
-                description=LanguageMap(**({course_language: description} if description is not None else {}))
-            ),
-        )
+        return self.get_data('data.course_id', required=True)

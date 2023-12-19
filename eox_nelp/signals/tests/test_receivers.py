@@ -453,7 +453,7 @@ class EmitInitializedCourseEventTestCase(unittest.TestCase):
     @patch("eox_nelp.signals.receivers.tracker")
     def test_event_is_emitted(self, tracker_mock):
         """
-        This when the user has completed more than one component
+        This tests when the user has completed more than one component
         therefore the event is not emitted.
 
         Expected behavior:

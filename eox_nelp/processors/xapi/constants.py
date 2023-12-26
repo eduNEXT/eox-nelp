@@ -3,7 +3,7 @@ Constants for xAPI specifications, this contains the NELC required values.
 """
 from eox_nelp.course_experience.models import RATING_OPTIONS
 
-DEFAULT_LANGUAGE = "en"
+DEFAULT_LANGUAGE = "en-US"
 RATED = "rated"
 MAX_FEEDBACK_SCORE = RATING_OPTIONS[-1][0]
 MIN_FEEDBACK_SCORE = 0

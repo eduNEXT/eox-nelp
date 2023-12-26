@@ -3,12 +3,14 @@
 Filters:
     XApiActorFilter: Modifies the standard ACtor in order to include the name attribute.
     XApiBaseEnrollmentFilter: Updates enrollment object definition.
+    XApiVerbFilter: Updates verba display language key.
 """
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import UsageKey
 from openedx_filters import PipelineStep
 from tincan import Agent, LanguageMap
 
+from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
 from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
@@ -150,6 +152,36 @@ class XApiBaseProblemsFilter(PipelineStep):
             result.definition.name = LanguageMap({course_language: display_name})
 
         result.definition.description = LanguageMap(**({course_language: label} if label else {}))
+
+        return {
+            "result": result
+        }
+
+
+class XApiVerbFilter(PipelineStep):
+    """This filter is designed to update the openedx verb default language from en to en-US.
+
+    How to set:
+        OPEN_EDX_FILTERS_CONFIG = {
+            "event_routing_backends.processors.xapi.transformer.xapi_transformer.get_verb": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiVerbFilter"],
+                "fail_silently": False,
+            },
+        }
+    """
+
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
+        """Modifies verb display key to use the eox_nelp default language.
+
+        Arguments:
+            transformer <XApiTransformer>: Transformer instance.
+            result <Verb>: Verb related to an event.
+
+        Returns:
+            Verb: Modified verb.
+        """
+        if constants.EN in result.display:
+            result.display = LanguageMap({DEFAULT_LANGUAGE: result.display[constants.EN]})
 
         return {
             "result": result

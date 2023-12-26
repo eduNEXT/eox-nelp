@@ -3,16 +3,23 @@
 Classes:
     XApiActorFilterTestCase: Tests cases for XApiActorFilter filter class.
     XApiBaseEnrollmentFilterTestCase: Test cases for XApiBaseEnrollmentFilter filter class.
-    XApiBaseProblemsFilterTestCase: Test cases for XXApiBaseProblemsFilter filter class.
+    XApiBaseProblemsFilterTestCase: Test cases for XApiBaseProblemsFilter filter class.
+    XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
 """
 from ddt import data, ddt
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from mock import Mock, patch
-from tincan import Activity, ActivityDefinition, Agent, LanguageMap
+from tincan import Activity, ActivityDefinition, Agent, LanguageMap, Verb
 
+from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
-from eox_nelp.openedx_filters.xapi.filters import XApiActorFilter, XApiBaseEnrollmentFilter, XApiBaseProblemsFilter
+from eox_nelp.openedx_filters.xapi.filters import (
+    XApiActorFilter,
+    XApiBaseEnrollmentFilter,
+    XApiBaseProblemsFilter,
+    XApiVerbFilter,
+)
 from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
 
 User = get_user_model()
@@ -214,7 +221,7 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         self.transformer.get_data.side_effect = lambda x: self.default_values[x]
 
         # Set input arguments.
-        self.activity.definition.name = LanguageMap(en=course_name)
+        self.activity.definition.name = LanguageMap({DEFAULT_LANGUAGE: course_name})
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
@@ -296,3 +303,48 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=activity)["result"]
 
         self.assertEqual(activity, returned_activity)
+
+
+@ddt
+class XApiVerbFilterTestCaseTestCase(TestCase):
+    """Test class for XApiVerbFilterTestCase filter class."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.filter = XApiVerbFilter(
+            filter_type="event_routing_backends.processors.xapi.transformer.xapi_transformer.get_verb",
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiVerbFilter"],
+        )
+
+    def test_change_language(self):
+        """ Test case when the verb display key is the open edx default value and must be changed
+
+        Expected behavior:
+            - Returned verb has the eox-nelp default language.
+        """
+        display = "any-word"
+        verb = Verb(
+            id='testing-id',
+            display=LanguageMap({constants.EN: display})
+        )
+
+        verb = self.filter.run_filter(transformer=Mock(), result=verb)["result"]
+
+        self.assertEqual(display, verb.display[DEFAULT_LANGUAGE])
+
+    @data("fr", "ar", "de", "es")
+    def test_keep_language(self, language):
+        """ Test case when the verb display key is different from default value.
+
+        Expected behavior:
+            - Returned verb has not been modified.
+        """
+        display = "any-word"
+        verb = Verb(
+            id='testing-id',
+            display=LanguageMap({language: display})
+        )
+
+        verb = self.filter.run_filter(transformer=Mock(), result=verb)["result"]
+
+        self.assertEqual(display, verb.display[language])

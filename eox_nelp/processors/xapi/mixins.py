@@ -37,8 +37,11 @@ class BaseCourseObjectTransformerMixin:
         course = get_course_from_id(self.course_id)
         display_name = course["display_name"]
         description = course["short_description"]
+        course_language = course["language"]
+
         # Set default value if language is not found
-        course_language = course["language"] or eox_nelp_constants.DEFAULT_LANGUAGE
+        if not course_language or course_language == constants.EN:
+            course_language = eox_nelp_constants.DEFAULT_LANGUAGE
 
         return Activity(
             id=self.get_object_iri("courses", self.course_id),
@@ -48,6 +51,17 @@ class BaseCourseObjectTransformerMixin:
                 description=LanguageMap(**({course_language: description} if description is not None else {})),
             ),
         )
+
+    def get_context_activities(self):
+        """The XApiTransformer class implements this method and returns in the parent key
+        an activity that contains the course metadata however this is not necessary in
+        cases where a transformer uses the course metadata as object since the data is
+        redundant and a course cannot be its own parent, therefore this must return None.
+
+        Returns:
+            None
+        """
+        return None
 
 
 class BaseModuleObjectTransformerMixin:
@@ -85,8 +99,11 @@ class BaseModuleObjectTransformerMixin:
         display_name = item.display_name
 
         course = get_course_from_id(self.course_id)
+        course_language = course["language"]
+
         # Set default value if language is not found
-        course_language = course["language"] or eox_nelp_constants.DEFAULT_LANGUAGE
+        if not course_language or course_language == constants.EN:
+            course_language = eox_nelp_constants.DEFAULT_LANGUAGE
 
         return Activity(
             id=self.get_object_iri("xblock", self.item_id),

@@ -24,6 +24,16 @@ class BaseCourseObjectTransformerMixinTestCase(TestCase):
         with self.assertRaises(NotImplementedError):
             mixin.course_id  # pylint: disable=pointless-statement
 
+    def test_get_context_activities(self):
+        """ Test that the method get_context_activities returns None
+
+        Expected behavior:
+            - None value is returned
+        """
+        mixin = BaseCourseObjectTransformerMixin()
+
+        self.assertIsNone(mixin.get_context_activities())
+
 
 class BaseModuleObjectTransformerMixinTestCase(TestCase):
     """Test class for BaseModuleObjectTransformerMixin class."""

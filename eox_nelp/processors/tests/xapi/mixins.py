@@ -75,6 +75,36 @@ class BaseCourseObjectTestCaseMixin:
             activity.definition,
         )
 
+    @patch("eox_nelp.processors.xapi.mixins.get_course_from_id")
+    def test_get_object_method_with_default_language(self, get_course_mock):
+        """ Test case that verifies that the object returned uses 'en-US' instead of 'en'
+
+        Expected behavior:
+            - Activity definition is the expected value.
+        """
+        course_id = "course-v1:edx+CS105+2023-T3"
+        self.transformer_class.get_data.return_value = course_id
+        object_id = f"http://example.com/courses/{course_id}"
+        self.transformer_class.get_object_iri.return_value = object_id
+        course = {
+            "display_name": "great-course",
+            "language": "en",
+            "short_description": "This is the best course",
+        }
+        get_course_mock.return_value = course
+        transformer = self.transformer_class()
+
+        activity = transformer.get_object()
+
+        self.assertEqual(
+            ActivityDefinition(
+                type=eox_nelp_constants.XAPI_ACTIVITY_COURSE,
+                name=LanguageMap({eox_nelp_constants.DEFAULT_LANGUAGE: course["display_name"]}),
+                description=LanguageMap({eox_nelp_constants.DEFAULT_LANGUAGE: course["short_description"]}),
+            ),
+            activity.definition,
+        )
+
 
 class BaseModuleObjectTestCaseMixin:
     """This is a test mixin for classes which implements the BaseModuleObjectTransformerMixin class."""
@@ -150,6 +180,46 @@ class BaseModuleObjectTestCaseMixin:
             ActivityDefinition(
                 type=constants.XAPI_ACTIVITY_MODULE,
                 name=LanguageMap({course["language"]: item.display_name}),
+            ),
+            activity.definition,
+        )
+
+    @patch("eox_nelp.processors.xapi.mixins.get_course_from_id")
+    def test_get_object_method_with_default_language(self, get_course_mock):
+        """ Test case that verifies that the object returned uses 'en-US' instead of 'en'
+
+        Expected behavior:
+            - Activity definition is the expected value.
+        """
+        # Set get_data returned values
+        course_id = "course-v1:edx+CS105+2023-T3"
+        item_id = "block-v1:edx+CS104+2023+type@vertical+block@cbf124449a7a46cd82270b6051d6e902"
+        self.transformer_class.get_data.side_effect = [item_id, course_id]
+
+        # Set modulestore mock
+        item = Mock()
+        item.display_name = "Unit"
+        modulestore.return_value.get_item.return_value = item
+
+        # Set get_object_iri mock
+        object_id = f"http://example.com/xblock/{item_id}"
+        self.transformer_class.get_object_iri.return_value = object_id
+
+        # Set get_course_from_id mock
+        course = {
+            "language": "en",
+        }
+        get_course_mock.return_value = course
+
+        # Initialize test class
+        transformer = self.transformer_class()
+
+        activity = transformer.get_object()
+
+        self.assertEqual(
+            ActivityDefinition(
+                type=constants.XAPI_ACTIVITY_MODULE,
+                name=LanguageMap({eox_nelp_constants.DEFAULT_LANGUAGE: item.display_name}),
             ),
             activity.definition,
         )

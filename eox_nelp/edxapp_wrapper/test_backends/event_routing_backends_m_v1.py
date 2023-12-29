@@ -15,6 +15,7 @@ def get_xapi_constants():
     constants = Mock()
     constants.EN = "en"
     constants.XAPI_VERB_INITIALIZED = "http://adlnet.gov/expapi/verbs/initialized"
+    constants.XAPI_ACTIVITY_COURSE = "http://adlnet.gov/expapi/activities/course"
     constants.INITIALIZED = "initialized"
 
     return constants

@@ -2,7 +2,7 @@
 
 Classes:
     XApiActorFilterTestCase: Tests cases for XApiActorFilter filter class.
-    XApiBaseEnrollmentFilterTestCase: Test cases for XApiBaseEnrollmentFilter filter class.
+    XApiCourseObjectFilterTestCase: Test cases for XApiCourseObjectFilter filter class.
     XApiBaseProblemsFilterTestCase: Test cases for XApiBaseProblemsFilter filter class.
     XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
 """
@@ -16,8 +16,8 @@ from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.openedx_filters.xapi.filters import (
     XApiActorFilter,
-    XApiBaseEnrollmentFilter,
     XApiBaseProblemsFilter,
+    XApiCourseObjectFilter,
     XApiVerbFilter,
 )
 from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
@@ -83,14 +83,14 @@ class XApiActorFilterTestCase(TestCase):
         self.assertEqual(self.username, actor.name)
 
 
-class XApiBaseEnrollmentFilterTestCase(TestCase):
-    """Test class for XApiBaseEnrollmentFilter filter class."""
+class XApiCourseObjectFilterTestCase(TestCase):
+    """Test class for XApiCourseObjectFilter filter class."""
 
     def setUp(self):
         """Setup common conditions for every test case"""
-        self.filter = XApiBaseEnrollmentFilter(
+        self.filter = XApiCourseObjectFilter(
             filter_type="event_routing_backends.processors.xapi.enrollment_events.base_enrollment.get_object",
-            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiBaseEnrollmentFilter"],
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiCourseObjectFilter"],
         )
 
     def test_course_id_not_found(self):
@@ -101,6 +101,26 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
         """
         activity = Activity(
             id="https://example.com/course/course-v1-invalid-edx+CS105+2023-T3",
+            definition=ActivityDefinition(
+                type=constants.XAPI_ACTIVITY_COURSE,
+            ),
+        )
+
+        returned_activity = self.filter.run_filter(transformer=Mock(), result=activity)["result"]
+
+        self.assertEqual(activity, returned_activity)
+
+    def test_invalid_type(self):
+        """ Test case when the type is different from http://adlnet.gov/expapi/activities/course.
+
+        Expected behavior:
+            - Returned value is the same as the given value.
+        """
+        activity = Activity(
+            id="https://example.com/course/course-v1:edx+CS105+2023-T3",
+            definition=ActivityDefinition(
+                type="another-type",
+            ),
         )
 
         returned_activity = self.filter.run_filter(transformer=Mock(), result=activity)["result"]
@@ -126,7 +146,7 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
         activity = Activity(
             id="https://example.com/course/course-v1:edx+CS105+2023-T3",
             definition=ActivityDefinition(
-                type="testing",
+                type=constants.XAPI_ACTIVITY_COURSE,
                 name=LanguageMap(en="old-course-name"),
             ),
         )
@@ -156,7 +176,7 @@ class XApiBaseEnrollmentFilterTestCase(TestCase):
         activity = Activity(
             id="https://example.com/course/course-v1:edx+CS105+2023-T3",
             definition=ActivityDefinition(
-                type="testing",
+                type=constants.XAPI_ACTIVITY_COURSE,
                 name=LanguageMap(en="old-course-name"),
             ),
         )

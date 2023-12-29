@@ -116,17 +116,21 @@ class XApiCourseObjectFilter(PipelineStep):
         }
 
 
-class XApiBaseProblemsFilter(PipelineStep):
-    """This filter is designed to modify object attributes of an event which transformer class
-    is a child of BaseProblemsTransformer, this will add the description field and will change
-    the name based on the course language.
+class XApiModuleQuestionObjectFilter(PipelineStep):
+    """This filter is designed to modify object attributes of events whose object type is a module
+    or a question, this will add the description field and will change the name based on the course language.
 
     How to set:
         OPEN_EDX_FILTERS_CONFIG = {
             "event_routing_backends.processors.xapi.problem_interaction_events.base_problems.get_object": {
-                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiBaseProblemsFilter"],
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
                 "fail_silently": False,
             },
+            "event_routing_backends.processors.xapi.progress_events.base_progress.get_object": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
+                "fail_silently": False,
+            },
+            ...
         }
     """
 
@@ -135,32 +139,32 @@ class XApiBaseProblemsFilter(PipelineStep):
 
         Arguments:
             transformer <XApiTransformer>: Transformer instance.
-            result <Activity>: Object activity for events related to enrollments.
+            result <Activity>: Module or Problem object activity for any kind of event.
 
         Returns:
             Activity: Modified activity.
         """
-        # Following line is hard-coded since this logic has not been tested with other events.
-        if transformer.event["name"] != "edx.grades.problem.submitted":
-            return {
-                "result": result
-            }
+        if result.definition.type in [constants.XAPI_ACTIVITY_QUESTION, constants.XAPI_ACTIVITY_MODULE]:
+            display_name = transformer.get_data('display_name')
 
-        display_name = transformer.get_data('display_name')
+            # Get label from module descriptor block.
+            usage_id = transformer.get_data("data.problem_id") or transformer.get_data("data.block_id")
+            usage_key = UsageKey.from_string(usage_id)
+            item = modulestore().get_item(usage_key)
+            label = get_item_label(item)
 
-        # Get label from module descriptor block.
-        usage_key = UsageKey.from_string(transformer.get_data("data.problem_id"))
-        item = modulestore().get_item(usage_key)
-        label = get_item_label(item)
+            # Get course languge block.
+            course = get_course_from_id(transformer.get_data('course_id'))
+            course_language = course.get("language")
 
-        # Get course languge block.
-        course = get_course_from_id(transformer.get_data('course_id'))
-        course_language = course.get("language") or DEFAULT_LANGUAGE  # Set default value if language is not found
+            # Set default value if language is not found
+            if not course_language or course_language == constants.EN:
+                course_language = DEFAULT_LANGUAGE
 
-        if display_name:
-            result.definition.name = LanguageMap({course_language: display_name})
+            if display_name:
+                result.definition.name = LanguageMap({course_language: display_name})
 
-        result.definition.description = LanguageMap(**({course_language: label} if label else {}))
+            result.definition.description = LanguageMap(**({course_language: label} if label else {}))
 
         return {
             "result": result

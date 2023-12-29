@@ -3,10 +3,10 @@
 Classes:
     XApiActorFilterTestCase: Tests cases for XApiActorFilter filter class.
     XApiCourseObjectFilterTestCase: Test cases for XApiCourseObjectFilter filter class.
-    XApiBaseProblemsFilterTestCase: Test cases for XApiBaseProblemsFilter filter class.
+    XApiModuleQuestionObjectFilterTestCase: Test cases for XApiModuleQuestionObjectFilter filter class.
     XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
 """
-from ddt import data, ddt
+from ddt import data, ddt, unpack
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from mock import Mock, patch
@@ -16,8 +16,8 @@ from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.openedx_filters.xapi.filters import (
     XApiActorFilter,
-    XApiBaseProblemsFilter,
     XApiCourseObjectFilter,
+    XApiModuleQuestionObjectFilter,
     XApiVerbFilter,
 )
 from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
@@ -189,8 +189,8 @@ class XApiCourseObjectFilterTestCase(TestCase):
 
 
 @ddt
-class XApiBaseProblemsFilterTestCase(TestCase):
-    """Test class for XApiBaseProblemsFilterr filter class."""
+class XApiModuleQuestionObjectFilterTestCase(TestCase):
+    """Test class for XApiModuleQuestionObjectFilterr filter class."""
 
     def setUp(self):
         """Setup common conditions for every test case"""
@@ -199,22 +199,16 @@ class XApiBaseProblemsFilterTestCase(TestCase):
             "data.problem_id": "block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
             "course_id": "course-v1:edx+CS105+2023-T3",
         }
-        self.filter = XApiBaseProblemsFilter(
+        self.filter = XApiModuleQuestionObjectFilter(
             filter_type="event_routing_backends.processors.xapi.problem_interaction_events.base_problems.get_object",
-            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiBaseProblemsFilter"],
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
         )
         self.transformer = Mock()
         self.transformer.event = {"name": "edx.grades.problem.submitted"}
         self.transformer.get_data.side_effect = lambda x: self.default_values[x]
         self.transformer._get_submission.return_value = {}  # pylint: disable=protected-access
         self.course = {"language": "ar"}
-        self.activity = Activity(
-            id="https://example.com/xblock/block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
-            definition=ActivityDefinition(
-                type="http://adlnet.gov/expapi/activities/question",
-                name=LanguageMap(en="old-testing-course"),
-            ),
-        )
+        self.activity = None
 
         item = Mock()
         item.markdown = ""
@@ -225,9 +219,25 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         modulestore.reset_mock()
         self.transformer.reset_mock()
 
-    @data(None, "")
+    def set_activity(self, definition_type):
+        """Set the activity argument for the given type"""
+        self.activity = Activity(
+            id="https://example.com/xblock/block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
+            definition=ActivityDefinition(
+                type=definition_type,
+                name=LanguageMap(en="old-testing-course"),
+            )
+        )
+
+    @data(
+        (constants.XAPI_ACTIVITY_MODULE, None),
+        (constants.XAPI_ACTIVITY_MODULE, ""),
+        (constants.XAPI_ACTIVITY_QUESTION, None),
+        (constants.XAPI_ACTIVITY_QUESTION, ""),
+    )
+    @unpack
     @patch("eox_nelp.openedx_filters.xapi.filters.get_course_from_id")
-    def test_invalid_display_name(self, display_name, get_course_mock):  # pylint: disable=unused-argument
+    def test_invalid_display_name(self, definition_type, display_name, get_course_mock):
         """ Test case when display_name is None or an empty string.
 
         Expected behavior:
@@ -235,6 +245,7 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         """
         course_name = "testing-course"
         get_course_mock.return_value = self.course
+        self.set_activity(definition_type)
 
         # Set results of get_data method.
         self.default_values["display_name"] = display_name
@@ -247,14 +258,16 @@ class XApiBaseProblemsFilterTestCase(TestCase):
 
         self.assertEqual({DEFAULT_LANGUAGE: course_name}, returned_activity.definition.name)
 
+    @data(constants.XAPI_ACTIVITY_MODULE, constants.XAPI_ACTIVITY_QUESTION)
     @patch("eox_nelp.openedx_filters.xapi.filters.get_course_from_id")
-    def test_valid_display_name(self, get_course_mock):
+    def test_valid_display_name(self, definition_type, get_course_mock):
         """ Test case when display_name is found and valid.
 
         Expected behavior:
             - Definition name has been updated.
         """
         get_course_mock.return_value = self.course
+        self.set_activity(definition_type)
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
@@ -263,8 +276,9 @@ class XApiBaseProblemsFilterTestCase(TestCase):
             returned_activity.definition.name,
         )
 
+    @data(constants.XAPI_ACTIVITY_MODULE, constants.XAPI_ACTIVITY_QUESTION)
     @patch("eox_nelp.openedx_filters.xapi.filters.get_course_from_id")
-    def test_update_description(self, get_course_mock):
+    def test_update_description(self, definition_type, get_course_mock):
         """ Test case when item label is valid and the description is updated.
 
         Expected behavior:
@@ -275,6 +289,7 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         item.markdown = f">>{label}<<"
         modulestore.return_value.get_item.return_value = item
         get_course_mock.return_value = self.course
+        self.set_activity(definition_type)
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
@@ -283,34 +298,39 @@ class XApiBaseProblemsFilterTestCase(TestCase):
             returned_activity.definition.description,
         )
 
+    @data(constants.XAPI_ACTIVITY_MODULE, constants.XAPI_ACTIVITY_QUESTION)
     @patch("eox_nelp.openedx_filters.xapi.filters.get_course_from_id")
-    def test_empty_label(self, get_course_mock):
+    def test_empty_label(self, definition_type, get_course_mock):
         """ Test case when the item markdown doesn't contain a label.
 
         Expected behavior:
             - Definition description is an empty dict.
         """
         get_course_mock.return_value = self.course
+        self.set_activity(definition_type)
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
         self.assertEqual({}, returned_activity.definition.description)
 
+    @data(constants.XAPI_ACTIVITY_MODULE, constants.XAPI_ACTIVITY_QUESTION)
     @patch("eox_nelp.openedx_filters.xapi.filters.get_course_from_id")
-    def test_default_language(self, get_course_mock):
+    def test_default_language(self, definition_type, get_course_mock):
         """ Test case when the course has no language or is not valid.
 
         Expected behavior:
             - Definition name has the default key language.
         """
         get_course_mock.return_value = {}
+        self.set_activity(definition_type)
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
         self.assertEqual([DEFAULT_LANGUAGE], list(returned_activity.definition.name.keys()))
 
     def test_invalid_event(self):
-        """ Test case when the event name is different from edx.grades.problem.submitted.
+        """ Test case when the event definition type is different from http://adlnet.gov/expapi/activities/module
+        or http://adlnet.gov/expapi/activities/question.
 
         Expected behavior:
             - Returned activity is the same input activity.
@@ -318,6 +338,9 @@ class XApiBaseProblemsFilterTestCase(TestCase):
         self.transformer.event = {"name": "other-event"}
         activity = Activity(
             id="empty-activity",
+            definition=ActivityDefinition(
+                type="invalid-type",
+            )
         )
 
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=activity)["result"]

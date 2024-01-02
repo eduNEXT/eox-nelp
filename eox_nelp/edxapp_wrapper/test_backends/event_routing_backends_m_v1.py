@@ -17,6 +17,8 @@ def get_xapi_constants():
     constants.XAPI_VERB_INITIALIZED = "http://adlnet.gov/expapi/verbs/initialized"
     constants.XAPI_ACTIVITY_COURSE = "http://adlnet.gov/expapi/activities/course"
     constants.INITIALIZED = "initialized"
+    constants.XAPI_ACTIVITY_MODULE = "http://adlnet.gov/expapi/activities/module"
+    constants.XAPI_ACTIVITY_QUESTION = "http://adlnet.gov/expapi/activities/question"
 
     return constants
 

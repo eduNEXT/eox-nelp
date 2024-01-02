@@ -2,7 +2,7 @@
 
 Filters:
     XApiActorFilter: Modifies the standard ACtor in order to include the name attribute.
-    XApiBaseEnrollmentFilter: Updates enrollment object definition.
+    XApiCourseObjectFilter: Updates course object definition.
     XApiVerbFilter: Updates verba display language key.
 """
 from django.contrib.auth import get_user_model
@@ -62,16 +62,21 @@ class XApiActorFilter(PipelineStep):
         }
 
 
-class XApiBaseEnrollmentFilter(PipelineStep):
-    """This filter is designed to modify object attributes of an enrollment event, this will add
+class XApiCourseObjectFilter(PipelineStep):
+    """This filter is designed to modify object attributes of an event which has a course as object, this will add
     the description field and will change the name based on the course language.
 
     How to set:
         OPEN_EDX_FILTERS_CONFIG = {
             "event_routing_backends.processors.xapi.enrollment_events.base_enrollment.get_object": {
-                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiBaseEnrollmentFilter"],
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiCourseObjectFilter"],
                 "fail_silently": False,
             },
+            "event_routing_backends.processors.xapi.completion_events.base_completion.get_object": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiCourseObjectFilter"],
+                "fail_silently": False,
+            },
+            ...
         }
     """
 
@@ -80,19 +85,23 @@ class XApiBaseEnrollmentFilter(PipelineStep):
 
         Arguments:
             transformer <XApiTransformer>: Transformer instance.
-            result <Activity>: Object activity for events related to enrollments.
+            result <Activity>: Course object activity for any kind of event
 
         Returns:
             Activity: Modified activity.
         """
         course_id = extract_course_id_from_string(result.id)
 
-        if course_id:
+        if course_id and result.definition.type == constants.XAPI_ACTIVITY_COURSE:
             # Get course course data
             course = get_course_from_id(course_id)
             display_name = course["display_name"]
             description = course["short_description"]
-            course_language = course["language"] or DEFAULT_LANGUAGE  # Set default value if language is not found
+            course_language = course.get("language")
+
+            # Set default value if language is not found
+            if not course_language or course_language == constants.EN:
+                course_language = DEFAULT_LANGUAGE
 
             # Create new attributes based on the course properties
             definition_name = LanguageMap(**({course_language: display_name} if display_name is not None else {}))

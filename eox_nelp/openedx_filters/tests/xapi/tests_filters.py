@@ -195,7 +195,6 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
     def setUp(self):
         """Setup common conditions for every test case"""
         self.default_values = {
-            "display_name": "testing-course",
             "data.problem_id": "block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
             "course_id": "course-v1:edx+CS105+2023-T3",
         }
@@ -210,9 +209,10 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
         self.course = {"language": "ar"}
         self.activity = None
 
-        item = Mock()
-        item.markdown = ""
-        modulestore.return_value.get_item.return_value = item
+        self.item = Mock()
+        self.item.markdown = ""
+        self.item.display_name = "testing-course"
+        modulestore.return_value.get_item.return_value = self.item
 
     def tearDown(self):
         """Restore mocks' state"""
@@ -248,7 +248,7 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
         self.set_activity(definition_type)
 
         # Set results of get_data method.
-        self.default_values["display_name"] = display_name
+        self.item.display_name = display_name
         self.transformer.get_data.side_effect = lambda x: self.default_values[x]
 
         # Set input arguments.
@@ -272,7 +272,7 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
         returned_activity = self.filter.run_filter(transformer=self.transformer, result=self.activity)["result"]
 
         self.assertEqual(
-            {self.course['language']: self.default_values["display_name"]},
+            {self.course['language']: self.item.display_name},
             returned_activity.definition.name,
         )
 
@@ -287,6 +287,7 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
         item = Mock()
         label = "This is a great label"
         item.markdown = f">>{label}<<"
+        item.display_name = None
         modulestore.return_value.get_item.return_value = item
         get_course_mock.return_value = self.course
         self.set_activity(definition_type)

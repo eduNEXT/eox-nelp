@@ -145,12 +145,11 @@ class XApiModuleQuestionObjectFilter(PipelineStep):
             Activity: Modified activity.
         """
         if result.definition.type in [constants.XAPI_ACTIVITY_QUESTION, constants.XAPI_ACTIVITY_MODULE]:
-            display_name = transformer.get_data('display_name')
-
-            # Get label from module descriptor block.
+            # Get component data from module descriptor block.
             usage_id = transformer.get_data("data.problem_id") or transformer.get_data("data.block_id")
             usage_key = UsageKey.from_string(usage_id)
             item = modulestore().get_item(usage_key)
+            display_name = item.display_name
             label = get_item_label(item)
 
             # Get course languge block.

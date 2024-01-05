@@ -7,6 +7,8 @@ Functions:
     course_grade_changed_progress_publisher: it will publish the user progress based on COURSE_GRADE_CHANGED signal.
     create_course_notifications: this will create upcoming notifications based on the sub-section due dates.
     certificate_publisher: Publish the user certificate data to the NELC certificates service.
+    include_tracker_context: Append tracker context to async task data.
+    update_async_tracker_context: Update tracker context based on the task data.
 """
 import logging
 
@@ -238,3 +240,29 @@ def update_payment_notifications(instance, **kwargs):  # pylint: disable=unused-
             payment_notification.id,
             payment_notification.internal_status,
         )
+
+
+def include_tracker_context(body, *args, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receiver used to add tracker context to the async process  to the task that need to be done.
+
+    Dispatched before a celery task is published. Note that this is executed in the process sending the task.
+    See:
+        https://celery.readthedocs.io/en/latest/userguide/signals.html#before-task-publish
+    """
+    current_tracker = tracker.get_tracker()
+    context = current_tracker.resolve_context()
+    body["kwargs"]["tracker_context"] = context
+
+
+def update_async_tracker_context(sender, *args, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receiver that runs on the async process to update the tracker context.
+    Dispatched before a task is executed.
+    See:
+       https://celery.readthedocs.io/en/latest/userguide/signals.html#task-prerun
+    """
+    request = sender.request
+    tracker_context = request.get("kwargs", {}).pop("tracker_context", {})
+    current_tracker = tracker.get_tracker()
+    current_tracker.enter_context("asynchronous_context", tracker_context)

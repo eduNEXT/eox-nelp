@@ -69,6 +69,14 @@ class EoxNelpConfig(AppConfig):
                         'dispatch_uid': 'update_payment_notifications_receiver',
                         'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
                     },
+                    {
+                        'receiver_func_name': 'include_tracker_context',
+                        'signal_path': 'celery.signals.before_task_publish',
+                    },
+                    {
+                        'receiver_func_name': 'update_async_tracker_context',
+                        'signal_path': 'celery.signals.task_prerun',
+                    },
                 ],
             },
         },

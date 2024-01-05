@@ -2,12 +2,15 @@
 Classes:
     CourseGradeChangedProgressPublisherTestCase: Test course_grade_changed_progress_publisher receiver.
     BlockcompletionProgressPublisherTestCase: Test block_completion_progress_publisher receiver.
+    IncludeTrackerContextTestCase: Test include_tracker_context receiver.
+    UpdateAsyncTrackerContextTestCase: Test update_async_tracker_context receiver.
 """
 import unittest
 
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils import timezone
+from eventtracking.tracker import get_tracker
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.data import EventsMetadata
@@ -21,6 +24,8 @@ from eox_nelp.signals.receivers import (
     course_grade_changed_progress_publisher,
     emit_initialized_course_event,
     enrollment_publisher,
+    include_tracker_context,
+    update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
 
@@ -428,7 +433,7 @@ class EmitInitializedCourseEventTestCase(unittest.TestCase):
     @patch("eox_nelp.signals.receivers.tracker")
     def test_event_is_not_emitted(self, tracker_mock):
         """
-        This when the user has completed more than one component
+        This tests when the user has completed more than one component
         therefore the event is not emitted.
 
         Expected behavior:
@@ -481,3 +486,58 @@ class EmitInitializedCourseEventTestCase(unittest.TestCase):
                 "created": block.created,
             }
         )
+
+
+class IncludeTrackerContextTestCase(unittest.TestCase):
+    """Test class for include_tracker_context method."""
+
+    def test_context_is_included(self):
+        """
+        This tests that the body kwargs has been updated after the method execution.
+
+        Expected behavior:
+            - body kwargs is equal to the tracker context
+        """
+        body = {"kwargs": {}}  # This is the default value for kwargs
+        context = {"This is a fake context": True}
+
+        # Set tracker context
+        tracker = get_tracker()
+
+        with tracker.context("this_does_not_matter", context):
+            include_tracker_context(body)
+
+        self.assertEqual(context, body["kwargs"]["tracker_context"])
+
+
+class UpdateAsyncTrackerContextTestCase(unittest.TestCase):
+    """Test class for update_async_tracker_context method."""
+
+    def test_context_is_included(self):
+        """
+        This tests that the tracker context has been updated after the method execution.
+
+        Expected behavior:
+            - sender request doesn't have any tracker_context key.
+            - the current tracker returns the expected context.
+        """
+        sender = Mock()
+        expected_context = {
+            "session_id": "ashjdgjashgdui15647851561",
+            "course_id": "course-v1:test+Cx105+2022_T4"
+        }
+        sender.request = {
+            "kwargs": {
+                "tracker_context": expected_context
+            }
+        }
+        tracker = get_tracker()
+
+        update_async_tracker_context(sender)
+
+        self.assertEqual(expected_context, tracker.resolve_context())
+        self.assertNotIn("tracker_context", sender.request["kwargs"])
+
+        # Following line doesn't affect the current implementation, this
+        # just clean the context affected by this test.
+        tracker.exit_context("asynchronous_context")

@@ -5,17 +5,22 @@ Classes:
     XApiCourseObjectFilterTestCase: Test cases for XApiCourseObjectFilter filter class.
     XApiModuleQuestionObjectFilterTestCase: Test cases for XApiModuleQuestionObjectFilter filter class.
     XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
+    XApiContextFilterTestCase: Test cases for XApiContextFilter filter class.
 """
+import json
+
 from ddt import data, ddt, unpack
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from mock import Mock, patch
-from tincan import Activity, ActivityDefinition, Agent, LanguageMap, Verb
+from opaque_keys.edx.keys import CourseKey
+from tincan import Activity, ActivityDefinition, Agent, Context, LanguageMap, Verb
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.openedx_filters.xapi.filters import (
     XApiActorFilter,
+    XApiContextFilter,
     XApiCourseObjectFilter,
     XApiModuleQuestionObjectFilter,
     XApiVerbFilter,
@@ -350,8 +355,8 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
 
 
 @ddt
-class XApiVerbFilterTestCaseTestCase(TestCase):
-    """Test class for XApiVerbFilterTestCase filter class."""
+class XApiVerbFilterTestCase(TestCase):
+    """Test class for XApiVerbFilter filter class."""
 
     def setUp(self):
         """Setup common conditions for every test case"""
@@ -392,3 +397,256 @@ class XApiVerbFilterTestCaseTestCase(TestCase):
         verb = self.filter.run_filter(transformer=Mock(), result=verb)["result"]
 
         self.assertEqual(display, verb.display[language])
+
+
+@ddt
+class XApiContextFilterTestCase(TestCase):
+    """Test class for XApiContextFilter filter class."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.filter = XApiContextFilter(
+            filter_type="event_routing_backends.processors.xapi.transformer.xapi_transformer.get_context",
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiContextFilter"],
+        )
+
+    def tearDown(self):
+        """Clean cache and restarts mocks"""
+        modulestore.reset_mock()
+
+    @data(
+        ("registration", "550e8400-e29b-41d4-a716-446655440000"),
+        ("platform", "This is the platform name"),
+        ("revision", "2024-10-25"),
+        ("language", "en-US"),
+    )
+    @unpack
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_update_string_attributes(self, attribute, value, extra_context_mock):
+        """ This tests that arguments that must be strings has been updated after the filter execution.
+
+        Expected behavior:
+            - The attribute is equal to the expected value.
+            - _get_extra_context was called with the right parameter.
+        """
+        context = Context()
+        transformer = Mock()
+        extra_context_mock.return_value = {attribute: value}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertEqual(value, str(getattr(context, attribute)))
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_update_instructor_attribute(self, extra_context_mock):
+        """ This tests that the instructor attribute has been updated after the filter execution.
+
+        Expected behavior:
+            - The attribute is equal to the expected value.
+            - _get_extra_context was called with the right parameter.
+        """
+        context = Context()
+        transformer = Mock()
+        expected_value = {"name": "Jhon", "mbox": "mailto:test@example.com"}
+        extra_context_mock.return_value = {"instructor": expected_value}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        # Remove objectType key since that is a value that is added automatically by tincan
+        result = json.loads(context.instructor.to_json())
+        del result["objectType"]
+
+        self.assertEqual(expected_value, result)
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @data("instructor", "team")
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_update_group_attributes(self, attribute, extra_context_mock):
+        """ This tests attributes that can be set by a list of dictionaries, as the team or instructor attribute.
+
+        Expected behavior:
+            - The attribute is equal to the expected value.
+            - _get_extra_context was called with the right parameter.
+        """
+        context = Context()
+        transformer = Mock()
+        expected_value = [
+            {"name": "Jhon", "mbox": "mailto:test@example.com"},
+            {"name": "Peter", "mbox": "mailto:peter@example.com"},
+            {"name": "Alex", "mbox": "mailto:alex@example.com"},
+        ]
+        extra_context_mock.return_value = {attribute: expected_value}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        result = json.loads(getattr(context, attribute).member.to_json())
+
+        # Remove objectType key since that is a value that is added automatically by tincan
+        for member in result:
+            del member["objectType"]
+
+        self.assertEqual(expected_value, result)
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @data("instructor", "team")
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_raise_invalid_group(self, attribute, extra_context_mock):
+        """This tests that the ValueError exception is raised when an invalid value is
+        attempted to be associated with a group attribute.
+
+        Expected behavior:
+            - ValueError is raised.
+            - _get_extra_context was called with the right parameter.
+        """
+        context = Context()
+        transformer = Mock()
+        invalid_value = "invalid-value"
+        extra_context_mock.return_value = {attribute: invalid_value}
+
+        self.assertRaises(ValueError, self.filter.run_filter, transformer, context)
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_update_extensions_attribute(self, extra_context_mock):
+        """ This tests that the extensions attribute has been updated after the filter execution.
+
+        Expected behavior:
+            - The attribute is equal to the expected value.
+            - _get_extra_contex was called with the right parameter.
+        """
+        context = Context()
+        transformer = Mock()
+        initial_value = {
+            "http://id.tincanapi.com/extension/browser-info": {
+                "code_name": "Mozilla",
+                "name": "Firefox",
+                "version": "5.0"
+            },
+        }
+        context.extensions = initial_value
+        extra_value = {
+            "https://nelc.gov.sa/extensions/platform": {
+                "name": {
+                    "ar-SA": "التقنيات المتقدمة للتدريب",
+                    "en-US": "Leading Tech for Training",
+                },
+            },
+        }
+        extra_context_mock.return_value = {"extensions": extra_value}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        expected_value = {**initial_value, **extra_value}
+
+        self.assertEqual(expected_value, context.extensions)
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_invalid_attribute(self, extra_context_mock):
+        """ This tests that the attribute has not been set when the context doesn't have the target attribute.
+
+        Expected behavior:
+            - Context doesn't have the attribute.
+            - _get_extra_contex was called with the right parameter.
+        """
+        context = Mock()
+        transformer = Mock()
+        del context.any_attribute
+        extra_context_mock.return_value = {"any_attribute": "any_value"}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertFalse(hasattr(context, "any_attribute"))
+        extra_context_mock.assert_called_once_with(transformer)
+
+    @data("context_activities", "statement")
+    @patch.object(XApiContextFilter, "_get_extra_context")
+    def test_unsupported_attribute(self, attribute, extra_context_mock):
+        """ This tests that unsupported attributes has not been updated.
+
+        Expected behavior:
+            - The attribute is different from the new value.
+            - _get_extra_contex was called with the right parameter.
+        """
+        context = Mock()
+        transformer = Mock()
+        new_value = "any_value"
+        extra_context_mock.return_value = {attribute: new_value}
+
+        context = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertNotEqual(new_value, getattr(context, attribute))
+        extra_context_mock.assert_called_once_with(transformer)
+
+    def test_get_context_from_general_settings(self):
+        """This checks that the method `_get_extra_context` returns the right value
+        from the general settings.
+
+        Expected behavior:
+            - Returned value is the expected value.
+        """
+        expected_value = {
+            "instructor": {
+                "name": "Jhon",
+                "mbox": "test@example.com"
+            },
+            "platform": "My-great-platform",
+            "language": "ar-SA",
+        }
+        transformer = Mock()
+        transformer.get_data.return_value = None
+
+        with override_settings(XAPI_EXTRA_CONTEXT=expected_value):
+            result = self.filter._get_extra_context(transformer)  # pylint: disable=protected-access
+
+        self.assertEqual(expected_value, result)
+
+    def test_get_context_from_course_settings(self):
+        """This checks that the method `_get_extra_context` returns the right value
+        from the other_course_settings, this also checks that the platform settings
+        are overridden.
+
+        Expected behavior:
+            - Returned value is the expected value.
+            - get_course is called with the course key.
+        """
+        platform_settings = {
+            "instructor": {
+                "name": "Jhon",
+                "mbox": "test@example.com"
+            },
+            "platform": "My-great-platform",
+            "language": "ar-SA",
+        }
+        course_settings = {
+            "XAPI_EXTRA_CONTEXT": {
+                "instructor": {
+                    "name": "Peter",
+                    "mbox": "peter@example.com"
+                },
+                "extensions": {
+                    "https://example.com/extensions/platform": {
+                        "name": {
+                            "ar-SA": "التكنولوجيا الرائدة",
+                            "en-US": "Leading Tech for Training",
+                        },
+                    },
+                },
+            },
+        }
+        course = Mock()
+        transformer = Mock()
+        course.other_course_settings = course_settings
+        transformer.get_data.return_value = "course-v1:edx+CS105+2023-T3"
+        modulestore.return_value.get_course.return_value = course
+
+        with override_settings(XAPI_EXTRA_CONTEXT=platform_settings):
+            result = self.filter._get_extra_context(transformer)  # pylint: disable=protected-access
+
+        expected_value = {**platform_settings, **course_settings.get("XAPI_EXTRA_CONTEXT")}
+
+        self.assertEqual(expected_value, result)
+        modulestore.return_value.get_course.assert_called_once_with(
+            CourseKey.from_string(transformer.get_data())
+        )

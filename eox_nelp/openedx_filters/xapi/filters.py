@@ -5,10 +5,11 @@ Filters:
     XApiCourseObjectFilter: Updates course object definition.
     XApiVerbFilter: Updates verba display language key.
 """
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters import PipelineStep
-from tincan import Agent, LanguageMap
+from tincan import Agent, Group, LanguageMap
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
@@ -152,7 +153,7 @@ class XApiModuleQuestionObjectFilter(PipelineStep):
             display_name = item.display_name
             label = get_item_label(item)
 
-            # Get course languge block.
+            # Get course language block.
             course = get_course_from_id(transformer.get_data('course_id'))
             course_language = course.get("language")
 
@@ -198,3 +199,156 @@ class XApiVerbFilter(PipelineStep):
         return {
             "result": result
         }
+
+
+class XApiContextFilter(PipelineStep):
+    """This filter is designed to update the context value for any event transformer.
+
+    How to set:
+        OPEN_EDX_FILTERS_CONFIG = {
+            "event_routing_backends.processors.xapi.transformer.xapi_transformer.get_context": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiContextFilter"],
+                "fail_silently": False,
+            },
+        }
+    """
+
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
+        """This allows to modify the statement context for any event, the allowed modifications are
+        limited by the tincan library and it's not possible to changed or updated all of them, the
+        supported fields are the following:
+
+        * registration: This must be a string that represent an UUID version 1
+        * instructor: This must be a dict representation of an Agent or a list of multiple dicts.
+        * team: This must be a list of dicts, each dict must be a agent representation.
+        * revision: This must be a string.
+        * platform: This must be a string.
+        * language: This must be a valid string language.
+        * extensions: This must be a dictionary.
+
+        ** statement: Not supported.
+        ** context_activities: NOT supported.
+
+        E.G.
+
+        {
+            "XAPI_EXTRA_CONTEXT":         {
+                "registration": "550e8400-e29b-41d4-a716-446655440000",
+                "instructor": {
+                    "name": "Jhon",
+                    "mbox": "test@example.com"
+                },
+                "team": [
+                    {
+                        "name": "Peter",
+                        "mbox": "peter@example.com"
+                    },
+                    {
+                        "name": "Alex",
+                        "mbox": "alex@example.com"
+                    },
+                    ...
+                ],
+                "platform": "My-great-platform",
+                "language": "ar-SA",
+                "extensions": {
+                    "https://example.com/extensions/platform": {
+                        "name": {
+                            "ar-SA": "التكنولوجيا الرائدة",
+                            "en-US": "Leading Tech for Training",
+                        },
+                    },
+                },
+            }
+        }
+
+
+
+        Arguments:
+            transformer <XApiTransformer>: Transformer instance.
+            result <Context>: Context related to an event.
+
+        Returns:
+            Context: Modified context.
+        """
+        extra_context = self._get_extra_context(transformer)
+        unsupported_fields = ["context_activities", "statement"]
+
+        for key, value in extra_context.items():
+            if not hasattr(result, key) or key in unsupported_fields:
+                break
+
+            updater = getattr(self, f"_update_{key}", None)
+
+            if updater:
+                updater(result, value)
+            else:
+                setattr(result, key, value)
+
+        return {
+            "result": result
+        }
+
+    def _get_extra_context(self, transformer):
+        """Gets and returns an extra context based on the general settings and the course configuration.
+
+        Arguments:
+            transformer <XApiTransformer>: Transformer instance.
+
+        Returns:
+            Dict: This a dict that contains fields that should be added or updated in the event context.
+        """
+        xapi_course_context = {}
+        course_id = transformer.get_data("course_id")
+        xapi_platform_context = getattr(settings, "XAPI_EXTRA_CONTEXT", {})
+
+        if course_id:
+            course_key = CourseKey.from_string(course_id)
+            course = modulestore().get_course(course_key)
+            xapi_course_context = course.other_course_settings.get("XAPI_EXTRA_CONTEXT", {})
+
+        xapi_platform_context.update(xapi_course_context)
+
+        return xapi_platform_context
+
+    def _update_extensions(self, context, value):
+        """This updates the extensions context attribute."""
+        context.extensions.update(value)
+
+    def _update_instructor(self, context, value):
+        """This updates the instructor context attribute."""
+        if isinstance(value, dict):
+            instructor = Agent(**value)
+        elif isinstance(value, list):
+            instructor = self.generate_group(value)
+        else:
+            raise ValueError()
+
+        context.instructor = instructor
+
+    def _update_team(self, context, value):
+        """This updates the team context attribute."""
+        if isinstance(value, list):
+            team = self.generate_group(value)
+        else:
+            raise ValueError()
+
+        context.team = team
+
+    @staticmethod
+    def generate_group(group_data):
+        """Generate a Group instance based on the given group_data argument.
+
+        Arguments:
+            group_data<list>: List of dictionaries that represents an Agent.
+
+        Returns:
+            Group
+        """
+        group = Group()
+
+        for agent_data in group_data:
+            agent = Agent(**agent_data)
+            group.addmember(agent)
+
+        return group

@@ -294,8 +294,8 @@ def emit_subsection_attempt_event(usage_id, user_id, *args, **kwargs):  # pylint
             {
                 "user_id": user_id,
                 "course_id": str(usage_key.context_key),
-                "block_id": str(subsection.location),
-                "submitted_at": timezone.now(),
+                "block_id": str(subsection_grade.location),
+                "submitted_at": timezone.now().strftime("%Y-%m-%d, %H:%M:%S"),
                 "earned": subsection_grade.graded_total.earned,
                 "possible": subsection_grade.graded_total.possible,
                 "percent": subsection_grade.percent_graded,

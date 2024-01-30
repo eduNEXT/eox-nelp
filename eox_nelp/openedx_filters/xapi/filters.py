@@ -3,7 +3,9 @@
 Filters:
     XApiActorFilter: Modifies the standard ACtor in order to include the name attribute.
     XApiCourseObjectFilter: Updates course object definition.
-    XApiVerbFilter: Updates verba display language key.
+    XApiVerbFilter: Updates verb display language key.
+    XApiXblockObjectFilter: Updates object definition of xblock's events.
+    XApiContextFilter: Updates the context value for any event transformer.
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -13,7 +15,7 @@ from tincan import Agent, Group, LanguageMap
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
-from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
+from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE, XAPI_ACTIVITY_UNIT_TEST
 from eox_nelp.utils import extract_course_id_from_string, get_course_from_id, get_item_label
 
 User = get_user_model()
@@ -117,18 +119,18 @@ class XApiCourseObjectFilter(PipelineStep):
         }
 
 
-class XApiModuleQuestionObjectFilter(PipelineStep):
-    """This filter is designed to modify object attributes of events whose object type is a module
-    or a question, this will add the description field and will change the name based on the course language.
+class XApiXblockObjectFilter(PipelineStep):
+    """This filter is designed to modify object attributes of events whose object is a xblock
+    this will add the description field and will change the name based on the course language.
 
     How to set:
         OPEN_EDX_FILTERS_CONFIG = {
             "event_routing_backends.processors.xapi.problem_interaction_events.base_problems.get_object": {
-                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiXblockObjectFilter"],
                 "fail_silently": False,
             },
             "event_routing_backends.processors.xapi.progress_events.base_progress.get_object": {
-                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiXblockObjectFilter"],
                 "fail_silently": False,
             },
             ...
@@ -145,7 +147,14 @@ class XApiModuleQuestionObjectFilter(PipelineStep):
         Returns:
             Activity: Modified activity.
         """
-        if result.definition.type in [constants.XAPI_ACTIVITY_QUESTION, constants.XAPI_ACTIVITY_MODULE]:
+        allowed_types = [
+            XAPI_ACTIVITY_UNIT_TEST,
+            constants.XAPI_ACTIVITY_MODULE,
+            constants.XAPI_ACTIVITY_LESSON,
+            constants.XAPI_ACTIVITY_QUESTION,
+        ]
+
+        if result.definition.type in allowed_types:
             # Get component data from module descriptor block.
             usage_id = transformer.get_data("data.problem_id") or transformer.get_data("data.block_id")
             usage_key = UsageKey.from_string(usage_id)

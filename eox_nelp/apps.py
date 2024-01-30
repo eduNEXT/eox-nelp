@@ -77,6 +77,14 @@ class EoxNelpConfig(AppConfig):
                         'receiver_func_name': 'update_async_tracker_context',
                         'signal_path': 'celery.signals.task_prerun',
                     },
+                    {
+                        'receiver_func_name': 'emit_subsection_attempt_event',
+                        'signal_path': 'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED',
+                    },
+                    {
+                        'receiver_func_name': 'emit_subsection_attempt_event',
+                        'signal_path': 'lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED',
+                    },
                 ],
             },
         },

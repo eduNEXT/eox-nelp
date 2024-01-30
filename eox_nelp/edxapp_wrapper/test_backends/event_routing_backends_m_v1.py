@@ -48,3 +48,12 @@ def get_xapi_transformer():
     setattr(XApiTransformer, "get_object_iri", Mock())
 
     return XApiTransformer
+
+
+def get_xapi_event_transformers():
+    """Test backend for the event_transformers module.
+
+    Returns:
+        Mock class.
+    """
+    return Mock()

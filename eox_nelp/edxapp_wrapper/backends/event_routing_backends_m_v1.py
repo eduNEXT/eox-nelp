@@ -3,7 +3,7 @@
 This is required since the library has explicit dependencies from openedx platform.
 https://github.com/openedx/event-routing-backends
 """
-from event_routing_backends.processors.xapi import constants
+from event_routing_backends.processors.xapi import constants, event_transformers
 from event_routing_backends.processors.xapi.registry import XApiTransformersRegistry
 from event_routing_backends.processors.xapi.transformer import XApiTransformer
 
@@ -36,3 +36,13 @@ def get_xapi_transformer():
         XApiTransformer class.
     """
     return XApiTransformer
+
+
+def get_xapi_event_transformers():
+    """Allow to get the event_transformers module
+    https://github.com/openedx/event-routing-backends/blob/master/event_routing_backends/processors/xapi/event_transformers/__init__.py
+
+    Returns:
+        event_transformers module.
+    """
+    return event_transformers

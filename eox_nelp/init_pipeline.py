@@ -20,6 +20,7 @@ def run_init_pipeline():
     set_mako_templates()
     register_xapi_transformers()
     update_permissions()
+    patch_generate_password()
 
 
 def patch_user_gender_choices():
@@ -82,3 +83,14 @@ def update_permissions():
         | rules.HasAccessRule("staff")
         | rules.HasAccessRule("instructor")
     )
+
+
+def patch_generate_password():
+    """This method patch `generate_password` of edx_django_util package,
+    with custom nelp `generate_password`.
+    """
+    # pylint: disable=import-outside-toplevel, unused-import
+    from edx_django_utils import user
+
+    from eox_nelp.user_authn.utils import generate_password
+    user.generate_password = generate_password

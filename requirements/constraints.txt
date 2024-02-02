@@ -17,3 +17,6 @@ djangorestframework==3.12.4
 edx-drf-extensions==8.0.0
 # maple django filter version
 django-filter==21.1
+# django password validators for generate_password monkey patch
+django-password-validators==1.7.3
+edx-django-utils==5.2.0

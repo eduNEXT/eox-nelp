@@ -20,7 +20,8 @@ asgiref==3.7.2
     # via
     #   -r requirements/base.txt
     #   django
-astroid==3.0.3
+    #   django-simple-history
+astroid==3.1.0
     # via pylint
 attrs==23.2.0
     # via
@@ -82,15 +83,15 @@ code-annotations==1.6.0
     # via
     #   -r requirements/base.txt
     #   edx-toggles
-coverage==7.4.1
+coverage==7.4.3
     # via -r requirements/test.in
-cryptography==42.0.2
+cryptography==42.0.5
     # via
     #   -r requirements/base.txt
     #   jwcrypto
     #   pyjwt
     #   social-auth-core
-ddt==1.7.1
+ddt==1.7.2
     # via -r requirements/test.in
 defusedxml==0.8.0rc2
     # via
@@ -107,6 +108,7 @@ django==3.2.24
     #   django-filter
     #   django-model-utils
     #   django-oauth-toolkit
+    #   django-password-validators
     #   django-waffle
     #   djangorestframework
     #   djangorestframework-jsonapi
@@ -156,7 +158,11 @@ django-oauth2-provider==0.2.6.1
     # via
     #   -r requirements/base.txt
     #   eox-core
-django-simple-history==3.4.0
+django-password-validators==1.7.3
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.txt
+django-simple-history==3.5.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -199,8 +205,9 @@ edx-api-doc-tools==1.7.0
     # via
     #   -r requirements/base.txt
     #   eox-core
-edx-django-utils==5.10.1
+edx-django-utils==5.2.0
     # via
+    #   -c requirements/constraints.txt
     #   -r requirements/base.txt
     #   edx-drf-extensions
     #   edx-rest-api-client
@@ -243,7 +250,7 @@ edx-when==2.4.0
     #   edx-proctoring
 eox-core==10.0.0
     # via -r requirements/base.txt
-eox-tenant==10.0.0
+eox-tenant==11.0.1
     # via
     #   -r requirements/base.txt
     #   eox-theming
@@ -263,7 +270,7 @@ fs==2.4.16
     # via
     #   -r requirements/base.txt
     #   xblock
-future==0.18.3
+future==1.0.0
     # via
     #   -r requirements/base.txt
     #   pyjwkest
@@ -315,7 +322,7 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.in
-newrelic==9.6.0
+newrelic==9.7.0
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -325,7 +332,7 @@ oauthlib==3.2.2
     #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
-openedx-events==9.5.1
+openedx-events==9.5.2
     # via
     #   -r requirements/base.txt
     #   eox-core
@@ -388,7 +395,7 @@ pyjwt[crypto]==2.8.0
     #   edx-proctoring
     #   edx-rest-api-client
     #   social-auth-core
-pylint==3.0.3
+pylint==3.1.0
     # via -r requirements/test.in
 pymongo==3.13.0
     # via
@@ -406,7 +413,7 @@ python-dateutil==2.8.2
     #   edx-drf-extensions
     #   edx-proctoring
     #   xblock
-python-ipware==2.0.1
+python-ipware==2.0.2
     # via
     #   -r requirements/base.txt
     #   django-ipware
@@ -456,7 +463,7 @@ semantic-version==2.10.0
     # via
     #   -r requirements/base.txt
     #   edx-drf-extensions
-shortuuid==1.0.11
+shortuuid==1.0.12
     # via
     #   -r requirements/base.txt
     #   django-oauth2-provider
@@ -493,13 +500,13 @@ sqlparse==0.4.4
     # via
     #   -r requirements/base.txt
     #   django
-stevedore==5.1.0
+stevedore==5.2.0
     # via
     #   -r requirements/base.txt
     #   code-annotations
     #   edx-django-utils
     #   edx-opaque-keys
-testfixtures==7.2.2
+testfixtures==8.0.0
     # via -r requirements/test.in
 text-unidecode==1.3
     # via
@@ -509,9 +516,9 @@ tincan==1.0.0
     # via -r requirements/base.txt
 tomli==2.0.1
     # via pylint
-tomlkit==0.12.3
+tomlkit==0.12.4
     # via pylint
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements/base.txt
     #   asgiref
@@ -526,7 +533,7 @@ uritemplate==4.1.1
     # via
     #   -r requirements/base.txt
     #   drf-yasg
-urllib3==2.2.0
+urllib3==2.2.1
     # via
     #   -r requirements/base.txt
     #   requests
@@ -548,7 +555,7 @@ webob==1.8.7
     # via
     #   -r requirements/base.txt
     #   xblock
-xblock==1.10.0
+xblock==2.0.0
     # via
     #   -r requirements/base.txt
     #   edx-when

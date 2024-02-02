@@ -5,4 +5,5 @@ from eox_nelp.processors.xapi.event_transformers.course_experience_events import
     FeedBackCourseTransformer,
     FeedBackUnitTransformer,
 )
+from eox_nelp.processors.xapi.event_transformers.grade_events import SubsectionSubmittedTransformer  # noqa: F401
 from eox_nelp.processors.xapi.event_transformers.initialized_events import InitializedCourseTransformer  # noqa: F401

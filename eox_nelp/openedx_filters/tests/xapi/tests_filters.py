@@ -3,7 +3,7 @@
 Classes:
     XApiActorFilterTestCase: Tests cases for XApiActorFilter filter class.
     XApiCourseObjectFilterTestCase: Test cases for XApiCourseObjectFilter filter class.
-    XApiModuleQuestionObjectFilterTestCase: Test cases for XApiModuleQuestionObjectFilter filter class.
+    XApiXblockObjectFilterTestCase: Test cases for XApiXblockObjectFilter filter class.
     XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
     XApiContextFilterTestCase: Test cases for XApiContextFilter filter class.
 """
@@ -22,8 +22,8 @@ from eox_nelp.openedx_filters.xapi.filters import (
     XApiActorFilter,
     XApiContextFilter,
     XApiCourseObjectFilter,
-    XApiModuleQuestionObjectFilter,
     XApiVerbFilter,
+    XApiXblockObjectFilter,
 )
 from eox_nelp.processors.xapi.constants import DEFAULT_LANGUAGE
 
@@ -194,8 +194,8 @@ class XApiCourseObjectFilterTestCase(TestCase):
 
 
 @ddt
-class XApiModuleQuestionObjectFilterTestCase(TestCase):
-    """Test class for XApiModuleQuestionObjectFilterr filter class."""
+class XApiXblockObjectFilterTestCase(TestCase):
+    """Test class for XApiXblockObjectFilterr filter class."""
 
     def setUp(self):
         """Setup common conditions for every test case"""
@@ -203,9 +203,9 @@ class XApiModuleQuestionObjectFilterTestCase(TestCase):
             "data.problem_id": "block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
             "course_id": "course-v1:edx+CS105+2023-T3",
         }
-        self.filter = XApiModuleQuestionObjectFilter(
+        self.filter = XApiXblockObjectFilter(
             filter_type="event_routing_backends.processors.xapi.problem_interaction_events.base_problems.get_object",
-            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiModuleQuestionObjectFilter"],
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiXblockObjectFilter"],
         )
         self.transformer = Mock()
         self.transformer.event = {"name": "edx.grades.problem.submitted"}

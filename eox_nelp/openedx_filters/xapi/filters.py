@@ -6,12 +6,13 @@ Filters:
     XApiVerbFilter: Updates verb display language key.
     XApiXblockObjectFilter: Updates object definition of xblock's events.
     XApiContextFilter: Updates the context value for any event transformer.
+    XApiCertificateContextFilter: Updates the context value for a certificate created event.
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters import PipelineStep
-from tincan import Agent, Group, LanguageMap
+from tincan import Agent, Extensions, Group, LanguageMap
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
@@ -361,3 +362,41 @@ class XApiContextFilter(PipelineStep):
             group.addmember(agent)
 
         return group
+
+
+class XApiCertificateContextFilter(PipelineStep):
+    """This filter is designed to update the certificate context extensions value.
+
+    How to set:
+        OPEN_EDX_FILTERS_CONFIG = {
+            "event_routing_backends.processors.xapi.transformer.xapi_transformer.get_context": {
+                "pipeline": ["eox_nelp.openedx_filters.xapi.filters.XApiCertificateContextFilter"],
+                "fail_silently": False,
+            },
+        }
+    """
+
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
+        """This adds jws-certificate-location extension
+
+        Arguments:
+            transformer <XApiTransformer>: Transformer instance.
+            result <Context>: Context related to an event.
+
+        Returns:
+            Context: Modified context.
+        """
+        certificate_id = transformer.get_data("data.certificate_id")
+
+        if certificate_id:
+            certificate_url = transformer.get_object_iri("certificates", certificate_id)
+            extension = {"http://id.tincanapi.com/extension/jws-certificate-location": certificate_url}
+
+            if result.extensions:
+                result.extensions.update(extension)
+            else:
+                result.extensions = Extensions(extension)
+
+        return {
+            "result": result
+        }

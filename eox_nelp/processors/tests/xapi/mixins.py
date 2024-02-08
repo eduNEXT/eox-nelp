@@ -68,7 +68,7 @@ class BaseCourseObjectTestCaseMixin:
         self.assertEqual(object_id, activity.id)
         self.assertEqual(
             ActivityDefinition(
-                type=eox_nelp_constants.XAPI_ACTIVITY_COURSE,
+                type=constants.XAPI_ACTIVITY_COURSE,
                 name=LanguageMap({course["language"]: course["display_name"]}),
                 description=LanguageMap({course["language"]: course["short_description"]}),
             ),
@@ -98,7 +98,7 @@ class BaseCourseObjectTestCaseMixin:
 
         self.assertEqual(
             ActivityDefinition(
-                type=eox_nelp_constants.XAPI_ACTIVITY_COURSE,
+                type=constants.XAPI_ACTIVITY_COURSE,
                 name=LanguageMap({eox_nelp_constants.DEFAULT_LANGUAGE: course["display_name"]}),
                 description=LanguageMap({eox_nelp_constants.DEFAULT_LANGUAGE: course["short_description"]}),
             ),

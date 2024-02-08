@@ -10,10 +10,14 @@ from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import override_settings
-from mock import patch
-from opaque_keys.edx.keys import CourseKey
+from django.utils import timezone
+from mock import Mock, patch
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from social_django.models import UserSocialAuth
 
+from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
+from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
+from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.signals import tasks
 from eox_nelp.signals.tasks import (
     _generate_progress_enrollment_data,
@@ -21,7 +25,9 @@ from eox_nelp.signals.tasks import (
     _post_futurex_progress,
     create_external_certificate,
     dispatch_futurex_progress,
+    emit_subsection_attempt_event_task,
 )
+from eox_nelp.tests.utils import generate_list_mock_data
 
 User = get_user_model()
 FALSY_ACTIVATION_VALUES = [0, "", None, [], False, {}, ()]
@@ -363,3 +369,132 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
         api_mock.return_value.create_external_certificate.assert_called_once_with(
             certificate_data
         )
+
+
+class EmitSubsectionAttemptEventTaskTestCase(unittest.TestCase):
+    """Test class for emit_subsection_attempt_event_task method."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.usage_key = UsageKey.from_string(
+            "block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
+        )
+        self.user, _ = User.objects.get_or_create(username="Petunia")
+        self.mock_components = generate_list_mock_data([
+            {
+                "location": "block-v1:edx+CS105+2023-T3+type@problem+block@0221040b086c4618b6b2b2a554558",
+            },
+            {
+                "location": "block-v1:edx+CS105+2023-T3+type@problem+block@0456sdaads040b086fsdf2a554ayu",
+            },
+            {
+                "location": "block-v1:edx+CS105+2023-T3+type@problem+block@08751040b086c4618sdfsdfsd15re8",
+            },
+        ])
+        self.mock_unit = Mock()
+        self.mock_unit.get_children.return_value = self.mock_components
+
+    def tearDown(self):
+        """Restore mocks' state"""
+        modulestore.reset_mock()
+        SubsectionGradeFactory.reset_mock()
+        get_student_module_as_dict.reset_mock()
+
+    def mock_validations(self):
+        """This method contains general mock validations for the emit_subsection_attempt_event method."""
+        # 1. modulestore was called once.
+        modulestore.assert_called_once()
+
+        store = modulestore()
+
+        # 2. get_parent_location was once with the usage key
+        get_parent_location = store.get_parent_location
+        get_parent_location.assert_called_once_with(self.usage_key)
+
+        parent_location = get_parent_location()
+
+        # 3. get_item was once with the result of get_parent_location.
+        get_item = store.get_item
+        get_item.assert_called_once_with(parent_location)
+
+        # 4. get_parent was called once.
+        vertical = get_item()
+        vertical.get_parent.assert_called_once()
+
+        subsection = vertical.get_parent()
+
+        # 5. get_course was once with the course key.
+        get_course = store.get_course
+        get_course.assert_called_once_with(self.usage_key.course_key)
+
+        course = get_course()
+
+        # 6. SubsectionGradeFactory was called once with the user instance and the result of get_course method.
+        SubsectionGradeFactory.assert_called_once_with(self.user, course=course)
+
+        subsection_grade_factory = SubsectionGradeFactory()
+
+        # 7. subsection_grade_factory create method was called once with the result of vertical.get_parent(),
+        # read_only equal to True and force_calculate equal to True.
+        subsection_grade_factory.create.assert_called_once_with(
+            subsection=subsection,
+            read_only=True,
+            force_calculate=True,
+        )
+
+    @patch("eox_nelp.signals.tasks.tracker")
+    def test_event_is_not_emitted(self, tracker_mock):
+        """
+        This tests when the subsection is not graded
+        therefore the event is not emitted.
+
+        Expected behavior:
+            - tracking.emit method is not called.
+            - mock validations passes.
+        """
+        subsection_grade = Mock(graded=False)
+        SubsectionGradeFactory.return_value.create.return_value = subsection_grade
+
+        emit_subsection_attempt_event_task(str(self.usage_key), self.user.id)
+
+        tracker_mock.emit.assert_not_called()
+        self.mock_validations()
+
+    @patch("eox_nelp.signals.tasks.tracker")
+    def test_event_is_emitted(self, tracker_mock):
+        """
+        This tests when the subsection is gradable and the event is emitted
+
+        Expected behavior:
+            - tracking.emit method is called with the right values.
+            - mock validations passes.
+        """
+        modulestore.return_value.get_item.return_value.get_parent.return_value.get_children.return_value = [
+            self.mock_unit,
+        ]
+        get_student_module_as_dict.return_value = {"attempts": 1}
+        graded_total = Mock(earned=15, possible=30)
+        subsection_grade = Mock(
+            graded=True,
+            percent_graded=50,
+            graded_total=graded_total,
+            location="block-v1:test+CS501+2022_T4+type@sequential+block@a54730a9b89f420a8d0343dd581b447a",
+        )
+        SubsectionGradeFactory.return_value.create.return_value = subsection_grade
+
+        emit_subsection_attempt_event_task(str(self.usage_key), self.user.id)
+
+        tracker_mock.emit.assert_called_once_with(
+            "nelc.eox_nelp.grades.subsection.submitted",
+            {
+                "user_id": self.user.id,
+                "course_id": str(self.usage_key.context_key),
+                "block_id": str(subsection_grade.location),
+                "submitted_at": timezone.now().strftime("%Y-%m-%d, %H:%M:%S"),
+                "earned": graded_total.earned,
+                "possible": graded_total.possible,
+                "percent": subsection_grade.percent_graded,
+                "attempts": len(self.mock_components)
+            }
+        )
+        self.mock_validations()

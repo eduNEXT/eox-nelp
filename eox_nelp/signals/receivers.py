@@ -15,17 +15,17 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from eventtracking import tracker
-from opaque_keys.edx.keys import UsageKey
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
-from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
-from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
-from eox_nelp.signals.tasks import create_external_certificate, dispatch_futurex_progress
+from eox_nelp.signals.tasks import (
+    create_external_certificate,
+    dispatch_futurex_progress,
+    emit_subsection_attempt_event_task,
+)
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
 User = get_user_model()
@@ -279,25 +279,7 @@ def emit_subsection_attempt_event(usage_id, user_id, *args, **kwargs):  # pylint
     """This emits  the 'nelc.eox_nelp.grades.subsection.submitted' event
     when a graded subsection has been attempted.
     """
-    store = modulestore()
-    user = User.objects.get(id=user_id)
-    usage_key = UsageKey.from_string(usage_id)
-    vertical = store.get_item(store.get_parent_location(usage_key))
-    subsection = vertical.get_parent()
-    course = store.get_course(usage_key.course_key)
-    subsection_grade_factory = SubsectionGradeFactory(user, course=course)
-    subsection_grade = subsection_grade_factory.create(subsection=subsection, read_only=True, force_calculate=True)
-
-    if subsection_grade.graded:
-        tracker.emit(
-            "nelc.eox_nelp.grades.subsection.submitted",
-            {
-                "user_id": user_id,
-                "course_id": str(usage_key.context_key),
-                "block_id": str(subsection_grade.location),
-                "submitted_at": timezone.now().strftime("%Y-%m-%d, %H:%M:%S"),
-                "earned": subsection_grade.graded_total.earned,
-                "possible": subsection_grade.graded_total.possible,
-                "percent": subsection_grade.percent_graded,
-            }
-        )
+    emit_subsection_attempt_event_task.delay(
+        usage_id=usage_id,
+        user_id=user_id
+    )

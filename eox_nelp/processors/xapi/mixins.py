@@ -46,7 +46,7 @@ class BaseCourseObjectTransformerMixin:
         return Activity(
             id=self.get_object_iri("courses", self.course_id),
             definition=ActivityDefinition(
-                type=eox_nelp_constants.XAPI_ACTIVITY_COURSE,
+                type=constants.XAPI_ACTIVITY_COURSE,
                 name=LanguageMap(**({course_language: display_name} if display_name is not None else {})),
                 description=LanguageMap(**({course_language: description} if description is not None else {})),
             ),

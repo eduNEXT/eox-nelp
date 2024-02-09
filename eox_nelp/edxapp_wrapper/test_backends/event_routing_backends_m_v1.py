@@ -21,6 +21,7 @@ def get_xapi_constants():
     constants.XAPI_ACTIVITY_QUESTION = "http://adlnet.gov/expapi/activities/question"
     constants.XAPI_VERB_ATTEMPTED = "http://adlnet.gov/expapi/verbs/attempted"
     constants.ATTEMPTED = "attempted"
+    constants.XAPI_ACTIVITY_ATTEMPT = "http://id.tincanapi.com/extension/attempt-id"
 
     return constants
 
@@ -63,6 +64,7 @@ def get_xapi_event_transformers():
 
     setattr(ProblemSubmittedTransformer, "get_data", Mock())
     setattr(ProblemSubmittedTransformer, "get_object_iri", Mock())
+    setattr(ProblemSubmittedTransformer, "get_context", Mock())
 
     return Mock(
         ProblemSubmittedTransformer=ProblemSubmittedTransformer

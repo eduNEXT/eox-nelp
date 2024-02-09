@@ -4,9 +4,10 @@ Classes:
     SubsectionSubmittedTransformerTestCase: Tests cases for SubsectionSubmittedTransformer class.
 """
 from django.test import TestCase
-from tincan import ActivityDefinition, LanguageMap, Result
+from mock import patch
+from tincan import ActivityDefinition, Context, Extensions, LanguageMap, Result
 
-from eox_nelp.edxapp_wrapper.event_routing_backends import constants
+from eox_nelp.edxapp_wrapper.event_routing_backends import constants, event_transformers
 from eox_nelp.processors.xapi import constants as eox_nelp_constants
 from eox_nelp.processors.xapi.event_transformers import SubsectionSubmittedTransformer
 
@@ -21,6 +22,7 @@ class SubsectionSubmittedTransformerTestCase(TestCase):
             "data.earned": 15,
             "data.possible": 30,
             "data.percent": 50,
+            "data.attempts": 40,
         }
         self.transformer = SubsectionSubmittedTransformer()
         self.transformer.get_data.side_effect = lambda x: self.default_values[x]
@@ -84,3 +86,37 @@ class SubsectionSubmittedTransformerTestCase(TestCase):
         result = self.transformer.get_result()
 
         self.assertEqual(expected_value, result)
+
+    def test_get_context_with_parent_extensions(self):
+        """ Tests that the context extensions have been updated when the parent extensions context is not None.
+
+        Expected behavior:
+            - Returned value contains attempt extension and its value is the expected.
+            - Returned context contains the parent values.
+        """
+        with patch.object(event_transformers.ProblemSubmittedTransformer, 'get_context') as parent_context:
+            parent_context.return_value = Context(
+                extensions=Extensions({"parent_extensions": "any-value"})
+            )
+            context = self.transformer.get_context()
+
+        self.assertEqual(
+            self.default_values["data.attempts"],
+            context.extensions[constants.XAPI_ACTIVITY_ATTEMPT],
+        )
+        self.assertTrue("parent_extensions" in context.extensions)
+
+    def test_get_context(self):
+        """ Tests that the context extensions have been created when the parent extensions context is None.
+
+        Expected behavior:
+            - Returned value contains attempt extension and its value is the expected.
+        """
+        with patch.object(event_transformers.ProblemSubmittedTransformer, 'get_context') as parent_context:
+            parent_context.return_value = Context()
+            context = self.transformer.get_context()
+
+        self.assertEqual(
+            self.default_values["data.attempts"],
+            context.extensions[constants.XAPI_ACTIVITY_ATTEMPT],
+        )

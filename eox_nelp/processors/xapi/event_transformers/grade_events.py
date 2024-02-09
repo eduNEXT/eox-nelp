@@ -4,7 +4,7 @@ Transformers for grading events.
 Classes:
     SubsectionSubmittedTransformer: Transformer for the event nelc.eox_nelp.grades.subsection.submitted.
 """
-from tincan import ActivityDefinition, LanguageMap, Result, Verb
+from tincan import ActivityDefinition, Extensions, LanguageMap, Result, Verb
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import XApiTransformersRegistry, constants, event_transformers
 from eox_nelp.processors.xapi import constants as eox_nelp_constants
@@ -67,3 +67,22 @@ class SubsectionSubmittedTransformer(event_transformers.ProblemSubmittedTransfor
                 "scaled": self.get_data("data.percent") or 0,
             }
         )
+
+    def get_context(self):
+        """
+        Get context for xAPI transformed event.
+        Returns:
+            `Context`
+        """
+        context = super().get_context()
+
+        attempts_extension = {
+            constants.XAPI_ACTIVITY_ATTEMPT: self.get_data("data.attempts")
+        }
+
+        if context.extensions:
+            context.extensions.update(attempts_extension)
+        else:
+            context.extensions = Extensions(attempts_extension)
+
+        return context

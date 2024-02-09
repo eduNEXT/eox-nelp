@@ -6,6 +6,7 @@ Classes:
     XApiXblockObjectFilterTestCase: Test cases for XApiXblockObjectFilter filter class.
     XApiVerbFilterTestCase: Test cases for XApiVerbFilter filter class.
     XApiContextFilterTestCase: Test cases for XApiContextFilter filter class.
+    XApiCertificateContextFilterTestCase: Test cases for XApiCertificateContextFilter filter class.
 """
 import json
 
@@ -14,12 +15,13 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
-from tincan import Activity, ActivityDefinition, Agent, Context, LanguageMap, Verb
+from tincan import Activity, ActivityDefinition, Agent, Context, Extensions, LanguageMap, Verb
 
 from eox_nelp.edxapp_wrapper.event_routing_backends import constants
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.openedx_filters.xapi.filters import (
     XApiActorFilter,
+    XApiCertificateContextFilter,
     XApiContextFilter,
     XApiCourseObjectFilter,
     XApiVerbFilter,
@@ -650,3 +652,82 @@ class XApiContextFilterTestCase(TestCase):
         modulestore.return_value.get_course.assert_called_once_with(
             CourseKey.from_string(transformer.get_data())
         )
+
+
+class XApiCertificateContextFilterTestCase(TestCase):
+    """Test class for XApiCertificateContextFilter filter class."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.filter = XApiCertificateContextFilter(
+            filter_type="event_routing_backends.processors.xapi.transformer.xapi_transformer.get_context",
+            running_pipeline=["eox_nelp.openedx_filters.xapi.filters.XApiCertificateContextFilter"],
+        )
+
+    def test_certificate_id_does_not_exist(self):
+        """ Tests when the transformer doesn't have the certificate_id value.
+
+        Expected behavior:
+            - Returned value is the same as the given value.
+            - get_data method was called with the right parameter
+        """
+        transformer = Mock()
+        transformer.get_data.return_value = None
+        context = Context()
+
+        result = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertEqual(context, result)
+        transformer.get_data.assert_called_once_with("data.certificate_id")
+
+    def test_update_certificate_with_extension(self):
+        """ Tests that the context extensions has been updated when the transformer returns a valid certificate_id.
+
+        Expected behavior:
+            - Returned value contains certificate url.
+            - Returned value keeps the previos extension.
+            - get_data method was called with the right parameter
+            - get_object_iri method was called with the right parameters
+        """
+        transformer = Mock()
+        certificate_id = "3b8a5421b73748eeba4fb07e6fe2ec6a"
+        certificate_url = f"http://local.overhang.io:8000/certificates/{certificate_id}"
+        transformer.get_data.return_value = certificate_id
+        transformer.get_object_iri.return_value = certificate_url
+        context = Context(
+            extensions=Extensions({"custom-test-extension": "any-value"})
+        )
+
+        result = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertEqual(
+            certificate_url,
+            result.extensions["http://id.tincanapi.com/extension/jws-certificate-location"],
+        )
+        self.assertTrue("custom-test-extension" in result.extensions)
+        transformer.get_data.assert_called_once_with("data.certificate_id")
+        transformer.get_object_iri.assert_called_once_with("certificates", certificate_id)
+
+    def test_update_certificate_without_extension(self):
+        """ Tests that the context extensions has been created when the transformer returns a valid certificate_id.
+
+        Expected behavior:
+            - Returned value contains certificate url.
+            - get_data method was called with the right parameter
+            - get_object_iri method was called with the right parameters
+        """
+        transformer = Mock()
+        certificate_id = "3b8a5421b73748eeba4fb07e6fe2ec6a"
+        certificate_url = f"http://local.overhang.io:8000/certificates/{certificate_id}"
+        transformer.get_data.return_value = certificate_id
+        transformer.get_object_iri.return_value = certificate_url
+        context = Context()
+
+        result = self.filter.run_filter(transformer=transformer, result=context)["result"]
+
+        self.assertEqual(
+            certificate_url,
+            result.extensions["http://id.tincanapi.com/extension/jws-certificate-location"],
+        )
+        transformer.get_data.assert_called_once_with("data.certificate_id")
+        transformer.get_object_iri.assert_called_once_with("certificates", certificate_id)

@@ -10,13 +10,18 @@ from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
-from opaque_keys.edx.keys import CourseKey
+from eventtracking import tracker
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.futurex import FuturexApiClient
+from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
+from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.signals.utils import _user_has_passing_grade
 
 courses = get_courseware_courses()
@@ -154,3 +159,52 @@ def create_external_certificate(external_certificate_data):
         external_certificate_data,
         response,
     )
+
+
+@shared_task
+def emit_subsection_attempt_event_task(usage_id, user_id):
+    """This emits the event nelc.eox_nelp.grades.subsection.submitted when
+    any component of a graded subsection has been attempted.
+
+    Args:
+        usage_id (str): component usage id.
+        user_id (str): User identifier.
+    """
+    def get_attempts(subsection):
+        """Inner method that returns the total of subsection attempts"""
+        attempts = 0
+
+        for unit in subsection.get_children():
+            for component in unit.get_children():
+                student_module = get_student_module_as_dict(
+                    user,
+                    usage_key.course_key,
+                    component.location,
+                )
+                attempts += student_module.get("attempts", 0)
+
+        return attempts
+
+    store = modulestore()
+    user = User.objects.get(id=user_id)
+    usage_key = UsageKey.from_string(usage_id)
+    vertical = store.get_item(store.get_parent_location(usage_key))
+    subsection = vertical.get_parent()
+    course = store.get_course(usage_key.course_key)
+    subsection_grade_factory = SubsectionGradeFactory(user, course=course)
+    subsection_grade = subsection_grade_factory.create(subsection=subsection, read_only=True, force_calculate=True)
+
+    if subsection_grade.graded:
+        tracker.emit(
+            "nelc.eox_nelp.grades.subsection.submitted",
+            {
+                "user_id": user_id,
+                "course_id": str(usage_key.context_key),
+                "block_id": str(subsection_grade.location),
+                "submitted_at": timezone.now().strftime("%Y-%m-%d, %H:%M:%S"),
+                "earned": subsection_grade.graded_total.earned,
+                "possible": subsection_grade.graded_total.possible,
+                "percent": subsection_grade.percent_graded,
+                "attempts": get_attempts(subsection),
+            }
+        )

@@ -46,6 +46,9 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EXTERNAL_CERTIFICATES_API_URL = 'https://testing.com'
     settings.EXTERNAL_CERTIFICATES_USER = 'test-user'
     settings.EXTERNAL_CERTIFICATES_PASSWORD = 'test-password'
+    settings.MINISTER_OF_TOURISM_API_URL = 'https://testing.com'
+    settings.MINISTER_OF_TOURISM_USER = 'test-user'
+    settings.MINISTER_OF_TOURISM_PASSWORD = 'test-password'
     settings.ENABLE_CERTIFICATE_PUBLISHER = True
 
 

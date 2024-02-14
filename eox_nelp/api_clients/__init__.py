@@ -124,17 +124,6 @@ class AbstractOauth2ApiClient(AbstractApiClient):
         client_secret (str): Client secret for OAuth 2.0 authentication.
     """
 
-    def __init__(self):
-        """Initialize an instance of AbstractOauth2ApiClient.
-
-        Gets the client ID and client secret from Django settings and then
-        calls the constructor of the parent class (AbstractApiClient).
-        """
-        self.client_id = getattr(settings, "FUTUREX_API_CLIENT_ID")
-        self.client_secret = getattr(settings, "FUTUREX_API_CLIENT_SECRET")
-
-        super().__init__()
-
     def _authenticate(self):
         """Authenticate the session with OAuth 2.0 credentials.
 
@@ -147,6 +136,7 @@ class AbstractOauth2ApiClient(AbstractApiClient):
         Returns:
             requests.Session: Session authenticated with OAuth 2.0 credentials.
         """
+        # pylint: disable=no-member
         key = f"{self.client_id}-{self.client_secret}"
         headers = cache.get(key)
 
@@ -182,17 +172,6 @@ class AbstractBasicAuthApiClient(AbstractApiClient):
         password (str): Password for basic authentication.
     """
 
-    def __init__(self):
-        """Initialize an instance of AbstractBasicAuthApiClient.
-
-        Gets the user and password from Django settings and then calls
-        the constructor of the parent class (AbstractApiClient).
-        """
-        self.user = getattr(settings, "EXTERNAL_CERTIFICATES_USER")
-        self.password = getattr(settings, "EXTERNAL_CERTIFICATES_PASSWORD")
-
-        super().__init__()
-
     def _authenticate(self):
         """Authenticate the session with the user and password.
 
@@ -202,6 +181,7 @@ class AbstractBasicAuthApiClient(AbstractApiClient):
         Returns:
             requests.Session: Session authenticated.
         """
+        # pylint: disable=no-member
         session = requests.Session()
         session.auth = HTTPBasicAuth(self.user, self.password)
 

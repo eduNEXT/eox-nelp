@@ -16,6 +16,13 @@ class FuturexApiClient(AbstractOauth2ApiClient):
         base_url: Futurex domain.
         session: persist certain parameters across requests.
     """
+
+    def __init__(self):
+        self.client_id = getattr(settings, "FUTUREX_API_CLIENT_ID")
+        self.client_secret = getattr(settings, "FUTUREX_API_CLIENT_SECRET")
+
+        super().__init__()
+
     @property
     def base_url(self):
         return getattr(settings, "FUTUREX_API_URL")

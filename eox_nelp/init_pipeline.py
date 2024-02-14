@@ -9,8 +9,10 @@ Functions:
 """
 import os
 
+from bridgekeeper.rules import is_staff
 from django.utils.translation import gettext_noop
 
+from eox_nelp.edxapp_wrapper.courseware import rules
 
 def run_init_pipeline():
     """
@@ -70,13 +72,11 @@ def update_permissions():
     """This method just change permissions for bussiness cases"""
     # pylint: disable=import-outside-toplevel,
     from bridgekeeper import perms
-    from bridgekeeper.rules import is_staff
-    from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
     from lms.djangoapps.instructor.permissions import CAN_RESEARCH
     perms.pop(CAN_RESEARCH, None)
     perms[CAN_RESEARCH] = (
         is_staff |
-        HasRolesRule('data_researcher') |
-        HasAccessRule('staff') |
-        HasAccessRule('instructor')
+        rules.HasRolesRule('data_researcher') |
+        rules.HasAccessRule('staff') |
+        rules.HasAccessRule('instructor')
     )

@@ -9,3 +9,12 @@ def get_courseware_courses():
         Mock class.
     """
     return Mock
+
+
+def get_courseware_rules():
+    """Test backend for eox_nelp.edxapp_wrapper.backends.courseware_m_v1.
+
+    Returns:
+        Mock class.
+    """
+    return Mock()

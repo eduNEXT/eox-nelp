@@ -10,6 +10,9 @@ Functions:
     include_tracker_context: Append tracker context to async task data.
     update_async_tracker_context: Update tracker context based on the task data.
     emit_subsection_attempt_event: Emits an event when a graded subsection has been attempted.
+    mt_course_completion_handler: Updates mt training stage based on completion events.
+    mt_course_passed_handler: Updates mt training stage based on COURSE_GRADE_NOW_PASSED signal.
+    mt_course_failed_handler: Updates mt training stage based on COURSE_GRADE_NOW_FAILED signal.
 """
 import logging
 
@@ -22,9 +25,11 @@ from openedx_events.learning.data import CertificateData, CourseData, UserData, 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
 from eox_nelp.signals.tasks import (
+    course_completion_mt_updater,
     create_external_certificate,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
+    update_mt_training_stage,
 )
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
@@ -282,4 +287,48 @@ def emit_subsection_attempt_event(usage_id, user_id, *args, **kwargs):  # pylint
     emit_subsection_attempt_event_task.delay(
         usage_id=usage_id,
         user_id=user_id
+    )
+
+
+def mt_course_completion_handler(instance, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the post_save BlockCompletion signal and this executes
+    the course_completion_mt_updater task, that basically updates the training stage based
+    on the completion logic.
+
+    Arguments:
+        instance<Blockcompletion>: Instance of BlockCompletion model.
+    """
+    course_completion_mt_updater.delay(
+        user_id=instance.user_id,
+        course_id=str(instance.context_key),
+    )
+
+
+def mt_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the COURSE_GRADE_NOW_PASSED signal and this executes
+    the update_mt_training_stage task, that updates the training stage with a result of 1 (PASS)
+
+    Arguments:
+        user <User>: Instance of auth user model.
+        course_id <CourseLocator>: Course locator.
+    """
+    update_mt_training_stage.delay(
+        course_id=str(course_id),
+        national_id=user.username,
+        stage_result=1,
+    )
+
+
+def mt_course_failed_handler(user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the COURSE_GRADE_NOW_FAILED signal and this executes
+    the update_mt_training_stage task, that updates the training stage with a result of 2 (FAIL)
+
+    Arguments:
+        user <User>: Instance of auth user model.
+        course_id <CourseLocator>: Course locator.
+    """
+    update_mt_training_stage.delay(
+        course_id=str(course_id),
+        national_id=user.username,
+        stage_result=2,
     )

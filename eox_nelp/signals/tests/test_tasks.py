@@ -3,6 +3,8 @@
 Classes:
     GetCompletionSummaryTestCase: Test _get_completion_summary method.
     GenerateProgressEnrollmentDataTestCase: Test _generate_progress_enrollment_data method.
+    UpdateMtTrainingStageTestCase: Test update_mt_training_stage task.
+    CourseCompletionMtUpdaterTestCase: Test course_completion_mt_updater task.
 """
 import unittest
 
@@ -23,9 +25,11 @@ from eox_nelp.signals.tasks import (
     _generate_progress_enrollment_data,
     _get_completion_summary,
     _post_futurex_progress,
+    course_completion_mt_updater,
     create_external_certificate,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
+    update_mt_training_stage,
 )
 from eox_nelp.tests.utils import generate_list_mock_data
 
@@ -496,5 +500,165 @@ class EmitSubsectionAttemptEventTaskTestCase(unittest.TestCase):
                 "percent": subsection_grade.percent_graded,
                 "attempts": len(self.mock_components)
             }
+        )
+        self.mock_validations()
+
+
+class UpdateMtTrainingStageTestCase(unittest.TestCase):
+    """Test class for update_mt_training_stage function"""
+
+    @patch("eox_nelp.signals.tasks.MinisterOfTourismApiClient")
+    def test_invalid_feature_flag(self, api_mock):
+        """Test when the ACTIVATE_MT_TRAINING_STAGE settings is False.
+
+        Expected behavior:
+            - MinisterOfTourismApiClient mock has not been called.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        national_id = "1245789652"
+        stage_result = 1
+
+        update_mt_training_stage(
+            course_id=course_id,
+            national_id=national_id,
+            stage_result=stage_result,
+        )
+
+        api_mock.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_TRAINING_STAGE=True)
+    @patch("eox_nelp.signals.tasks.MinisterOfTourismApiClient")
+    def test_update_training_stage_call(self, api_mock):
+        """Test when the feature flag has been set and the api call has been executed.
+
+        Expected behavior:
+            - MinisterOfTourismApiClient mock has been called once.
+            - update_training_stage was called with the right parameters.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        national_id = "1245789652"
+        stage_result = 1
+
+        update_mt_training_stage(
+            course_id=course_id,
+            national_id=national_id,
+            stage_result=stage_result,
+        )
+
+        api_mock.assert_called_once()
+        api_mock.return_value.update_training_stage.assert_called_once_with(
+            course_id=course_id,
+            national_id=national_id,
+            stage_result=stage_result,
+        )
+
+
+class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
+    """Test class for course_completion_mt_updater function."""
+
+    def setUp(self):
+        """ Set common conditions for test cases."""
+        self.descriptor = Mock()
+        self.course_id = "course-v1:test+Cx105+2022_T4"
+        modulestore.return_value.get_course.return_value = self.descriptor
+
+    def tearDown(self):
+        """Restore mocks' state"""
+        modulestore.reset_mock()
+
+    def mock_validations(self):
+        """This method contains general mock validations for the course_completion_mt_updater function."""
+        # 1. modulestore was called once.
+        modulestore.assert_called_once()
+
+        store = modulestore()
+
+        # 2. get_course was called once with the usage key
+        course_key = CourseKey.from_string(self.course_id)
+        store.get_course.assert_called_once_with(course_key)
+
+    def test_invalid_feature_flag(self):
+        """Test when the ACTIVATE_MT_COMPLETION_UPDATER settings is False.
+
+        Expected behavior:
+            - modulestore mock has not been called.
+        """
+        course_completion_mt_updater(
+            user_id=20,
+            course_id=self.course_id,
+        )
+
+        modulestore.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
+    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.tasks.update_mt_training_stage")
+    def test_invalid_grader(self, updater_mock, completion_summary_mock):
+        """Test when grading_policy's GRADER is not empty.
+
+        Expected behavior:
+            - update_mt_training_stage mock has not been called.
+            - mock validators pass
+        """
+        national_id = "1245789652"
+        user_instance, _ = User.objects.get_or_create(username=national_id)
+        completion_summary_mock.return_value = {"incomplete_count": 0}
+        self.descriptor.grading_policy = {
+            "GRADER": [1, 2, 3],
+        }
+
+        course_completion_mt_updater(
+            user_id=user_instance.id,
+            course_id=self.course_id,
+        )
+
+        updater_mock.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
+    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.tasks.update_mt_training_stage")
+    def test_invalid_completion_summary(self, updater_mock, completion_summary_mock):
+        """Test when completion summary incomplete count is different from 0.
+
+        Expected behavior:
+            - update_mt_training_stage mock has not been called.
+            - mock validations pass
+        """
+        national_id = "1245789652"
+        user_instance, _ = User.objects.get_or_create(username=national_id)
+        completion_summary_mock.return_value = {"incomplete_count": 15}
+        self.descriptor.grading_policy = {"GRADER": []}
+
+        course_completion_mt_updater(
+            user_id=user_instance.id,
+            course_id=self.course_id,
+        )
+
+        updater_mock.assert_not_called()
+        self.mock_validations()
+
+    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
+    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.tasks.update_mt_training_stage")
+    def test_update_mt_training_stage_call(self, updater_mock, completion_summary_mock):
+        """Test when conditions are met and the update_mt_training_stage is called
+
+        Expected behavior:
+            - update_mt_training_stage was called with the right parameters.
+            - mock validations pass
+        """
+        user_instance, _ = User.objects.get_or_create(username="1245789652")
+        completion_summary_mock.return_value = {"incomplete_count": 0}
+        self.descriptor.grading_policy = {"GRADER": []}
+
+        course_completion_mt_updater(
+            user_id=user_instance.id,
+            course_id=self.course_id,
+        )
+
+        updater_mock.assert_called_once_with(
+            course_id=self.course_id,
+            national_id=user_instance.username,
+            stage_result=1,
         )
         self.mock_validations()

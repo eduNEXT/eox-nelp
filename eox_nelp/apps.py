@@ -85,6 +85,22 @@ class EoxNelpConfig(AppConfig):
                         'receiver_func_name': 'emit_subsection_attempt_event',
                         'signal_path': 'lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED',
                     },
+                    {
+                        'receiver_func_name': 'mt_course_completion_handler',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'mt_course_completion_receviver',
+                        'sender_path': 'completion.models.BlockCompletion',
+                    },
+                    {
+                        'receiver_func_name': 'mt_course_passed_handler',
+                        'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_PASSED',
+                        'dispatch_uid': 'mt_course_passed_receiver',
+                    },
+                    {
+                        'receiver_func_name': 'mt_course_failed_handler',
+                        'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_FAILED',
+                        'dispatch_uid': 'mt_course_failed_receiver',
+                    },
                 ],
             },
         },

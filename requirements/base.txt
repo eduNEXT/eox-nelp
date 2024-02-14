@@ -12,19 +12,21 @@ appdirs==1.4.4
     # via fs
 asgiref==3.7.2
     # via django
-attrs==23.1.0
+attrs==23.2.0
     # via openedx-events
-beautifulsoup4==4.12.2
+beautifulsoup4==4.12.3
     # via bs4
 billiard==4.2.0
     # via celery
-bs4==0.0.1
+bridgekeeper==0.9
     # via -r requirements/base.in
-celery==5.3.5
+bs4==0.0.2
+    # via -r requirements/base.in
+celery==5.3.6
     # via
     #   eox-core
     #   event-tracking
-certifi==2023.7.22
+certifi==2024.2.2
     # via requests
 cffi==1.16.0
     # via
@@ -38,6 +40,7 @@ click==8.1.7
     #   click-didyoumean
     #   click-plugins
     #   click-repl
+    #   code-annotations
     #   edx-django-utils
     #   eox-core
 click-didyoumean==0.3.0
@@ -46,7 +49,9 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-cryptography==41.0.5
+code-annotations==1.6.0
+    # via edx-toggles
+cryptography==42.0.2
     # via
     #   jwcrypto
     #   pyjwt
@@ -55,9 +60,7 @@ defusedxml==0.8.0rc2
     # via
     #   python3-openid
     #   social-auth-core
-deprecated==1.2.14
-    # via jwcrypto
-django==3.2.23
+django==3.2.24
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
@@ -75,6 +78,7 @@ django==3.2.23
     #   edx-drf-extensions
     #   edx-i18n-tools
     #   edx-proctoring
+    #   edx-toggles
     #   edx-when
     #   eox-core
     #   eox-theming
@@ -87,14 +91,15 @@ django-crum==0.7.9
     # via
     #   edx-django-utils
     #   edx-proctoring
+    #   edx-toggles
 django-filter==21.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   eox-core
-django-ipware==5.0.2
+django-ipware==6.0.4
     # via edx-proctoring
-django-model-utils==4.3.1
+django-model-utils==4.4.0
     # via
     #   edx-proctoring
     #   edx-when
@@ -104,13 +109,14 @@ django-oauth2-provider==0.2.6.1
     # via eox-core
 django-simple-history==3.4.0
     # via edx-proctoring
-django-waffle==4.0.0
+django-waffle==4.1.0
     # via
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-proctoring
+    #   edx-toggles
     #   eox-core
-django-webpack-loader==2.0.1
+django-webpack-loader==3.0.1
     # via edx-proctoring
 djangorestframework==3.12.4
     # via
@@ -133,21 +139,24 @@ drf-yasg==1.21.7
     # via edx-api-doc-tools
 edx-api-doc-tools==1.7.0
     # via eox-core
-edx-django-utils==5.8.0
+edx-django-utils==5.10.1
     # via
     #   edx-drf-extensions
     #   edx-rest-api-client
+    #   edx-toggles
     #   edx-when
     #   event-tracking
+    #   openedx-events
 edx-drf-extensions==8.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   edx-proctoring
     #   edx-when
+    #   eox-core
 edx-i18n-tools==1.3.0
     # via -r requirements/base.in
-edx-opaque-keys[django]==2.3.0
+edx-opaque-keys[django]==2.5.1
     # via
     #   -r requirements/base.in
     #   edx-drf-extensions
@@ -159,78 +168,84 @@ edx-proctoring==4.16.1
     # via eox-core
 edx-rest-api-client==5.6.1
     # via edx-proctoring
+edx-toggles==5.1.1
+    # via event-tracking
 edx-when==2.4.0
     # via edx-proctoring
-eox-core==8.1.0
+eox-core==10.0.0
     # via -r requirements/base.in
-eox-tenant==9.2.1
+eox-tenant==10.0.0
     # via
     #   -r requirements/base.in
     #   eox-theming
-eox-theming==5.0.0
+eox-theming==7.0.0
     # via -r requirements/base.in
-event-tracking==2.2.0
+event-tracking==2.3.0
     # via
     #   -r requirements/base.in
     #   edx-proctoring
-fastavro==1.9.0
+fastavro==1.9.4
     # via openedx-events
 fs==2.4.16
     # via xblock
 future==0.18.3
     # via pyjwkest
-idna==3.4
+idna==3.6
     # via requests
 inflection==0.5.1
     # via
     #   djangorestframework-jsonapi
     #   drf-yasg
+jinja2==3.1.3
+    # via code-annotations
 jsonfield==3.1.0
     # via edx-proctoring
-jwcrypto==1.5.0
+jwcrypto==1.5.4
     # via django-oauth-toolkit
-kombu==5.3.3
+kombu==5.3.5
     # via celery
-lxml==4.9.3
+lxml==5.1.0
     # via
     #   edx-i18n-tools
     #   xblock
-mako==1.3.0
+mako==1.3.2
     # via
     #   -r requirements/base.in
     #   xblock
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
+    #   jinja2
     #   mako
     #   xblock
-newrelic==9.1.2
+newrelic==9.6.0
     # via edx-django-utils
 oauthlib==3.2.2
     # via
     #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
-openedx-events==0.13.0
+openedx-events==9.5.1
     # via
     #   -r requirements/base.in
     #   eox-core
+    #   event-tracking
 openedx-filters==1.6.0
     # via -r requirements/base.in
 packaging==23.2
     # via drf-yasg
-path==16.7.1
+path==16.10.0
     # via edx-i18n-tools
 pbr==6.0.0
     # via stevedore
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.41
+prompt-toolkit==3.0.43
     # via click-repl
-psutil==5.9.6
+psutil==5.9.8
     # via edx-django-utils
 pycparser==2.21
     # via cffi
-pycryptodomex==3.19.0
+pycryptodomex==3.20.0
     # via
     #   edx-proctoring
     #   pyjwkest
@@ -255,9 +270,13 @@ python-dateutil==2.8.2
     #   edx-drf-extensions
     #   edx-proctoring
     #   xblock
+python-ipware==2.0.1
+    # via django-ipware
+python-slugify==8.0.4
+    # via code-annotations
 python3-openid==3.2.0
     # via social-auth-core
-pytz==2023.3.post1
+pytz==2024.1
     # via
     #   django
     #   drf-yasg
@@ -267,6 +286,7 @@ pytz==2023.3.post1
     #   xblock
 pyyaml==6.0.1
     # via
+    #   code-annotations
     #   drf-yasg
     #   edx-i18n-tools
     #   xblock
@@ -304,42 +324,46 @@ slumber==0.7.1
     # via edx-rest-api-client
 social-auth-app-django==5.4.0
     # via -r requirements/base.in
-social-auth-core==4.5.0
-    # via social-auth-app-django
+social-auth-core==4.5.3
+    # via
+    #   eox-core
+    #   social-auth-app-django
 soupsieve==2.5
     # via beautifulsoup4
 sqlparse==0.4.4
     # via django
 stevedore==5.1.0
     # via
+    #   code-annotations
     #   edx-django-utils
     #   edx-opaque-keys
+text-unidecode==1.3
+    # via python-slugify
 tincan==1.0.0
     # via -r requirements/base.in
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   asgiref
     #   edx-opaque-keys
-tzdata==2023.3
+    #   jwcrypto
+tzdata==2024.1
     # via celery
 uritemplate==4.1.1
     # via drf-yasg
-urllib3==2.1.0
+urllib3==2.2.0
     # via requests
 vine==5.1.0
     # via
     #   amqp
     #   celery
     #   kombu
-wcwidth==0.2.10
+wcwidth==0.2.13
     # via prompt-toolkit
 web-fragments==2.1.0
     # via xblock
 webob==1.8.7
     # via xblock
-wrapt==1.16.0
-    # via deprecated
-xblock==1.8.1
+xblock==1.10.0
     # via edx-when
 
 # The following packages are considered to be unsafe in a requirements file:

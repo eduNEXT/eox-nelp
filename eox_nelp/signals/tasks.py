@@ -237,11 +237,11 @@ def update_mt_training_stage(course_id, national_id, stage_result):
 
 
 @shared_task
-def course_completion_mt_updater(user_id, course_id):
+def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=None):
     """This executes the update_mt_training_stage task synchronously based on the following conditions:
 
-        1. grading_policy's GRADER is empty, that means that the course is not graded.
-        2. incomplete_count is 0, that means that the user has completed the whole course.
+        1. incomplete_count is 0, that means that the user has completed the whole course.
+        2. force_graded is False and the course is not graded or force_graded is True and the course is graded.
 
     Arguments:
         course_id (str): Unique course identifier.
@@ -255,10 +255,14 @@ def course_completion_mt_updater(user_id, course_id):
     descriptor = modulestore().get_course(course_key)
     grading_policy = descriptor.grading_policy
     completion_summary = _get_completion_summary(user, course_id)
+    is_complete = completion_summary["incomplete_count"] == 0
+    graded = bool(grading_policy["GRADER"])
 
-    if not grading_policy["GRADER"] and completion_summary["incomplete_count"] == 0:
-        update_mt_training_stage(
-            course_id=course_id,
-            national_id=user.username,
-            stage_result=1,
-        )
+    if not is_complete or (force_graded and not graded) or (not force_graded and graded):
+        return
+
+    update_mt_training_stage(
+        course_id=course_id,
+        national_id=user.username,
+        stage_result=stage_result,
+    )

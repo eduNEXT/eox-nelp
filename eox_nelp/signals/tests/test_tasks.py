@@ -553,6 +553,7 @@ class UpdateMtTrainingStageTestCase(unittest.TestCase):
         )
 
 
+@ddt
 class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
     """Test class for course_completion_mt_updater function."""
 
@@ -586,30 +587,33 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         course_completion_mt_updater(
             user_id=20,
             course_id=self.course_id,
+            stage_result=1,
         )
 
         modulestore.assert_not_called()
 
+    @data(([], True), ([1, 2, 3], False))
     @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.tasks._get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
-    def test_invalid_grader(self, updater_mock, completion_summary_mock):
-        """Test when grading_policy's GRADER is not empty.
+    def test_invalid_grading_conditions(self, test_data, updater_mock, completion_summary_mock):
+        """Test when followingconditions are not met:
+            1. Course is graded and the force_graded parameter is False.
+            2. Course is not graded and the force_graded parameter is True.
 
         Expected behavior:
             - update_mt_training_stage mock has not been called.
             - mock validators pass
         """
-        national_id = "1245789652"
-        user_instance, _ = User.objects.get_or_create(username=national_id)
+        user_instance, _ = User.objects.get_or_create(username="1245789652")
         completion_summary_mock.return_value = {"incomplete_count": 0}
-        self.descriptor.grading_policy = {
-            "GRADER": [1, 2, 3],
-        }
+        self.descriptor.grading_policy = {"GRADER": test_data[0]}
 
         course_completion_mt_updater(
             user_id=user_instance.id,
             course_id=self.course_id,
+            stage_result=1,
+            force_graded=test_data[1],
         )
 
         updater_mock.assert_not_called()
@@ -624,24 +628,27 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
             - update_mt_training_stage mock has not been called.
             - mock validations pass
         """
-        national_id = "1245789652"
-        user_instance, _ = User.objects.get_or_create(username=national_id)
+        user_instance, _ = User.objects.get_or_create(username="1245789652")
         completion_summary_mock.return_value = {"incomplete_count": 15}
         self.descriptor.grading_policy = {"GRADER": []}
 
         course_completion_mt_updater(
             user_id=user_instance.id,
             course_id=self.course_id,
+            stage_result=1,
         )
 
         updater_mock.assert_not_called()
         self.mock_validations()
 
+    @data(([1, 2, 3], True), ([], False))
     @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.tasks._get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
-    def test_update_mt_training_stage_call(self, updater_mock, completion_summary_mock):
-        """Test when conditions are met and the update_mt_training_stage is called
+    def test_update_mt_training_stage_call(self, test_data, updater_mock, completion_summary_mock):
+        """Test when following conditions are met and the update_mt_training_stage is called.
+            1. The course has been completed, is graded and the parameter force_graded is True.
+            2. The course has been completed, is not graded and the parameter force_graded is False.
 
         Expected behavior:
             - update_mt_training_stage was called with the right parameters.
@@ -649,16 +656,18 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         """
         user_instance, _ = User.objects.get_or_create(username="1245789652")
         completion_summary_mock.return_value = {"incomplete_count": 0}
-        self.descriptor.grading_policy = {"GRADER": []}
+        self.descriptor.grading_policy = {"GRADER": test_data[0]}
 
         course_completion_mt_updater(
             user_id=user_instance.id,
             course_id=self.course_id,
+            stage_result=2,
+            force_graded=test_data[1],
         )
 
         updater_mock.assert_called_once_with(
             course_id=self.course_id,
             national_id=user_instance.username,
-            stage_result=1,
+            stage_result=2,
         )
         self.mock_validations()

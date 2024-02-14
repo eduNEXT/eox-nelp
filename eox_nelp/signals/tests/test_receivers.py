@@ -592,6 +592,7 @@ class MtCourseCompletionHandlerTestCase(unittest.TestCase):
         task_mock.delay.assert_called_with(
             user_id=instance.user_id,
             course_id=course_id,
+            stage_result=1,
         )
 
 
@@ -620,7 +621,7 @@ class MtCoursePassedHandlerTestCase(unittest.TestCase):
 class MtCourseFailedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_failed_handler function."""
 
-    @patch("eox_nelp.signals.receivers.update_mt_training_stage")
+    @patch("eox_nelp.signals.receivers.course_completion_mt_updater")
     def test_call_async_task(self, task_mock):
         """Test that the async task is called with the right parameters
 
@@ -633,7 +634,8 @@ class MtCourseFailedHandlerTestCase(unittest.TestCase):
         mt_course_failed_handler(user_instance, CourseKey.from_string(course_id))
 
         task_mock.delay.assert_called_with(
+            user_id=user_instance.id,
             course_id=course_id,
-            national_id=user_instance.username,
             stage_result=2,
+            force_graded=True,
         )

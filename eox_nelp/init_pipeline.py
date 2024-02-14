@@ -13,6 +13,7 @@ from bridgekeeper.rules import is_staff
 from django.utils.translation import gettext_noop
 
 from eox_nelp.edxapp_wrapper.courseware import rules
+from eox_nelp.edxapp_wrapper.instructor import permissions
 
 def run_init_pipeline():
     """
@@ -72,9 +73,8 @@ def update_permissions():
     """This method just change permissions for bussiness cases"""
     # pylint: disable=import-outside-toplevel,
     from bridgekeeper import perms
-    from lms.djangoapps.instructor.permissions import CAN_RESEARCH
-    perms.pop(CAN_RESEARCH, None)
-    perms[CAN_RESEARCH] = (
+    perms.pop(permissions.CAN_RESEARCH, None)
+    perms[permissions.CAN_RESEARCH] = (
         is_staff |
         rules.HasRolesRule('data_researcher') |
         rules.HasAccessRule('staff') |

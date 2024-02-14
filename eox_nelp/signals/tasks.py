@@ -224,9 +224,6 @@ def update_mt_training_stage(course_id, national_id, stage_result):
         national_id (str): User identifier.
         stage_result (int): Representation of pass or fail result, 1 for pass  2 for fail.
     """
-    if not getattr(settings, "ACTIVATE_MT_TRAINING_STAGE", False):
-        return
-
     api_client = MinisterOfTourismApiClient()
 
     api_client.update_training_stage(
@@ -247,9 +244,6 @@ def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=
         course_id (str): Unique course identifier.
         national_id (str): User identifier.
     """
-    if not getattr(settings, "ACTIVATE_MT_COMPLETION_UPDATER", False):
-        return
-
     user = User.objects.get(id=user_id)
     course_key = CourseKey.from_string(course_id)
     descriptor = modulestore().get_course(course_key)

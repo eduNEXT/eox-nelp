@@ -508,26 +508,6 @@ class UpdateMtTrainingStageTestCase(unittest.TestCase):
     """Test class for update_mt_training_stage function"""
 
     @patch("eox_nelp.signals.tasks.MinisterOfTourismApiClient")
-    def test_invalid_feature_flag(self, api_mock):
-        """Test when the ACTIVATE_MT_TRAINING_STAGE settings is False.
-
-        Expected behavior:
-            - MinisterOfTourismApiClient mock has not been called.
-        """
-        course_id = "course-v1:test+Cx105+2022_T4"
-        national_id = "1245789652"
-        stage_result = 1
-
-        update_mt_training_stage(
-            course_id=course_id,
-            national_id=national_id,
-            stage_result=stage_result,
-        )
-
-        api_mock.assert_not_called()
-
-    @override_settings(ACTIVATE_MT_TRAINING_STAGE=True)
-    @patch("eox_nelp.signals.tasks.MinisterOfTourismApiClient")
     def test_update_training_stage_call(self, api_mock):
         """Test when the feature flag has been set and the api call has been executed.
 
@@ -578,26 +558,11 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         course_key = CourseKey.from_string(self.course_id)
         store.get_course.assert_called_once_with(course_key)
 
-    def test_invalid_feature_flag(self):
-        """Test when the ACTIVATE_MT_COMPLETION_UPDATER settings is False.
-
-        Expected behavior:
-            - modulestore mock has not been called.
-        """
-        course_completion_mt_updater(
-            user_id=20,
-            course_id=self.course_id,
-            stage_result=1,
-        )
-
-        modulestore.assert_not_called()
-
     @data(([], True), ([1, 2, 3], False))
-    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.tasks._get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_invalid_grading_conditions(self, test_data, updater_mock, completion_summary_mock):
-        """Test when followingconditions are not met:
+        """Test when following conditions are not met:
             1. Course is graded and the force_graded parameter is False.
             2. Course is not graded and the force_graded parameter is True.
 
@@ -618,7 +583,6 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
 
         updater_mock.assert_not_called()
 
-    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.tasks._get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_invalid_completion_summary(self, updater_mock, completion_summary_mock):
@@ -642,7 +606,6 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         self.mock_validations()
 
     @data(([1, 2, 3], True), ([], False))
-    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.tasks._get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_update_mt_training_stage_call(self, test_data, updater_mock, completion_summary_mock):

@@ -576,6 +576,23 @@ class MtCourseCompletionHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_completion_handler function."""
 
     @patch("eox_nelp.signals.receivers.course_completion_mt_updater")
+    def test_invalid_feature_flag(self, task_mock):
+        """Test when the ACTIVATE_MT_COMPLETION_UPDATER settings is False.
+
+        Expected behavior:
+            - modulestore mock has not been called.
+        """
+        instance = Mock()
+        instance.user_id = 5
+        course_id = "course-v1:test+Cx105+2022_T4"
+        instance.context_key = CourseKey.from_string(course_id)
+
+        mt_course_completion_handler(instance)
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
+    @patch("eox_nelp.signals.receivers.course_completion_mt_updater")
     def test_call_async_task(self, task_mock):
         """Test that the async task is called with the right parameters
 
@@ -600,6 +617,21 @@ class MtCoursePassedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_passed_handler function."""
 
     @patch("eox_nelp.signals.receivers.update_mt_training_stage")
+    def test_invalid_feature_flag(self, task_mock):
+        """Test when the ACTIVATE_MT_TRAINING_STAGE settings is False.
+
+        Expected behavior:
+            - MinisterOfTourismApiClient mock has not been called.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user_instance, _ = User.objects.get_or_create(username="Severus")
+
+        mt_course_passed_handler(user_instance, CourseKey.from_string(course_id))
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_TRAINING_STAGE=True)
+    @patch("eox_nelp.signals.receivers.update_mt_training_stage")
     def test_call_async_task(self, task_mock):
         """Test that the async task is called with the right parameters
 
@@ -621,6 +653,21 @@ class MtCoursePassedHandlerTestCase(unittest.TestCase):
 class MtCourseFailedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_failed_handler function."""
 
+    @patch("eox_nelp.signals.receivers.course_completion_mt_updater")
+    def test_invalid_feature_flag(self, task_mock):
+        """Test when the ACTIVATE_MT_COMPLETION_UPDATER settings is False.
+
+        Expected behavior:
+            - modulestore mock has not been called.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user_instance, _ = User.objects.get_or_create(username="Severus")
+
+        mt_course_failed_handler(user_instance, CourseKey.from_string(course_id))
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(ACTIVATE_MT_COMPLETION_UPDATER=True)
     @patch("eox_nelp.signals.receivers.course_completion_mt_updater")
     def test_call_async_task(self, task_mock):
         """Test that the async task is called with the right parameters

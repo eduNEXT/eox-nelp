@@ -36,7 +36,7 @@ class TestMinisterOfTourismApiClient(TestBasicAuthApiClientMixin, unittest.TestC
             "data": {
                 "result": True
             },
-            "elaspsedTime": 0.2972466
+            "elapsedTime": 0.2972466
         }
         post_mock.return_value = expected_value
         course_id = "course-v1:FutureX+guide+2023"

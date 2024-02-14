@@ -298,6 +298,9 @@ def mt_course_completion_handler(instance, **kwargs):  # pylint: disable=unused-
     Arguments:
         instance<Blockcompletion>: Instance of BlockCompletion model.
     """
+    if not getattr(settings, "ACTIVATE_MT_COMPLETION_UPDATER", False):
+        return
+
     course_completion_mt_updater.delay(
         user_id=instance.user_id,
         course_id=str(instance.context_key),
@@ -313,6 +316,9 @@ def mt_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unus
         user <User>: Instance of auth user model.
         course_id <CourseLocator>: Course locator.
     """
+    if not getattr(settings, "ACTIVATE_MT_TRAINING_STAGE", False):
+        return
+
     update_mt_training_stage.delay(
         course_id=str(course_id),
         national_id=user.username,
@@ -328,6 +334,9 @@ def mt_course_failed_handler(user, course_id, **kwargs):  # pylint: disable=unus
         user <User>: Instance of auth user model.
         course_id <CourseLocator>: Course locator.
     """
+    if not getattr(settings, "ACTIVATE_MT_COMPLETION_UPDATER", False):
+        return
+
     course_completion_mt_updater.delay(
         user_id=user.id,
         course_id=str(course_id),

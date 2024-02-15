@@ -10,7 +10,6 @@ from importlib import import_module
 
 from django.conf import settings
 
-
 backend = import_module(settings.EOX_NELP_COURSEWARE_BACKEND)
 
 rules = backend.get_courseware_rules()

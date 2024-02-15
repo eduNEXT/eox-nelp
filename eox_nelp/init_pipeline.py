@@ -71,13 +71,14 @@ def update_permissions():
     # pylint: disable=import-outside-toplevel,
     from bridgekeeper import perms
     from bridgekeeper.rules import is_staff
+
     from eox_nelp.edxapp_wrapper.courseware import rules
     from eox_nelp.edxapp_wrapper.instructor import permissions
 
     perms.pop(permissions.CAN_RESEARCH, None)
     perms[permissions.CAN_RESEARCH] = (
-        is_staff |
-        rules.HasRolesRule('data_researcher') |
-        rules.HasAccessRule('staff') |
-        rules.HasAccessRule('instructor')
+        is_staff
+        | rules.HasRolesRule("data_researcher")
+        | rules.HasAccessRule("staff")
+        | rules.HasAccessRule("instructor")
     )

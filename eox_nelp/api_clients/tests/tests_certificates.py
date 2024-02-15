@@ -5,6 +5,7 @@ Classes:
 """
 import unittest
 
+from django.conf import settings
 from django.test import override_settings
 from django.utils import timezone
 from mock import Mock, patch
@@ -20,6 +21,8 @@ class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.Te
     def setUp(self):
         """Setup common conditions for every test case"""
         self.api_class = ExternalCertificatesApiClient
+        self.user = settings.EXTERNAL_CERTIFICATES_USER
+        self.password = settings.EXTERNAL_CERTIFICATES_PASSWORD
 
     @patch.object(ExternalCertificatesApiClient, "make_post")
     @patch.object(ExternalCertificatesApiClient, "_authenticate", Mock)

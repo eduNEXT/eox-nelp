@@ -3,12 +3,14 @@ signals receivers can use.
 
 tasks:
     dispatch_futurex_progress: Logic to post progress data to futurex. It could be sync or async.
+    update_mt_training_stage: Updates mt training stage.
+    course_completion_mt_updater: Updates mt training stage based on completion logic.
 """
 import logging
 
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
 from eox_core.edxapp_wrapper.courseware import get_courseware_courses
@@ -18,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.futurex import FuturexApiClient
+from eox_nelp.api_clients.mt import MinisterOfTourismApiClient
 from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
@@ -26,6 +29,7 @@ from eox_nelp.signals.utils import _user_has_passing_grade
 
 courses = get_courseware_courses()
 logger = logging.getLogger(__name__)
+User = get_user_model()
 
 
 @shared_task
@@ -208,3 +212,51 @@ def emit_subsection_attempt_event_task(usage_id, user_id):
                 "attempts": get_attempts(subsection),
             }
         )
+
+
+@shared_task
+def update_mt_training_stage(course_id, national_id, stage_result):
+    """Sets MinisterOfTourismApiClient and updates the training stage base on the
+    input arguments.
+
+    Arguments:
+        course_id (str): Unique course identifier.
+        national_id (str): User identifier.
+        stage_result (int): Representation of pass or fail result, 1 for pass  2 for fail.
+    """
+    api_client = MinisterOfTourismApiClient()
+
+    api_client.update_training_stage(
+        course_id=course_id,
+        national_id=national_id,
+        stage_result=stage_result,
+    )
+
+
+@shared_task
+def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=None):
+    """This executes the update_mt_training_stage task synchronously based on the following conditions:
+
+        1. incomplete_count is 0, that means that the user has completed the whole course.
+        2. force_graded is False and the course is not graded or force_graded is True and the course is graded.
+
+    Arguments:
+        course_id (str): Unique course identifier.
+        national_id (str): User identifier.
+    """
+    user = User.objects.get(id=user_id)
+    course_key = CourseKey.from_string(course_id)
+    descriptor = modulestore().get_course(course_key)
+    grading_policy = descriptor.grading_policy
+    completion_summary = _get_completion_summary(user, course_id)
+    is_complete = completion_summary["incomplete_count"] == 0
+    graded = bool(grading_policy["GRADER"])
+
+    if not is_complete or (force_graded and not graded) or (not force_graded and graded):
+        return
+
+    update_mt_training_stage(
+        course_id=course_id,
+        national_id=user.username,
+        stage_result=stage_result,
+    )

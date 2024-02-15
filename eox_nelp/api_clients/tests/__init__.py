@@ -213,10 +213,7 @@ class TestBasicAuthApiClientMixin(TestApiClientMixin):
             - api client has the attribute session
             - Session has the right auth value.
         """
-        expected_auth = HTTPBasicAuth(
-            settings.EXTERNAL_CERTIFICATES_USER,
-            settings.EXTERNAL_CERTIFICATES_PASSWORD
-        )
+        expected_auth = HTTPBasicAuth(self.user, self.password)
         session_mock.return_value.auth = expected_auth
 
         api_client = self.api_class()

@@ -3,7 +3,7 @@ This contains all the required dependencies from instructor.
 
 Attributes:
     backend: Imported module by using the plugin settings.
-    rules: Wrapper of courseware rules.
+    permissions: Wrapper of instructor permissions.
 """
 
 from importlib import import_module

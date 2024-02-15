@@ -50,6 +50,8 @@ def plugin_settings(settings):
     settings.EOX_NELP_EVENT_ROUTING_BACKEND = 'eox_nelp.edxapp_wrapper.backends.event_routing_backends_m_v1'
     settings.EOX_NELP_GRADES_BACKEND = 'eox_nelp.edxapp_wrapper.backends.grades_m_v1'
     settings.EOX_NELP_COURSE_BLOCKS_BACKEND = 'eox_nelp.edxapp_wrapper.backends.course_blocks_m_v1'
+    settings.EOX_NELP_COURSEWARE_BACKEND = 'eox_nelp.edxapp_wrapper.backends.courseware_m_v1'
+    settings.EOX_NELP_INSTRUCTOR_BACKEND = 'eox_nelp.edxapp_wrapper.backends.instructor_m_v1'
 
     settings.FUTUREX_API_URL = 'https://testing-site.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'

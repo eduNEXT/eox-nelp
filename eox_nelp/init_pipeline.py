@@ -19,6 +19,7 @@ def run_init_pipeline():
     patch_user_gender_choices()
     set_mako_templates()
     register_xapi_transformers()
+    update_permissions()
 
 
 def patch_user_gender_choices():
@@ -63,3 +64,21 @@ def register_xapi_transformers():
     """This method just import the event transformers in order to register all of them."""
     # pylint: disable=import-outside-toplevel, unused-import
     from eox_nelp.processors.xapi import event_transformers as xapi_event_transformers  # noqa: F401
+
+
+def update_permissions():
+    """This method just change permissions for bussiness cases"""
+    # pylint: disable=import-outside-toplevel,unsupported-binary-operation
+    from bridgekeeper import perms
+    from bridgekeeper.rules import is_staff
+
+    from eox_nelp.edxapp_wrapper.courseware import rules
+    from eox_nelp.edxapp_wrapper.instructor import permissions
+
+    perms.pop(permissions.CAN_RESEARCH, None)
+    perms[permissions.CAN_RESEARCH] = (
+        is_staff
+        | rules.HasRolesRule("data_researcher")
+        | rules.HasAccessRule("staff")
+        | rules.HasAccessRule("instructor")
+    )

@@ -32,8 +32,8 @@ def patch_user_gender_choices():
     from eox_nelp.edxapp_wrapper.student import UserProfile
 
     UserProfile.GENDER_CHOICES = (
-        ("m", gettext_noop("Male")),
-        ("f", gettext_noop("Female")),
+        ('m', gettext_noop('Male')),
+        ('f', gettext_noop('Female')),
     )
 
 
@@ -56,8 +56,8 @@ def set_mako_templates():
     for module in module_templates_to_include:
         path_to_templates = os.path.dirname(module.__file__)
 
-        if path_to_templates not in edxmako.LOOKUP["main"].directories:
-            edxmako.paths.add_lookup("main", path_to_templates)
+        if path_to_templates not in edxmako.LOOKUP['main'].directories:
+            edxmako.paths.add_lookup('main', path_to_templates)
 
 
 def register_xapi_transformers():

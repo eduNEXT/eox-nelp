@@ -5,8 +5,6 @@ Required NELP middlewares that allow to customize edx-platform.
 classes:
     ExtendedProfileFieldsMiddleware: Set extended_profile_fields in registration form.
 """
-from django.conf import settings
-from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 
 from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
@@ -135,22 +133,3 @@ class ExtendedProfileFieldsMiddleware:
             # pylint: disable=protected-access
             form_instance._add_field_with_configurable_select_options(field, label, form_desc, required=required)
         return handler
-
-
-class TenantExistMiddleware:
-    """The value of EDNX_TENANT_DOMAIN is set before starting a request by eox_tenant
-    in this line https://github.com/eduNEXT/eox-tenant/blob/master/eox_tenant/signals.py#L52
-    if the value doesn't exist that means that there is no TenantRonfig or Route record for
-    that specific site. The functionality of this middleware is to block those requests that
-    don't have an active tenant configuration
-    """
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        """Check if EDNX_TENANT_DOMAIN has already been set, otherwise raises a 404 error."""
-        if hasattr(settings, "EDNX_TENANT_DOMAIN"):
-            return self.get_response(request)
-
-        raise Http404

@@ -15,3 +15,4 @@ from django.conf import settings
 backend = import_module(settings.EOX_NELP_USER_AUTHN)
 
 RegistrationFormFactory = backend.get_registration_form_factory()
+views = backend.get_views()

@@ -7,6 +7,8 @@ Django
 django-filter
 djangorestframework
 djangorestframework-jsonapi==5.0.0
+django-password-validators==1.7.3
+edx-django-utils
 edx-drf-extensions
 edx-i18n-tools
 edx-opaque-keys

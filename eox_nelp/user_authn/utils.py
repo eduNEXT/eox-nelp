@@ -1,3 +1,4 @@
+"""Utils for user_authn"""
 import logging
 import random
 import string

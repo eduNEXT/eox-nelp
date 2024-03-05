@@ -14,3 +14,11 @@ def get_registration_form_factory():
         RegistrationFormFactory class.
     """
     return views.registration_form.RegistrationFormFactory
+
+
+def get_views():
+    """Allow to get the views module of user_authn
+    https://github.com/eduNEXT/edunext-platform/tree/master/openedx/core/djangoapps/user_authn/views
+    Returns: view module
+    """
+    return views

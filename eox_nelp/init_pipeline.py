@@ -98,7 +98,7 @@ def patch_generate_password():
 
 
 def patch_registration_form_factory():
-    """This method patch `RegistrationFormFactory` of user_auth.view.registration_form ,
+    """This method patches `RegistrationFormFactory` of user_auth.view.registration_form ,
     with custom nelp `NelpRegistrationFormFactory`.
     """
     # pylint: disable=import-outside-toplevel, unused-import

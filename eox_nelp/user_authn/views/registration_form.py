@@ -57,6 +57,7 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
         )
         translations = extended_profile_fields_translations.get(request.LANGUAGE_CODE, {})
         extended_profile_fields = list(set(extended_profile_fields) - set(self.EXTRA_FIELDS))
+
         for field_name in extended_profile_fields:
             setattr(
                 NelpRegistrationFormFactory,
@@ -78,6 +79,7 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
 
             handler = getattr(self, f"_add_{field_name}_field")
             self.field_handlers[field_name] = handler
+
         self.field_order = self.field_order + sorted(extended_profile_fields)
 
         return super().get_registration_form(request)

@@ -97,7 +97,7 @@ class RegistrationFormFactoryTestCase(TestCase):
             self.assertEqual(
                 getattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG"), f"{_('Enter your')} {field_name}"
             )
-            self.assertTrue(field_name in nelp_form_factory.field_handlers)
+            self.assertIn(field_name, nelp_form_factory.field_handlers)
 
     def test_custom_fields_with_translations(self):
         """Test the integration of custom fields for registration form with translation configured.
@@ -146,7 +146,7 @@ class RegistrationFormFactoryTestCase(TestCase):
                 getattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG"),
                 f"{_('Enter your')} {extended_profile_fields_translations[self.request.LANGUAGE_CODE][field_name]}",
             )
-            self.assertTrue(field_name in nelp_form_factory.field_handlers)
+            self.assertIn(field_name, nelp_form_factory.field_handlers)
 
     def test_not_extended_profile_fields(self):
         """Test the integration of custom fields without definition or configuration..

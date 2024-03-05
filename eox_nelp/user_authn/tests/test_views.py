@@ -148,6 +148,44 @@ class RegistrationFormFactoryTestCase(TestCase):
             )
             self.assertIn(field_name, nelp_form_factory.field_handlers)
 
+    def test_custom_fields_ordered(self):
+        """Test the integration of custom fields for registration form.
+        Expected behaviour:
+            - field_order list attr of the form factory has extended_profile fields ordered.
+            - for each extended_profile_field:
+              - NelpRegistrationFormFactory class has the _add{field} attr
+              - account class has the desired attr `...SELECT_MSG for field.
+              - account class has the desired value of `...SELECT_MSG attr.
+              - account class has the desired attr `...TXT_MSG for field.
+              - account class has the desired value of `...TXT_MSG attr.
+              - field_handlers dict has the key of the each_field_name.
+
+        """
+        extended_profile_fields = ["hobby", "sport", "movie"]
+        self.request.LANGUAGE_CODE = "en"
+        configuration_helpers.get_value.side_effect = mock_responses(
+            {"extended_profile_fields": extended_profile_fields}
+        )
+        nelp_form_factory = NelpRegistrationFormFactory()
+        nelp_form_factory.field_order = ["movie", "sport", "hobby"]
+        nelp_form_factory.EXTRA_FIELDS = self.EXTRA_FIELDS
+        nelp_form_factory.field_handlers = {}
+
+        nelp_form_factory.get_registration_form(self.request)
+
+        self.assertListEqual(nelp_form_factory.field_order, ["movie", "sport", "hobby"])
+        for field_name in extended_profile_fields:
+            self.assertTrue(hasattr(NelpRegistrationFormFactory, f"_add_{field_name}_field"))
+            self.assertTrue(hasattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG"))
+            self.assertEqual(
+                getattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG"), f"{_('Select your')} {field_name}"
+            )
+            self.assertTrue(hasattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG"))
+            self.assertEqual(
+                getattr(accounts, f"REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG"), f"{_('Enter your')} {field_name}"
+            )
+            self.assertIn(field_name, nelp_form_factory.field_handlers)
+
     def test_not_extended_profile_fields(self):
         """Test the integration of custom fields without definition or configuration..
         Expected behaviour:

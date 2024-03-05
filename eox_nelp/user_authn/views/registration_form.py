@@ -1,3 +1,8 @@
+"""Registration form module for  nelp business case"
+classes:
+    NelpRegistrationFormFactory: Form factory that add extended_profile_fields feature.
+
+"""
 from django.utils.translation import gettext_lazy as _
 
 from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers

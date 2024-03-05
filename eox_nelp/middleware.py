@@ -3,7 +3,6 @@
 Required NELP middlewares that allow to customize edx-platform.
 
 classes:
-    ExtendedProfileFieldsMiddleware: Set extended_profile_fields in registration form.
     PreserveUserLanguageCookieMiddleware: Set the LANGUAGE cookie name with the original cookie sent by user.
 """
 from django.conf import settings

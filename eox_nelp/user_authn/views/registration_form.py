@@ -85,7 +85,13 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
             handler = getattr(self, f"_add_{field_name}_field")
             self.field_handlers[field_name] = handler
 
-        self.field_order = self.field_order + sorted(extended_profile_fields)
+        field_order = self.field_order
+        difference_extended_profile = set(extended_profile_fields).difference(set(field_order))
+        # sort the additional fields so we have could have a deterministic result when presenting them
+        if difference_extended_profile:
+            self.field_order = field_order + sorted(difference_extended_profile)
+
+        return super().get_registration_form(request)
 
         return super().get_registration_form(request)
 

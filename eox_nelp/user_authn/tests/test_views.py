@@ -40,7 +40,7 @@ class RegistrationFormFactoryTestCase(TestCase):
 
     def setUp(self):
         """
-        Create site since the view use the request.site attribute to determine the current domain.
+        Configure field_order and mock a request.
         """
         self.request = Mock()
         self.field_order = [

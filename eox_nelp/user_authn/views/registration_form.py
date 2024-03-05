@@ -55,9 +55,9 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
         """This method add the `extended_profile_fields` before the base-normal method is executed.
         Also translations keep working and the extended_profile_fields are appended at the end of the fields order.
         """
-        extended_profile_fields = configuration_helpers.get_value('extended_profile_fields', [])
+        extended_profile_fields = configuration_helpers.get_value("extended_profile_fields", [])
         extended_profile_fields_translations = configuration_helpers.get_value(
-            'extended_profile_fields_translations',
+            "extended_profile_fields_translations",
             {},
         )
         translations = extended_profile_fields_translations.get(request.LANGUAGE_CODE, {})
@@ -66,28 +66,28 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
         for field_name in extended_profile_fields:
             setattr(
                 NelpRegistrationFormFactory,
-                f'_add_{field_name}_field',
+                f"_add_{field_name}_field",
                 self._generate_handler(field_name, translations.get(field_name, field_name)),
             )
             # Set attributes in accounts since those fields are required by
             # "add_field_with_configurable_select_option" method.
             setattr(
                 accounts,
-                f'REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG',
+                f"REQUIRED_FIELD_{field_name.upper()}_SELECT_MSG",
                 f"{_('Select your')} {translations.get(field_name, field_name)}",
             )
             setattr(
                 accounts,
-                f'REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG',
+                f"REQUIRED_FIELD_{field_name.upper()}_TEXT_MSG",
                 f"{_('Enter your')} {translations.get(field_name, field_name)}",
             )
 
-            self.field_handlers[field_name] = getattr(self, f"_add_{field_name}_field") # Bound method need it
+            self.field_handlers[field_name] = getattr(self, f"_add_{field_name}_field")  # Bound method need it
 
         difference_extended_profile = set(extended_profile_fields).difference(set(self.field_order))
         # sort the additional fields so we have could have a deterministic result when presenting them
         if difference_extended_profile:
-            self.field_order = self.field_order+ sorted(difference_extended_profile)
+            self.field_order = self.field_order + sorted(difference_extended_profile)
 
         return super().get_registration_form(request)
 
@@ -111,4 +111,5 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
             """
             # pylint: disable=protected-access
             form_instance._add_field_with_configurable_select_options(field, label, form_desc, required=required)
+
         return handler

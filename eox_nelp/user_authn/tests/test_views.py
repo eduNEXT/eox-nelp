@@ -12,8 +12,8 @@ from eox_nelp.user_authn.views.registration_form import NelpRegistrationFormFact
 
 
 def mock_responses(responses):
-    """Function that manage the response of a mock based in its args.
-    You configre using a dict defining in the dict they key of each the args is used the response
+    """Function that manages the response of a mock based on its args.
+    You configure using a dict defining in the dict they key of each the args is used the response
     of the function would be.
     eg:
     my_mock.foo.side_effect = mock_responses({

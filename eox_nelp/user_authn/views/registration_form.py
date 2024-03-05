@@ -83,7 +83,7 @@ class NelpRegistrationFormFactory(RegistrationFormFactory):
             )
 
             handler = getattr(self, f"_add_{field_name}_field")
-            self.field_handlers[field_name] = handler
+            self.field_handlers[field_name] = self._generate_handler(field_name, translations.get(field_name, field_name))
 
         field_order = self.field_order
         difference_extended_profile = set(extended_profile_fields).difference(set(field_order))

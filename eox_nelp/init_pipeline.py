@@ -47,10 +47,12 @@ def set_mako_templates():
     from eox_nelp import static as templates
     from eox_nelp.edxapp_wrapper.edxmako import edxmako
     from eox_nelp.payment_notifications import templates as payment_notifications_templates
+    from eox_nelp.phone_validation import templates as phone_validation_templates
 
     module_templates_to_include = [
         templates,
         payment_notifications_templates,
+        phone_validation_templates,
     ]
 
     for module in module_templates_to_include:

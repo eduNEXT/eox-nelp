@@ -23,7 +23,7 @@ config.optimization = {
   minimize: true,
 }
 
-config.plugins.splice(1, 3,
+config.plugins.splice(3, 3,
   new MiniCssExtractPlugin({ // Override MiniCssExtractPlugin in order to change the file name
     filename: '[name]/css/[name].css',
   }),

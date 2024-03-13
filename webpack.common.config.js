@@ -9,8 +9,14 @@ const configuration = [];
 
 // Set entries.
 const entries = {
-  feedback_carousel: './eox_nelp/course_experience/frontend/src/components/FeedbackCarousel/index',
-  tenant_stats: './eox_nelp/stats/frontend/src/components/TenantStats/index',
+  tenant_stats: {
+    js: './eox_nelp/stats/frontend/src/components/TenantStats/index',
+    template: 'eox_nelp/stats/templates/tenant_stats.html',
+  },
+  feedback_carousel: {
+    js: './eox_nelp/course_experience/frontend/src/components/FeedbackCarousel/index',
+    template: 'eox_nelp/course_experience/frontend/templates/feedback_courses.html',
+  },
 }
 
 Object.entries(entries).forEach((entry) => {
@@ -19,7 +25,7 @@ Object.entries(entries).forEach((entry) => {
 
   // Override entries.
   config.entry = {
-    [key]: value,
+    [key]: value['js'],
   }
 
   // Override output configuration in order to get a unique folder per entry.
@@ -37,10 +43,20 @@ Object.entries(entries).forEach((entry) => {
   // Override frontend-platform  default plugins
   const existingPluginsCopy = config.plugins.slice();
 
-  existingPluginsCopy.splice(2, 1, new CleanWebpackPlugin())
+  existingPluginsCopy.splice(2, 1, new CleanWebpackPlugin({
+    cleanOnceBeforeBuildPatterns: [
+        '!__init_.py',
+    ]
+  }))
   existingPluginsCopy.splice(3, 3,
     new MiniCssExtractPlugin({ // Override MiniCssExtractPlugin in order to change the file name
       filename: 'css/[name].css',
+    }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      minify: false,
+      publicPath: `/static/${key}/`,
+      template: path.resolve(process.cwd(), value['template']),
     }),
     new Dotenv({ // Override the Dotenv plugin in order to use env.frontend instead of .env
       path: path.resolve(process.cwd(), '.env.frontend'),

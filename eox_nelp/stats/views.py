@@ -47,4 +47,4 @@ def get_tenant_stats(request):
     context = {query_param: "true" for query_param in STATS_QUERY_PARAMS}
     context.update(request.GET.dict())
 
-    return edxmako.shortcuts.render_to_response("tenant_stats.html", context, "main", request)
+    return edxmako.shortcuts.render_to_response("tenant_stats/index.html", context, "main", request)

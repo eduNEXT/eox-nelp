@@ -20,7 +20,7 @@ class GetTenantStatsTestCase(TestCase):
         Set base variables and objects across experience test cases.
         """
         self.client = Client()
-        self.template_name = "tenant_stats.html"
+        self.template_name = "tenant_stats/index.html"
 
     def test_get_default_stats(self):
         """

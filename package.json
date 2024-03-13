@@ -7,7 +7,7 @@
     "build": "fedx-scripts webpack --config ./webpack.prod.config.js",
     "dev": "fedx-scripts webpack --config ./webpack.dev.config.js --watch"
   },
-    "repository": {
+  "repository": {
     "type": "git",
     "url": "git+ssh://git@bitbucket.org/edunext/eox-nelp.git"
   },
@@ -27,7 +27,9 @@
   "devDependencies": {
     "@edx/browserslist-config": "^1.1.1",
     "@edx/frontend-build": "github:nelc/frontend-build#open-release/palm.nelp",
+    "clean-webpack-plugin": "^4.0.0",
     "dotenv-webpack": "^8.0.1",
+    "html-webpack-plugin": "^5.5.4",
     "sass": "^1.63.3",
     "sass-loader": "^13.3.2",
     "webpack-merge": "^5.9.0"

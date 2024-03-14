@@ -1,16 +1,14 @@
 import React, { useState} from 'react';
 import ReactDOM from 'react-dom';
 import { APP_INIT_ERROR, APP_READY, subscribe, initialize } from '@edx/frontend-platform';
-import { getLocale, getMessages, IntlProvider } from '@edx/frontend-platform/i18n';
 import { StatsContainer, messages as essentialsMessages } from '@edunext/frontend-essentials'
+import { AppProvider } from '@edx/frontend-platform/react';
 
 import './index.scss';
 
 function LaunchStatsContainer() {
-  const [locale, setLocale] = useState(getLocale());
-
   return (
-    <IntlProvider locale={locale} messages={getMessages()}>
+    <AppProvider>
       <StatsContainer
         showVideos={showVideos}
         showCourses={showCourses}
@@ -19,7 +17,7 @@ function LaunchStatsContainer() {
         showInstructors={showInstructors}
         showCertificates={showCertificates}
       />
-    </IntlProvider>
+    </AppProvider>
   );
 }
 

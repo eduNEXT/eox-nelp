@@ -1,7 +1,6 @@
 @import "~@edx/brand/paragon/fonts";
 @import "~@edx/brand/paragon/variables";
 @import "~@edx/paragon/styles/scss/core/core";
-@import "~@edx/brand/paragon/overrides";
 
 body {
   background-color: transparent;
@@ -10,6 +9,10 @@ body {
     .stats-container{
       margin: 0;
       width: auto;
+
+      .stats-image {
+        color: var(--pgn-color-secondary-200, #d1d1d1);
+      }
     }
   }
 }

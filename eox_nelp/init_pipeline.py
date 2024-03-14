@@ -44,14 +44,12 @@ def set_mako_templates():
     # pylint: disable=import-error, import-outside-toplevel
     # This cannot be at the top of the file since this file is imported the plugin initialization
     # and therefore the settings has not been set yet
-    from eox_nelp.course_experience.frontend import templates as course_experience_templates
+    from eox_nelp import static as templates
     from eox_nelp.edxapp_wrapper.edxmako import edxmako
     from eox_nelp.payment_notifications import templates as payment_notifications_templates
-    from eox_nelp.stats import templates as stats_templates
 
     module_templates_to_include = [
-        stats_templates,
-        course_experience_templates,
+        templates,
         payment_notifications_templates,
     ]
 

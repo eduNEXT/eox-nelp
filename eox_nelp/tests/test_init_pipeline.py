@@ -10,10 +10,9 @@ from unittest.mock import call
 from django.test import TestCase
 from mock import patch
 
-from eox_nelp.course_experience.frontend import templates as course_experience_templates
+from eox_nelp import static as templates
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
 from eox_nelp.init_pipeline import run_init_pipeline, set_mako_templates
-from eox_nelp.stats import templates as stats_templates
 
 
 class RunInitPipelineTestCase(TestCase):
@@ -53,6 +52,5 @@ class SetMakoTemplatesTestCase(TestCase):
         set_mako_templates()
 
         edxmako.paths.add_lookup.assert_has_calls([
-            call('main', os.path.dirname(stats_templates.__file__)),
-            call('main', os.path.dirname(course_experience_templates.__file__)),
+            call('main', os.path.dirname(templates.__file__)),
         ])

@@ -1,4 +1,7 @@
 """ Module with methods to reuse in test cases"""
+import datetime
+
+from django.core.cache import cache
 from mock import Mock
 
 
@@ -62,3 +65,28 @@ def set_key_values(element):
         else:
             setattr(model, key, value)
     return model
+
+
+def get_cache_expiration_time(key):
+    """
+    Util to get the expiration time of a key cache in seconds.
+    Args:
+        key <str>: Cache key to be searched in cache.
+    Returns:
+        int: expiration remaining time of the key in seconds. If there is a problem with the key time return 0.
+    """
+    # use make_key to generate Django's internal key storage name
+    expiration_unix_timestamp = cache._expire_info.get(cache.make_key(key))  # pylint: disable=protected-access
+    if expiration_unix_timestamp is None:
+        return 0
+
+    expiration_date_time = datetime.datetime.fromtimestamp(expiration_unix_timestamp)
+    now = datetime.datetime.now()
+
+    # Be careful subtracting an older date from a newer date does not give zero
+    if expiration_date_time < now:
+        return 0
+
+    # give me the seconds left till the key expires
+    delta = expiration_date_time - now
+    return delta.seconds

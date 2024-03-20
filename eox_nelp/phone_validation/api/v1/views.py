@@ -1,82 +1,68 @@
-# pylint: disable=too-many-lines
-"""The generic views for course-experience API. Nelp flavour.
-Classes:
-- BaseJsonAPIView: General config of rest json api
-    - ExperienceView: Config of experience views
-        - UnitExperienceView: config for unit-exp views
-            - LikeDislikeUnitExperienceView: class-view(`/eox-nelp/api/experience/v1/like/units/`)
-            - ReportUnitExperienceView: class-view(`/eox-nelp/api/experience/v1/report/units/`)
-        - CourseExperienceView: config for course-exp views
-            - LikeDislikeCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/like/courses/`)
-            - ReportCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/report/courses/`)
-            - FeedbackCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/feedback/courses/`)
-    - PublicBaseJsonAPIView: General config of rest json api
-        - PublicFeedbackCourseExperienceView: class-view(`/eox-nelp/api/experience/v1/feedback/public/courses/`)
+"""The generic views for NELP OTP to confirm phone number.
+
+function-views:
+  - generate_otp: generate and send via SMS the OTP related a user. Saved in cache.
+  - validate_otp: Compare and check if the proposed OTP match the User OTP saved in cache.
+    If match, updates the profile phone_number.
+
 """
+import logging
+
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Q
-from django.http import Http404, HttpResponseForbidden
+from rest_framework import status
+from django.http import HttpResponseForbidden, JsonResponse
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-try:
-    from eox_audit_model.decorators import audit_drf_api
-except ImportError:
-    def audit_drf_api(*args, **kwargs):  # pylint: disable=unused-argument
-        """Identity decorator"""
-        return lambda x: x
 
 
-INVALID_KEY_ERROR = {
-    "error": "bad opaque key(item_id or course_id) `InvalidKeyError`"
-}
+from eox_nelp.utils import generate_otp_code
 
 
-@api_view(['POST'])
+logger = logging.getLogger(__name__)
+
+
+@api_view(["POST"])
 def generate_otp(request):
-    if not request.data:
-        return HttpResponseForbidden()
+    user_phone_number = request.data.get("phone_number", None)
 
-    otp = generate_otp_chars(
+    if not user_phone_number:
+        return JsonResponse(
+            data={"detail": "missing phone_number in data."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    otp = generate_otp_code(
         length=getattr(settings, "PHONE_VALIDATION_OTP_LENGTH", 8),
         custom_charset=getattr(settings, "PHONE_VALIDATION_OTP_CHARSET", ""),
     )
-    # user_otp_key = request.user.username + request.data.phone_number
-    # cache.set(
-    #     user_otp_key,
-    #     otp,
-    #     timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600)
-    # )
-    return Response({"message": "Got some data!", "data": request.data})
+    user_otp_key = f"{request.user.username}-{user_phone_number}"
+    logger.info(f"generating otp {user_otp_key[:-5]}*****")
+    cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
+
+    return Response({"message": "Success generate-otp!"}, status=status.HTTP_200_OK)
 
 
-
-
-@api_view(['POST'])
+@api_view(["POST"])
 def validate_otp(request):
-    if request.method == 'POST':
-        return Response({"message": "Got some data!", "data": request.data})
-    return Response({"message": "Hello, world!"})
+    user_phone_number = request.data.get("phone_number", None)
+    proposed_user_otp = request.data.get("one_time_password", None)
 
+    if not user_phone_number or not proposed_user_otp:
+        return JsonResponse(
+            data={"detail": "missing phone_number or one_time_password in data."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
+    user_otp_key = f"{request.user.username}-{user_phone_number}"
+    logger.info(f"validating otp for {user_otp_key[:-5]}*****")
 
+    if not proposed_user_otp == cache.get(user_otp_key):
+        return HttpResponseForbidden(reason="Forbidden - wrong code")
 
-import random
-import string
+    user = request.user
+    user.profile.phone_number = user_phone_number
+    user.profile.save()
 
-def generate_otp_chars(length=8, custom_charset=""):
-    """Generates a random 8-digit (or custom length) alphanumeric OTP string.
-
-    Args:
-        length (int, optional): The desired length of the OTP. Defaults to 8.
-        custom_charset (custom charset provided ): Charset to use to select random code.
-
-    Returns:
-        str: The generated OTP string.
-    """
-    allowed_chars = string.ascii_letters + string.digits
-    if custom_charset:
-        allowed_chars = custom_charset
-    otp = ''.join(random.choice(allowed_chars) for _ in range(length))
-    return otp
+    return Response({"message": "Success validate-otp!"}, status=status.HTTP_201_CREATED)

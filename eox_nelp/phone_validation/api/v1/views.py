@@ -10,20 +10,23 @@ import logging
 
 from django.conf import settings
 from django.core.cache import cache
-from rest_framework import status
 from django.http import HttpResponseForbidden, JsonResponse
-
-from rest_framework.decorators import api_view
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-
 from eox_nelp.utils import generate_otp_code
-
 
 logger = logging.getLogger(__name__)
 
 
 @api_view(["POST"])
+@authentication_classes((
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
 def generate_otp(request):
     user_phone_number = request.data.get("phone_number", None)
 
@@ -41,10 +44,14 @@ def generate_otp(request):
     logger.info(f"generating otp {user_otp_key[:-5]}*****")
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
 
-    return Response({"message": "Success generate-otp!"}, status=status.HTTP_200_OK)
+    return Response({"message": "Success generate-otp!"}, status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])
+@authentication_classes((
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
 def validate_otp(request):
     user_phone_number = request.data.get("phone_number", None)
     proposed_user_otp = request.data.get("one_time_password", None)
@@ -65,4 +72,4 @@ def validate_otp(request):
     user.profile.phone_number = user_phone_number
     user.profile.save()
 
-    return Response({"message": "Success validate-otp!"}, status=status.HTTP_201_CREATED)
+    return Response({"message": "Success validate-otp! Saved phone_number"}, status=status.HTTP_201_CREATED)

@@ -13,6 +13,7 @@ from mock import Mock
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
+from eox_nelp.phone_validation.api.v1 import views
 from eox_nelp.tests.test_utils import get_key_expiration
 
 User = get_user_model()
@@ -87,6 +88,7 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
             - Status code 400.
         """
         url_endpoint = reverse(self.reverse_viewname)
+
         response = self.client.post(url_endpoint, wrong_payload, format="json")
 
         self.assertDictEqual(response.json(), {"detail": "missing phone_number in data."})
@@ -96,6 +98,7 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
         """
         Test  the post request to generate otp.
         Expected behavior:
+            - check logging generation msg
             - Check the response say success otp generated.
             - Status code 201.
             - Check that in cache the OTP is stored(not None).
@@ -106,10 +109,14 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
         url_endpoint = reverse(self.reverse_viewname)
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
-        response = self.client.post(url_endpoint, payload, format="json")
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
 
         otp_stored = cache.get(user_otp_key)
         expiration_otp = get_key_expiration(user_otp_key)
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:generating otp {user_otp_key[:-5]}*****"
+        ])
         self.assertDictEqual(response.json(), {"message": "Success generate-otp!"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(otp_stored)
@@ -125,6 +132,7 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
         """
         Test  the post request to generate otp with custom settings.
         Expected behavior:
+            - check logging generation msg
             - Check the response say success otp generated..
             - Status code 201.
             - Check that in cache the OTP is stored(not None).
@@ -136,10 +144,14 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
         url_endpoint = reverse(self.reverse_viewname)
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
-        response = self.client.post(url_endpoint, payload, format="json")
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
 
         otp_stored = cache.get(user_otp_key)
         expiration_otp = get_key_expiration(user_otp_key)
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:generating otp {user_otp_key[:-5]}*****"
+        ])
         self.assertDictEqual(response.json(), {"message": "Success generate-otp!"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(otp_stored)
@@ -164,6 +176,7 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
             - Status code 400.
         """
         url_endpoint = reverse(self.reverse_viewname)
+
         response = self.client.post(url_endpoint, wrong_payload, format="json")
 
         self.assertDictEqual(response.json(), {"detail": "missing phone_number or one_time_password in data."})
@@ -175,6 +188,7 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
         """
         Test  the post request to validate otp with wrong validation code.
         Expected behavior:
+            - check logging validation msg
             - Status code 403.
             - Check that user profile mock is not assigned and still is Mock.
             - Check that profile mock save method has not been called.
@@ -185,8 +199,12 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
         cache.set(user_otp_key, correct_otp, timeout=600)
 
-        response = self.client.post(url_endpoint, payload, format="json")
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
 
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIsInstance(getattr(self.user.profile, "phone_number"), Mock)
         self.user.profile.save.assert_not_called()
@@ -195,6 +213,7 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
         """
         Test  the post  request to validate otp with good reqs.
         Expected behavior:
+            - check loggin validation msg
             - Check the response say success validate-otp.
             - Status code 201.
             - Check that user profile mock has the phone_number
@@ -206,8 +225,12 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
         cache.set(user_otp_key, correct_otp, timeout=600)
 
-        response = self.client.post(url_endpoint, payload, format="json")
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
 
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
         self.assertDictEqual(response.json(), {"message": "Success validate-otp! Saved phone_number"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.user.profile.phone_number, payload["phone_number"])

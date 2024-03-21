@@ -1,7 +1,7 @@
 """Utils that can be used for the plugin project"""
-import re
 import random
-import string
+import re
+import string as string_module
 from copy import copy
 
 from opaque_keys.edx.keys import CourseKey
@@ -168,7 +168,7 @@ def generate_otp_code(length=8, custom_charset=""):
     Returns:
         str: The generated OTP string.
     """
-    allowed_chars = string.ascii_letters + string.digits
+    allowed_chars = string_module.ascii_letters + string_module.digits
     if custom_charset:
         allowed_chars = custom_charset
     otp = ''.join(random.choice(allowed_chars) for _ in range(length))

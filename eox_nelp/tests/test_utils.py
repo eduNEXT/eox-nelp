@@ -230,7 +230,7 @@ class CamelToSnakeTestCase(TestCase):
 def get_key_expiration(key):
     """Util to get the expiration time of a key cache in seconds."""
     # use make_key to generate Django's internal key storage name
-    expiration_unix_timestamp = cache._expire_info.get(cache.make_key(key))
+    expiration_unix_timestamp = cache._expire_info.get(cache.make_key(key))  # pylint: disable=protected-access
     if expiration_unix_timestamp is None:
         return 0
 

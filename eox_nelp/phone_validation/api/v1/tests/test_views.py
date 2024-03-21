@@ -79,22 +79,22 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
     reverse_viewname = "phone-validation-api:v1:generate-otp"
 
     @data({}, {"not_phone_number": 3123123123})
-    def test_generate_otp_without_right_data(self, wrong_data):
+    def test_generate_otp_without_right_payload(self, wrong_payload):
         """
-        Test  the post get  request to generate otp is not running due missing keys in the data sent.
+        Test  the post request to generate otp is not running due missing keys in the payload sent.
         Expected behavior:
             - Check the response say is missing some keys.
             - Status code 400.
         """
         url_endpoint = reverse(self.reverse_viewname)
-        response = self.client.post(url_endpoint, wrong_data, format="json")
+        response = self.client.post(url_endpoint, wrong_payload, format="json")
 
         self.assertDictEqual(response.json(), {"detail": "missing phone_number in data."})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_generate_otp(self):
         """
-        Test  the post  request to generate otp.
+        Test  the post request to generate otp.
         Expected behavior:
             - Check the response say success otp generated.
             - Status code 201.
@@ -102,18 +102,18 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
             - Check that the expiration OTP is less than default value 600s, and bigger than a prudent execution time.
             - Check the lenght of the OTP code is the default 8.
         """
-        data = {"phone_number": 3218995688}
+        payload = {"phone_number": 3218995688}
         url_endpoint = reverse(self.reverse_viewname)
-        user_otp_key = f"{self.user.username}-{data['phone_number']}"
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
-        response = self.client.post(url_endpoint, data, format="json")
+        response = self.client.post(url_endpoint, payload, format="json")
 
         otp_stored = cache.get(user_otp_key)
         expiration_otp = get_key_expiration(user_otp_key)
         self.assertDictEqual(response.json(), {"message": "Success generate-otp!"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(otp_stored)
-        self.assertTrue(500 < expiration_otp and expiration_otp < 600)
+        self.assertTrue(500 < expiration_otp < 600)
         self.assertEqual(len(otp_stored), 8)
 
     @override_settings(
@@ -132,11 +132,11 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
             - Check the lenght of the OTP code is the settings value.
             - Check that the chars of setting value is presented in the otp code.
         """
-        data = {"phone_number": 3218995688}
+        payload = {"phone_number": 3218995688}
         url_endpoint = reverse(self.reverse_viewname)
-        user_otp_key = f"{self.user.username}-{data['phone_number']}"
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
-        response = self.client.post(url_endpoint, data, format="json")
+        response = self.client.post(url_endpoint, payload, format="json")
 
         otp_stored = cache.get(user_otp_key)
         expiration_otp = get_key_expiration(user_otp_key)
@@ -156,9 +156,15 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
     reverse_viewname = "phone-validation-api:v1:validate-otp"
 
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
-    def test_validate_otp_without_right_data(self, wrong_data):
+    def test_validate_otp_without_right_payload(self, wrong_payload):
+        """
+        Test  the post request to validate otp is not running due missing keys in the payload sent.
+        Expected behavior:
+            - Check the response say is missing some keys.
+            - Status code 400.
+        """
         url_endpoint = reverse(self.reverse_viewname)
-        response = self.client.post(url_endpoint, wrong_data, format="json")
+        response = self.client.post(url_endpoint, wrong_payload, format="json")
 
         self.assertDictEqual(response.json(), {"detail": "missing phone_number or one_time_password in data."})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -167,19 +173,19 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
 
     def test_validate_otp_without_right_validation_code(self):
         """
-        Test  the post  request to validate otp with wrong validation code.
+        Test  the post request to validate otp with wrong validation code.
         Expected behavior:
             - Status code 403.
             - Check that user profile mock is not assigned and still is Mock.
             - Check that profile mock save method has not been called.
         """
         correct_otp = "correct17"
-        data = {"phone_number": 3219990000, "one_time_password": "password"}
+        payload = {"phone_number": 3219990000, "one_time_password": "password"}
         url_endpoint = reverse(self.reverse_viewname)
-        user_otp_key = f"{self.user.username}-{data['phone_number']}"
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
         cache.set(user_otp_key, correct_otp, timeout=600)
 
-        response = self.client.post(url_endpoint, data, format="json")
+        response = self.client.post(url_endpoint, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertIsInstance(getattr(self.user.profile, "phone_number"), Mock)
@@ -195,14 +201,14 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
             - Check that profile mock save method has called once.
         """
         correct_otp = "correct26"
-        data = {"phone_number": 3219990000, "one_time_password": correct_otp}
+        payload = {"phone_number": 3219990000, "one_time_password": correct_otp}
         url_endpoint = reverse(self.reverse_viewname)
-        user_otp_key = f"{self.user.username}-{data['phone_number']}"
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
         cache.set(user_otp_key, correct_otp, timeout=600)
 
-        response = self.client.post(url_endpoint, data, format="json")
+        response = self.client.post(url_endpoint, payload, format="json")
 
         self.assertDictEqual(response.json(), {"message": "Success validate-otp! Saved phone_number"})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(self.user.profile.phone_number, data["phone_number"])
+        self.assertEqual(self.user.profile.phone_number, payload["phone_number"])
         self.user.profile.save.assert_called_once()

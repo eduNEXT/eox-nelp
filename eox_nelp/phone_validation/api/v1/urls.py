@@ -1,7 +1,6 @@
 """eox_nelp phone_validation.api v1 urls
 """
-from django.conf import settings
-from django.urls import path, re_path
+from django.urls import path
 
 from eox_nelp.phone_validation.api.v1.views import generate_otp, validate_otp
 

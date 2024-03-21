@@ -28,6 +28,24 @@ logger = logging.getLogger(__name__)
 ))
 @permission_classes((IsAuthenticated,))
 def generate_otp(request):
+    """ View for generate OTP.
+    ## Usage
+
+    ### **POST** /eox-nelp/api/phone-validation/v1/generate-otp/
+
+    request example data:
+    ``` json
+    {
+        "phone_number": 3213123123
+    }
+    ```
+    **POST Response Values**
+    ``` json
+    {
+        "message": "Success generate-otp!"
+    }
+    ```
+    """
     user_phone_number = request.data.get("phone_number", None)
 
     if not user_phone_number:
@@ -41,7 +59,7 @@ def generate_otp(request):
         custom_charset=getattr(settings, "PHONE_VALIDATION_OTP_CHARSET", ""),
     )
     user_otp_key = f"{request.user.username}-{user_phone_number}"
-    logger.info(f"generating otp {user_otp_key[:-5]}*****")
+    logger.info("generating otp %s*****", user_otp_key[:-5])
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
 
     return Response({"message": "Success generate-otp!"}, status=status.HTTP_201_CREATED)
@@ -53,6 +71,25 @@ def generate_otp(request):
 ))
 @permission_classes((IsAuthenticated,))
 def validate_otp(request):
+    """ View for validate OTP.
+    ## Usage
+
+    ### **POST** /eox-nelp/api/phone-validation/v1/validate-otp/
+
+    request example data:
+    ``` json
+    {
+        "phone_number": 3213123123,
+        "one_time_password": 234fasds
+    }
+    ```
+    **POST Response Values**
+    ``` json
+    {
+        "message": "Success validate-otp! Saved phone_number"
+    }
+    ```
+    """
     user_phone_number = request.data.get("phone_number", None)
     proposed_user_otp = request.data.get("one_time_password", None)
 
@@ -63,7 +100,7 @@ def validate_otp(request):
         )
 
     user_otp_key = f"{request.user.username}-{user_phone_number}"
-    logger.info(f"validating otp for {user_otp_key[:-5]}*****")
+    logger.info("validating otp for %s*****", user_otp_key[:-5])
 
     if not proposed_user_otp == cache.get(user_otp_key):
         return HttpResponseForbidden(reason="Forbidden - wrong code")

@@ -80,7 +80,7 @@ def validate_otp(request):
     ``` json
     {
         "phone_number": 3213123123,
-        "one_time_password": 234fasds
+        "one_time_password": "234fasds"
     }
     ```
     **POST Response Values**

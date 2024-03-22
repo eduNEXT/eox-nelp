@@ -1,5 +1,7 @@
 """Utils that can be used for the plugin project"""
+import random
 import re
+import string as string_module
 from copy import copy
 
 from opaque_keys.edx.keys import CourseKey
@@ -154,3 +156,20 @@ def camel_to_snake(string):
         String in snake case.
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
+
+
+def generate_otp_code(length=8, custom_charset=""):
+    """Generates a random 8-digit (or custom length) alphanumeric OTP string.
+
+    Args:
+        length (int, optional): The desired length of the OTP. Defaults to 8.
+        custom_charset (custom charset provided ): Charset to use to select random code.
+
+    Returns:
+        str: The generated OTP string.
+    """
+    allowed_chars = string_module.ascii_letters + string_module.digits
+    if custom_charset:
+        allowed_chars = custom_charset
+    otp = ''.join(random.choice(allowed_chars) for _ in range(length))
+    return otp

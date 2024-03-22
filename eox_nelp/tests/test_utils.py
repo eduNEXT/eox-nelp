@@ -4,7 +4,10 @@ Classes:
     ExtractCourseIdFromStringTestCase: Tests cases for the extract_course_id_from_string method.
     GetCourseFromIdTestCase: Tests cases for the get_course_from_id method.
 """
+import datetime
+
 from ddt import data, ddt
+from django.core.cache import cache
 from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -222,3 +225,22 @@ class CamelToSnakeTestCase(TestCase):
             - TypeError is raised
         """
         self.assertRaises(TypeError, camel_to_snake, input_value)
+
+
+def get_key_expiration(key):
+    """Util to get the expiration time of a key cache in seconds."""
+    # use make_key to generate Django's internal key storage name
+    expiration_unix_timestamp = cache._expire_info.get(cache.make_key(key))  # pylint: disable=protected-access
+    if expiration_unix_timestamp is None:
+        return 0
+
+    expiration_date_time = datetime.datetime.fromtimestamp(expiration_unix_timestamp)
+    now = datetime.datetime.now()
+
+    # Be careful subtracting an older date from a newer date does not give zero
+    if expiration_date_time < now:
+        return 0
+
+    # give me the seconds left till the key expires
+    delta = expiration_date_time - now
+    return delta.seconds

@@ -1,19 +1,17 @@
 import React, { useState} from 'react';
 import ReactDOM from 'react-dom';
 import { APP_INIT_ERROR, APP_READY, subscribe, initialize } from '@edx/frontend-platform';
-import { getLocale, getMessages, IntlProvider } from '@edx/frontend-platform/i18n';
 import { FeedbackCarousel, messages as essentialsMessages } from '@edunext/frontend-essentials'
+import { AppProvider } from '@edx/frontend-platform/react';
 
 import './index.scss';
 
 
 function LaunchFeedbackCarousel() {
-  const [locale, setLocale] = useState(getLocale());
-
   return (
-    <IntlProvider locale={locale} messages={getMessages()}>
+    <AppProvider>
       <FeedbackCarousel />
-    </IntlProvider>
+    </AppProvider>
   );
 }
 

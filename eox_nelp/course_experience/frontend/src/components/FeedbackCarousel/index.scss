@@ -19,3 +19,9 @@ body {
     border-color: var(--pgn-color-primary-400);
   }
 }
+
+#feedback-courses-carousel .feedback-container {
+  .carousel-item {
+    margin-left: unset;
+  }
+}

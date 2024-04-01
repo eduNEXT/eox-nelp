@@ -120,3 +120,6 @@ dmypy.json
 #unnecesary files on frontend build
 report.html
 eox_nelp/static/*.svg
+eox_nelp/static/*.png
+eox_nelp/static/*/*.svg
+eox_nelp/static/*/*.png

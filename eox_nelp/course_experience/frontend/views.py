@@ -19,4 +19,4 @@ class FeedbackCoursesTemplate(View):
 
     def get(self, request):  # pylint: disable=unused-argument
         """Render start html"""
-        return edxmako.shortcuts.render_to_response("feedback_courses.html", {}, "main", request)
+        return edxmako.shortcuts.render_to_response("feedback_carousel/index.html", {}, "main", request)

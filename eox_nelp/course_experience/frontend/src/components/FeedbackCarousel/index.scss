@@ -1,7 +1,6 @@
 @import "~@edx/brand/paragon/fonts";
 @import "~@edx/brand/paragon/variables";
 @import "~@edx/paragon/styles/scss/core/core";
-@import "~@edx/brand/paragon/overrides";
 
 #feedback-courses-carousel .feedback-container .feedback-carousel-title {
   margin: 0 0 20px 0;
@@ -14,4 +13,15 @@ body {
 
 .feedback-card {
   background: white;
+
+  hr {
+    border-top: var(--pgn-size-hr-border-width) solid var(--pgn-color-hr-border, #0000001a);
+    border-color: var(--pgn-color-primary-400);
+  }
+}
+
+#feedback-courses-carousel .feedback-container {
+  .carousel-item {
+    margin-left: unset;
+  }
 }

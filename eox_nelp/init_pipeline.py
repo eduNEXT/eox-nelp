@@ -42,17 +42,15 @@ def patch_user_gender_choices():
 def set_mako_templates():
     """This method adds the plugin templates to mako configuration."""
     # pylint: disable=import-error, import-outside-toplevel
-    # This cannot be at the top of the file since this file is imported the plugin initialization
+    # This cannot be at the top of the file since this file is imported on the plugin initialization
     # and therefore the settings has not been set yet
-    from eox_nelp import static as templates
+    from eox_nelp import static as static_module
     from eox_nelp.edxapp_wrapper.edxmako import edxmako
     from eox_nelp.payment_notifications import templates as payment_notifications_templates
-    from eox_nelp.phone_validation import templates as phone_validation_templates
 
     module_templates_to_include = [
-        templates,
+        static_module,
         payment_notifications_templates,
-        phone_validation_templates,
     ]
 
     for module in module_templates_to_include:

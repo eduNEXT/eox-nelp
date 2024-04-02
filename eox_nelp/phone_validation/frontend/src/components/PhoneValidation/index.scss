@@ -10,4 +10,10 @@
 
 .pgn__modal-layer{
   z-index: 9999;
+
+  .phone-validator-modal {
+    .btn {
+      background-image: none;
+    }
+  }
 }

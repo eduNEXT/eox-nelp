@@ -41,7 +41,7 @@ class SMSVendorApiClient(AbstractNotAuthenticatedApiClient):
                 "number": recipient,
                 "username": getattr(settings, "SMS_VENDOR_USERNAME"),
                 "password": getattr(settings, "SMS_VENDOR_PASSWORD"),
-                "sender": "NELC",
+                "sender": getattr(settings, "SMS_VENDOR_MSG_SENDER", "NELC"),
             }
             return self.make_post(path, payload)
 

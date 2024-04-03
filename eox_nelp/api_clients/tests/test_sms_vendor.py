@@ -5,6 +5,7 @@ Classes:
 """
 import unittest
 
+from django.conf import settings
 from mock import patch
 
 from eox_nelp.api_clients.sms_vendor import SMSVendorApiClient
@@ -36,9 +37,9 @@ class TestSMSVendorApiClient(TestApiClientMixin, unittest.TestCase):
         expected_payload = {
             "message": message,
             "number": recipient,
-            "username": 'test-user',
-            "password": 'test-password',
-            "sender": "NELC",
+            "username": settings.SMS_VENDOR_USERNAME,
+            "password": settings.SMS_VENDOR_PASSWORD,
+            "sender": settings.SMS_VENDOR_MSG_SENDER,
         }
         response = api_client.send_sms(recipient, message)
 

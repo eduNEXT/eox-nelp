@@ -1,0 +1,19 @@
+@import "~bootstrap/scss/mixins";
+@import "~@edx/brand/paragon/variables";
+@import "~@edx/paragon/styles/scss/core/variables";
+@import "~@edx/paragon/src/ActionRow/index";
+@import "~@edx/paragon/src/Button/index";
+@import "~@edx/paragon/src/Form/index";
+@import "~@edx/paragon/src/IconButton/index";
+@import "~@edx/paragon/src/Modal/index";
+@import "~@edx/brand/paragon/overrides";
+
+.pgn__modal-layer{
+  z-index: 9999;
+
+  .phone-validator-modal {
+    .btn {
+      background-image: none;
+    }
+  }
+}

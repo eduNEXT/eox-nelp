@@ -188,7 +188,7 @@ class AbstractBasicAuthApiClient(AbstractApiClient):
         return session
 
 
-class AbstractBasicApiClient(AbstractApiClient):
+class AbstractNotAuthenticatedApiClient(AbstractApiClient):
     """Abstract class for a basic  API client without authentication.
     This class provides basic functionality for an API client that requires
     basic api client without auth. Use a normal session.

@@ -186,3 +186,18 @@ class AbstractBasicAuthApiClient(AbstractApiClient):
         session.auth = HTTPBasicAuth(self.user, self.password)
 
         return session
+
+
+class AbstractNotAuthenticatedApiClient(AbstractApiClient):
+    """Abstract class for a basic  API client without authentication.
+    This class provides basic functionality for an API client that requires
+    basic api client without auth. Use a normal session.
+    """
+    def _authenticate(self):
+        """Creates and configures a requests session without authentication.
+
+        Returns:
+            requests.Session: Basic Session.
+        """
+        # pylint: disable=no-member
+        return requests.Session()

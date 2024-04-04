@@ -50,6 +50,10 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.MINISTER_OF_TOURISM_USER = 'test-user'
     settings.MINISTER_OF_TOURISM_PASSWORD = 'test-password'
     settings.ENABLE_CERTIFICATE_PUBLISHER = True
+    settings.SMS_VENDOR_URL = 'https://testing.com'
+    settings.SMS_VENDOR_USERNAME = 'test-user'
+    settings.SMS_VENDOR_PASSWORD = 'test-password'
+    settings.SMS_VENDOR_MSG_SENDER = 'Nelc-test'
 
 
 SETTINGS = SettingsClass()

@@ -34,7 +34,7 @@ jobs:
               "base_ref": "${{ github.base_ref }}",
               "strain_property": "${{ env.STRAIN_PROPERTY }}",
               "strain_property_value": "${{ env.PROPERTY_VALUE }}",
-              "strain_path": "mango/nelp/strain.yml",
+              "strain_path": "palm/nelp/strain.yml",
               "pr_number": "${{ github.event.number }}",
               "pr_action": "${{ github.event.action }}"
             }

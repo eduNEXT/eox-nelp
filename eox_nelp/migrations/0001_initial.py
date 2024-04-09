@@ -106,6 +106,14 @@ class Migration(migrations.Migration):
                 ('mode', models.CharField(default='honor', max_length=32, choices=[('verified', 'verified'), ('honor', 'honor'), ('audit', 'audit'), ('professional', 'professional'), ('no-id-professional', 'no-id-professional')])),
             ],
         ),
+        migrations.CreateModel(
+            name='UserSignupSource',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('site', models.CharField(default='', max_length=255)),
+            ],
+        ),
     ]
 
     if getattr(settings, 'TESTING_MIGRATIONS', False):

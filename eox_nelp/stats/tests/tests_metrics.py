@@ -100,8 +100,9 @@ class TestGetLearnersMetric(unittest.TestCase):
         CourseEnrollment.reset_mock()
         cache.clear()
 
+    @patch("eox_nelp.stats.metrics.get_current_request")
     @patch("eox_nelp.stats.metrics.get_cached_courses")
-    def test_get_learners_metric(self, get_cached_courses_mock):
+    def test_get_learners_metric(self, get_cached_courses_mock, get_current_request_mock):
         """Test that the function is getting the information through the CourseEnrollment model.
 
         Expected behavior:
@@ -113,8 +114,10 @@ class TestGetLearnersMetric(unittest.TestCase):
             - The count method was called once.
         """
         tenant = "http://test.com"
+        get_current_request_mock.return_value.site = tenant
         filter_result = CourseEnrollment.objects.filter.return_value
-        values_result = filter_result.values.return_value
+        exclude_result = filter_result.exclude.return_value
+        values_result = exclude_result.values.return_value
         distinct_result = values_result.distinct.return_value
         distinct_result.count.return_value = 5874
         get_cached_courses_mock.return_value = ["course1", "course2", "course3"]
@@ -128,7 +131,7 @@ class TestGetLearnersMetric(unittest.TestCase):
             user__is_staff=False,
             user__is_superuser=False,
         )
-        filter_result.values.assert_called_once_with("user")
+        exclude_result.values.assert_called_once_with("user")
         values_result.distinct.assert_called_once_with()
         distinct_result.count.assert_called_once_with()
         get_cached_courses_mock.assert_called_once_with(tenant)

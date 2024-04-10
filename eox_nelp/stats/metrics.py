@@ -8,8 +8,10 @@ functions:
     get_courses_metrics: Return metrics for the visible courses.
     get_course_certificates_metric: Return a dict metric representin the certificates of a course.
 """
+from crum import get_current_request
 from django.conf import settings
 from eox_core.edxapp_wrapper.certificates import get_generated_certificate
+from eox_core.edxapp_wrapper.users import get_user_signup_source
 
 from eox_nelp.edxapp_wrapper.branding import get_visible_courses
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
@@ -18,6 +20,7 @@ from eox_nelp.edxapp_wrapper.student import CourseAccessRole, CourseEnrollment
 from eox_nelp.stats.decorators import cache_method
 
 GeneratedCertificate = get_generated_certificate()
+UserSignupSource = get_user_signup_source()
 
 
 @cache_method
@@ -100,13 +103,23 @@ def get_learners_metric(tenant):
     Return:
         <int>: Total of learners.
     """
+    request = get_current_request()
     tenant_courses = get_cached_courses(tenant)
 
-    return CourseEnrollment.objects.filter(
+    users_from_signup_source = UserSignupSource.objects.filter(
+        site=str(request.site),
+        user__is_staff=False,
+        user__is_superuser=False,
+    ).values_list("user", flat=True).distinct()
+    total_enrollments = CourseEnrollment.objects.filter(
         course__in=tenant_courses,
         user__is_staff=False,
         user__is_superuser=False,
+    ).exclude(
+        user__in=users_from_signup_source,
     ).values('user').distinct().count()
+
+    return total_enrollments + users_from_signup_source.count()
 
 
 @cache_method

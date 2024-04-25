@@ -22,6 +22,7 @@ def run_init_pipeline():
     update_permissions()
     patch_generate_password()
     patch_registration_form_factory()
+    patch_gettest()
 
 
 def patch_user_gender_choices():
@@ -103,3 +104,14 @@ def patch_registration_form_factory():
     from eox_nelp.edxapp_wrapper.user_authn import views
     from eox_nelp.user_authn.views.registration_form import NelpRegistrationFormFactory
     views.registration_form.RegistrationFormFactory = NelpRegistrationFormFactory
+
+
+def patch_gettest():
+    """This method patches `RegistrationFormFactory` of user_auth.view.registration_form ,
+    with custom nelp `NelpRegistrationFormFactory`.
+    """
+    # pylint: disable=import-outside-toplevel, unused-import
+    from django.utils import translation
+    from eox_nelp.translation import nelp_gettext
+    translation.gettext_original = translation.gettext
+    translation.gettext = nelp_gettext

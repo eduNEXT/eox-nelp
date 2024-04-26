@@ -11,7 +11,7 @@ def nelp_gettext(message):
         message (string): English message input to view to override the translation.
 
     Returns:
-        string: Translation in the desired language.
+        (string): Translation in the desired language.
     """
     # pylint: disable=import-outside-toplevel, unused-import
 

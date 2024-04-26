@@ -15,8 +15,7 @@ def nelp_gettext(message):
     """
     # pylint: disable=import-outside-toplevel, unused-import
 
-    translated_message = get_custom_translated_message(message)
-    if translated_message:
+    if translated_message := get_custom_translated_message(message):
         return translated_message
 
     from django.utils.translation import gettext_original

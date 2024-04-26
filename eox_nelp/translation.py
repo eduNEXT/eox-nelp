@@ -43,4 +43,4 @@ def get_custom_translated_message(message):
     if not user_language:
         return None
 
-    return custom_translations.get(user_language).get(message)
+    return custom_translations.get(user_language, {}).get(message)

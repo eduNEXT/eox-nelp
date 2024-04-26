@@ -3,18 +3,20 @@ from django.conf import settings
 
 
 def nelp_gettext(message):
-    request = get_current_request()
-    if request:
-        if not hasattr(request, "tenant_config_custom_translations"):
-            custom_translations = getattr(settings, "custom_translations", {})
-            setattr(request, "tenant_config_custom_translations", custom_translations)
+    """_summary_
 
-        custom_translation = request.tenant_config_custom_translations.get(
-            request.COOKIES[settings.LANGUAGE_COOKIE_NAME], {}
-        ).get(message, None)
-        if custom_translation:
-            return custom_translation
+    Args:
+        message (string): English message input to view to override the translation.
+
+    Returns:
+        string: Translation in the desired language.
+    """
+    if request := get_current_request():
+        custom_translations = getattr(settings, "custom_translations", {})
+        user_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+        if custom_translations and user_language:
+            if custom_translation := custom_translations.get(user_language).get(message):
+                return custom_translation
 
     from django.utils.translation import gettext_original
-
     return gettext_original(message)

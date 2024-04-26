@@ -17,5 +17,4 @@ def nelp_gettext(message):
 
     from django.utils.translation import gettext_original
 
-    # return "johanseto2"
     return gettext_original(message)

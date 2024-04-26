@@ -1,3 +1,4 @@
+"""Translation module to manage helpers related translations and languages."""
 from crum import get_current_request
 from django.conf import settings
 
@@ -11,6 +12,7 @@ def nelp_gettext(message):
     Returns:
         string: Translation in the desired language.
     """
+    # pylint: disable=import-outside-toplevel, unused-import
     if request := get_current_request():
         custom_translations = getattr(settings, "custom_translations", {})
         user_language = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)

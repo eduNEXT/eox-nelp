@@ -107,16 +107,14 @@ def patch_registration_form_factory():
 
 
 def patch_gettest():
-    """This method patches `gettext` of django.utils.translation.
+    """This method patches `gettext` of django.utils.translation
     with custom nelp `nelp_gettext`.
+    The original get_text is saved with name `gettext_original` to used in case.
     """
     # pylint: disable=import-outside-toplevel, unused-import
     from django.utils import translation
+
     from eox_nelp.translation import nelp_gettext
+
     translation.gettext_original = translation.gettext
     translation.gettext = nelp_gettext
-    # from django.utils.functional import lazy
-
-    # translation.gettext_lazy = lazy(nelp_gettext, str)
-    # translation.ugettext = nelp_gettext
-    # translation.ugettext_lazy = nelp_gettext

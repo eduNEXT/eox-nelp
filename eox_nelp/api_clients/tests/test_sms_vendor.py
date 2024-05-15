@@ -9,7 +9,7 @@ from django.conf import settings
 from mock import patch
 
 from eox_nelp.api_clients.sms_vendor import SMSVendorApiClient
-from eox_nelp.api_clients.tests import TestRestApiClientMixin
+from eox_nelp.api_clients.tests.mixins import TestRestApiClientMixin
 
 
 class TestSMSVendorApiClient(TestRestApiClientMixin, unittest.TestCase):

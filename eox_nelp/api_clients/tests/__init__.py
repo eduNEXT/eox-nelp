@@ -12,14 +12,14 @@ from requests.auth import HTTPBasicAuth
 from eox_nelp import api_clients
 
 
-class TestApiClientMixin:
+class TestRestApiClientMixin:
     """Basic API client tests."""
 
     def tearDown(self):  # pylint: disable=invalid-name
         """Clear cache after each test case"""
         cache.clear()
 
-    @patch("eox_nelp.api_clients.requests")
+    @patch("eox_nelp.api_clients.authenticators.requests")
     def test_successful_post(self, requests_mock):
         """Test case when a POST request success.
 
@@ -49,7 +49,7 @@ class TestApiClientMixin:
             json=data,
         )
 
-    @patch("eox_nelp.api_clients.requests")
+    @patch("eox_nelp.api_clients.authenticators.requests")
     def test_failed_post(self, requests_mock):
         """Test case when a POST request fails.
 
@@ -84,7 +84,7 @@ class TestApiClientMixin:
             f"ERROR:{api_clients.__name__}:{log_error}"
         ])
 
-    @patch("eox_nelp.api_clients.requests")
+    @patch("eox_nelp.api_clients.authenticators.requests")
     def test_successful_get(self, requests_mock):
         """Test case when a GET request success.
 
@@ -113,7 +113,7 @@ class TestApiClientMixin:
             params=params,
         )
 
-    @patch("eox_nelp.api_clients.requests")
+    @patch("eox_nelp.api_clients.authenticators.requests")
     def test_failed_get(self, requests_mock):
         """Test case when a GET request fails.
 
@@ -149,7 +149,7 @@ class TestApiClientMixin:
         ])
 
 
-class TestOauth2ApiClientMixin(TestApiClientMixin):
+class TestOauth2AuthenticatorMixin:
     """
     This test class contains test cases for the `AbstractOauth2ApiClient` class
     to ensure that the authentication process using OAuth2 is working correctly.
@@ -163,7 +163,7 @@ class TestOauth2ApiClientMixin(TestApiClientMixin):
         """
         self.assertRaises(MissingTokenError, self.api_class)
 
-    @patch("eox_nelp.api_clients.OAuth2Session")
+    @patch("eox_nelp.api_clients.authenticators.OAuth2Session")
     def test_successful_authentication(self, oauth2_session_mock):
         """Test case when the authentication response is valid.
 
@@ -193,13 +193,13 @@ class TestOauth2ApiClientMixin(TestApiClientMixin):
         )
 
 
-class TestBasicAuthApiClientMixin(TestApiClientMixin):
+class TestBasicAuthAuthenticatorMixin:
     """
     This test class contains test cases for the `AbstractBasicAuthApiClient` class
     to ensure that the authentication process using Basic Auth is working correctly.
     """
 
-    @patch("eox_nelp.api_clients.requests.Session")
+    @patch("eox_nelp.api_clients.authenticators.requests.Session")
     def test_authentication_call(self, session_mock):
         """
         Test the authentication call for the API client.

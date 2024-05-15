@@ -11,11 +11,11 @@ from django.utils import timezone
 from mock import Mock, patch
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
-from eox_nelp.api_clients.tests import TestBasicAuthApiClientMixin
+from eox_nelp.api_clients.tests import TestBasicAuthAuthenticatorMixin, TestRestApiClientMixin
 from eox_nelp.signals.utils import generate_reference_id
 
 
-class TestExternalCertificatesApiClient(TestBasicAuthApiClientMixin, unittest.TestCase):
+class TestExternalCertificatesApiClient(TestRestApiClientMixin, TestBasicAuthAuthenticatorMixin, unittest.TestCase):
     """Tests ExternalCertificatesApiClient"""
 
     def setUp(self):

@@ -5,7 +5,8 @@ Classes:
 """
 from django.conf import settings
 
-from eox_nelp.api_clients import AbstractBasicAuthApiClient
+from eox_nelp.api_clients import AbstractAPIRestClient
+from eox_nelp.api_clients.authenticators import BasicAuthAuthenticator
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -15,9 +16,10 @@ except ImportError:
         return lambda x: x
 
 
-class ExternalCertificatesApiClient(AbstractBasicAuthApiClient):
+class ExternalCertificatesApiClient(AbstractAPIRestClient):
     """Allow to perform multiple external certificates operations."""
 
+    authentication_class = BasicAuthAuthenticator
     extra_headers_key = "EXTERNAL_CERTIFICATES_EXTRA_HEADERS"
 
     def __init__(self):

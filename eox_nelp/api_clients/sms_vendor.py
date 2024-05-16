@@ -5,7 +5,7 @@ Classes:
 """
 from django.conf import settings
 
-from eox_nelp.api_clients import AbstractNotAuthenticatedApiClient
+from eox_nelp.api_clients import AbstractAPIRestClient
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -15,7 +15,7 @@ except ImportError:
         return lambda x: x
 
 
-class SMSVendorApiClient(AbstractNotAuthenticatedApiClient):
+class SMSVendorApiClient(AbstractAPIRestClient):
     """Allow to perform SMS send operations."""
 
     @property

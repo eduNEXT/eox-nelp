@@ -6,16 +6,18 @@ Classes:
 """
 from django.conf import settings
 
-from eox_nelp.api_clients import AbstractOauth2ApiClient
+from eox_nelp.api_clients import AbstractAPIRestClient
+from eox_nelp.api_clients.authenticators import Oauth2Authenticator
 
 
-class FuturexApiClient(AbstractOauth2ApiClient):
+class FuturexApiClient(AbstractAPIRestClient):
     """Allow to perform multiple Futurex API operations based on an authenticated session.
 
     Attributes:
         base_url: Futurex domain.
         session: persist certain parameters across requests.
     """
+    authentication_class = Oauth2Authenticator
 
     def __init__(self):
         self.client_id = getattr(settings, "FUTUREX_API_CLIENT_ID")

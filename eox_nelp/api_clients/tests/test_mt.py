@@ -9,10 +9,10 @@ from django.conf import settings
 from mock import Mock, patch
 
 from eox_nelp.api_clients.mt import MinisterOfTourismApiClient
-from eox_nelp.api_clients.tests import TestBasicAuthApiClientMixin
+from eox_nelp.api_clients.tests.mixins import TestBasicAuthAuthenticatorMixin, TestRestApiClientMixin
 
 
-class TestMinisterOfTourismApiClient(TestBasicAuthApiClientMixin, unittest.TestCase):
+class TestMinisterOfTourismApiClient(TestRestApiClientMixin, TestBasicAuthAuthenticatorMixin, unittest.TestCase):
     """Tests MinisterOfTourismApiClient"""
 
     def setUp(self):

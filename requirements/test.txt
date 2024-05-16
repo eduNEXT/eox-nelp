@@ -12,6 +12,10 @@ aniso8601==9.0.1
     # via
     #   -r requirements/base.txt
     #   tincan
+annotated-types==0.6.0
+    # via
+    #   -r requirements/base.txt
+    #   pydantic
 appdirs==1.4.4
     # via
     #   -r requirements/base.txt
@@ -254,7 +258,7 @@ edx-when==2.5.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-eox-core==10.0.0
+eox-core==10.2.0
     # via -r requirements/base.txt
 eox-tenant==11.2.0
     # via
@@ -392,6 +396,12 @@ pycryptodomex==3.20.0
     #   -r requirements/base.txt
     #   edx-proctoring
     #   pyjwkest
+pydantic==2.7.1
+    # via -r requirements/base.txt
+pydantic-core==2.18.2
+    # via
+    #   -r requirements/base.txt
+    #   pydantic
 pyflakes==3.2.0
     # via flake8
 pyjwkest==1.4.2
@@ -468,9 +478,7 @@ requests-oauthlib==2.0.0
     #   -r requirements/base.txt
     #   social-auth-core
 requests-pkcs12==1.22
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    # via -r requirements/base.txt
 rules==3.3
     # via
     #   -r requirements/base.txt
@@ -542,6 +550,8 @@ typing-extensions==4.11.0
     #   astroid
     #   edx-opaque-keys
     #   jwcrypto
+    #   pydantic
+    #   pydantic-core
 tzdata==2024.1
     # via
     #   -r requirements/base.txt
@@ -576,6 +586,8 @@ xblock==4.0.1
     # via
     #   -r requirements/base.txt
     #   edx-when
+xmltodict==0.13.0
+    # via -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

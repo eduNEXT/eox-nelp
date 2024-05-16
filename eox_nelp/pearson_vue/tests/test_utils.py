@@ -1,18 +1,27 @@
-"""This file contains all the test for the utils.py file.
+"""This file contains all the test for the pearson vue  utils.py file.
 
 Classes:
-    ExtractCourseIdFromStringTestCase: Tests cases for the extract_course_id_from_string method.
-    GetCourseFromIdTestCase: Tests cases for the get_course_from_id method.
+    UpdatePayloadUsernameTokenTestCase: Tests cases for update_payload_username_token method.
+    UpdatePayloadCddRequestTestCase: Tests cases for update_payload_cdd_request method.
+    UpdatePayloadEadRequestTestCase: Test cased for update_payload_ead_request method.
 """
-from django.test import TestCase
-from eox_nelp.pearson_vue.utils import update_payload_cdd_request, update_payload_ead_request,update_payload_username_token
-from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD,PAYLOAD_PING_DATABASE
-from bs4 import BeautifulSoup
 import xmltodict
+from bs4 import BeautifulSoup
+from django.test import TestCase
+
+from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
+from eox_nelp.pearson_vue.utils import (
+    update_payload_cdd_request,
+    update_payload_ead_request,
+    update_payload_username_token,
+)
+
+
 class UpdatePayloadUsernameTokenTestCase(TestCase):
     def setUp(self):
         """Setup common conditions for every test case"""
         self.payload_base = PAYLOAD_PING_DATABASE
+
     def test_username_password_not_modified(self):
         username = "darth"
         password = "vaderpass"
@@ -23,80 +32,72 @@ class UpdatePayloadUsernameTokenTestCase(TestCase):
         self.assertEqual(payload_result_bs.find("wsse:Username").text, username)
         self.assertEqual(payload_result_bs.find("wsse:Password").text, password)
 
+
 class UpdatePayloadCddRequestTestCase(TestCase):
     def setUp(self):
         """Setup common conditions for every test case"""
         self.payload_base = PAYLOAD_CDD
         self.payload_base_bs = BeautifulSoup(PAYLOAD_CDD, "xml")
+
     def test_cdd_request_not_modified(self):
-        dict_mapping = {}
+        update_dict = {}
 
-
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
 
         self.assertDictEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
 
     def test_cdd_request_modify_attrs(self):
-        dict_mapping = {
+        update_dict = {
             "@clientCandidateID": "newclientcandidateID",
             "@clientID": "123999222ID",
         }
 
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
         result_cdd_request_attrs = payload_result_bs.find("sch:cddRequest").attrs
         for key in result_cdd_request_attrs:
-            self.assertEqual(result_cdd_request_attrs[key], dict_mapping[f"@{key}"])
-
-
-
+            self.assertEqual(result_cdd_request_attrs[key], update_dict[f"@{key}"])
 
     def test_cdd_request_modify_candidate_name(self):
-        dict_mapping = {
+        update_dict = {
             "candidateName": {
                 "firstName": "Darth",
                 "lastName": "Vader",
                 "middleName": "Anakin",
                 "salutation": "Mr",
-                "suffix": "Lord"
+                "suffix": "Lord",
             }
         }
 
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
-        for key in dict_mapping["candidateName"].keys():
-            self.assertEqual(payload_result_bs.find(key).text, dict_mapping["candidateName"][key])
+        for key in update_dict["candidateName"].keys():
+            self.assertEqual(payload_result_bs.find(key).text, update_dict["candidateName"][key])
 
     def test_cdd_request_modify_web_account_info(self):
-        dict_mapping = {
-            "webAccountInfo": {
-                "email": "vader@mail.com"
-            }
-        }
+        update_dict = {"webAccountInfo": {"email": "vader@mail.com"}}
 
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
-        self.assertEqual(payload_result_bs.find("email").text, dict_mapping["webAccountInfo"]["email"])
+        self.assertEqual(payload_result_bs.find("email").text, update_dict["webAccountInfo"]["email"])
 
     def test_cdd_request_modify_last_update(self):
-        dict_mapping = {
-            "lastUpdate": "2033/04/14 09:35:18 GMT"
-        }
+        update_dict = {"lastUpdate": "2033/04/14 09:35:18 GMT"}
 
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
-        self.assertEqual(payload_result_bs.find("lastUpdate").text, dict_mapping["lastUpdate"])
+        self.assertEqual(payload_result_bs.find("lastUpdate").text, update_dict["lastUpdate"])
 
     def test_cdd_request_modify_adress_info(self):
-        dict_mapping = {
+        update_dict = {
             "primaryAddress": {
                 "addressType": "Work",
                 "companyName": "Pearson VUE Clark Kent",
@@ -130,12 +131,17 @@ class UpdatePayloadCddRequestTestCase(TestCase):
             }
         }
 
-        payload_result = update_payload_cdd_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_cdd_request(self.payload_base, update_dict)
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
-        self.assertDictEqual(xmltodict.parse(payload_result)['soapenv:Envelope']['soapenv:Body']['sch:cddRequest']['primaryAddress'], dict_mapping["primaryAddress"])
-        self.assertDictEqual(xmltodict.parse(payload_result)['soapenv:Envelope']['soapenv:Body']['sch:cddRequest']['alternateAddress'], dict_mapping["alternateAddress"])
-
+        self.assertDictEqual(
+            xmltodict.parse(payload_result)["soapenv:Envelope"]["soapenv:Body"]["sch:cddRequest"]["primaryAddress"],
+            update_dict["primaryAddress"],
+        )
+        self.assertDictEqual(
+            xmltodict.parse(payload_result)["soapenv:Envelope"]["soapenv:Body"]["sch:cddRequest"]["alternateAddress"],
+            update_dict["alternateAddress"],
+        )
 
 
 class UpdatePayloadEadRequestTestCase(TestCase):
@@ -145,41 +151,40 @@ class UpdatePayloadEadRequestTestCase(TestCase):
         self.payload_base_bs = BeautifulSoup(PAYLOAD_EAD, "xml")
 
     def test_ead_request_not_modified(self):
-        dict_mapping = {}
+        update_dict = {}
 
-        payload_result = update_payload_ead_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_ead_request(self.payload_base, update_dict)
 
         self.assertDictEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
 
-
-    def test_edd_request_modify_attrs(self):
-        dict_mapping = {
+    def test_ead_request_modify_attrs(self):
+        update_dict = {
             "@clientID": "00000000ID",
             "@authorizationTransactionType": "Update",
-            "@clientAuthorizationID":"A9999",
+            "@clientAuthorizationID": "A9999",
         }
 
-        payload_result = update_payload_ead_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_ead_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
         result_cdd_request_attrs = payload_result_bs.find("sch:eadRequest").attrs
         for key in result_cdd_request_attrs:
-            self.assertEqual(result_cdd_request_attrs[key], dict_mapping[f"@{key}"])
+            self.assertEqual(result_cdd_request_attrs[key], update_dict[f"@{key}"])
 
-    def test_edd_request_modify_all_info(self):
-        dict_mapping = {
+    def test_ead_request_modify_all_info(self):
+        update_dict = {
             "clientCandidateID": "Superman123456",
             "examAuthorizationCount": "5",
             "examSeriesCode": "OTT2",
             "eligibilityApptDateFirst": "2024/05/01 00:00:00",
             "eligibilityApptDateLast": "3256/12/31 23:59:59",
-            "lastUpdate": "2024/05/16 23:09:01 GMT"
+            "lastUpdate": "2024/05/16 23:09:01 GMT",
         }
 
-        payload_result = update_payload_ead_request(self.payload_base, dict_mapping)
+        payload_result = update_payload_ead_request(self.payload_base, update_dict)
         payload_result_bs = BeautifulSoup(payload_result, "xml")
 
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
-        for key in dict_mapping.keys():
-            self.assertEqual(payload_result_bs.find(key).text, dict_mapping[key])
+        for key in update_dict.keys():
+            self.assertEqual(payload_result_bs.find(key).text, update_dict[key])

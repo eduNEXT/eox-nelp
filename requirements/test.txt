@@ -468,9 +468,7 @@ requests-oauthlib==2.0.0
     #   -r requirements/base.txt
     #   social-auth-core
 requests-pkcs12==1.22
-    # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    # via -r requirements/base.txt
 rules==3.3
     # via
     #   -r requirements/base.txt
@@ -576,6 +574,8 @@ xblock==4.0.1
     # via
     #   -r requirements/base.txt
     #   edx-when
+xmltodict==0.13.0
+    # via -r requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

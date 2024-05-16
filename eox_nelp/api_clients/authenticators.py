@@ -10,6 +10,9 @@ Classes:
 
     UnAuthenticatedAuthenticator:
         A class for unauthenticated request.
+
+    PKCS12Authenticator:
+        A class for authenticating users using PFX certificate.
 """
 from abc import ABC, abstractmethod
 
@@ -18,6 +21,7 @@ from django.core.cache import cache
 from oauthlib.oauth2 import BackendApplicationClient
 from requests.auth import HTTPBasicAuth
 from requests_oauthlib import OAuth2Session
+from requests_pkcs12 import Pkcs12Adapter
 
 
 class AbstractAuthenticator(ABC):
@@ -103,3 +107,23 @@ class UnAuthenticatedAuthenticator(AbstractAuthenticator):
         """
         # pylint: disable=no-member
         return requests.Session()
+
+
+class PKCS12Authenticator(AbstractAuthenticator):
+    """PKCS12Authenticator is a class for authenticating users
+    using a PFX certificate and its passphrase.
+    """
+
+    def authenticate(self, api_client):
+        """Creates and configures a requests session with a specific certificate.
+
+        Returns:
+            requests.Session: Basic Session.
+        """
+        session = requests.Session()
+        session.mount(
+            api_client.base_url,
+            Pkcs12Adapter(pkcs12_filename=api_client.cert, pkcs12_password=api_client.passphrase),
+        )
+
+        return session

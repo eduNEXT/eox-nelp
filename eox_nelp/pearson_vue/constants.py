@@ -1,3 +1,4 @@
+"""Module to add constants related Pearson Vue Integration"""
 PAYLOAD_PING = """
 <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope" xmlns:sch="http://ws.pearsonvue.com/ping/schema">
     <soapenv:Header/>

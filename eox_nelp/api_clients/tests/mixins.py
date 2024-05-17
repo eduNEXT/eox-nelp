@@ -4,6 +4,8 @@ Classes:
     TestRestApiClientMixin: Basic tests that can be implemented by AbstractAPIRestClient children.
     TestOauth2AuthenticatorMixin: Basic tests that can be implemented by Oauth2Authenticator children.
     TestBasicAuthAuthenticatorMixin: Basic tests that can be implemented by BasicAuthAuthenticator children.
+    TestSOAPClientMixin: Basic tests that can be implemented by AbstractSOAPClient children.
+    TestPKCS12AuthenticatorMixin: Basic tests that can be implemented by PKCS12Authenticator children.
 """
 from django.conf import settings
 from django.core.cache import cache
@@ -151,6 +153,102 @@ class TestRestApiClientMixin:
         ])
 
 
+class TestSOAPClientMixin:
+    """Basic API client tests."""
+
+    @patch("eox_nelp.api_clients.authenticators.requests")
+    def test_successful_post(self, requests_mock):
+        """Test case when a POST request success.
+
+        Expected behavior:
+            - Response is the expected value
+            - POST was called with the given data and right url.
+        """
+        response = Mock()
+        response.ok = True
+        response.text = "<result> xml response string from API </result>"
+        expected_value = response.text
+        requests_mock.Session.return_value.post.return_value = response
+        data = """
+            <soapenv:Envelope>
+                <soapenv:Header/>
+                    <soapenv:Body>
+                        <sch:pingServiceRequest/>
+                    </soapenv:Body>
+            </soapenv:Envelope>
+        """
+
+        with patch.object(self.api_class, "_authenticate") as auth_mock:
+            auth_mock.return_value = requests_mock.Session()
+            api_client = self.api_class()
+
+        response = api_client.make_post("fake/path", data)
+
+        self.assertEqual(response, expected_value)
+        requests_mock.Session.return_value.post.assert_called_with(
+            url=f"{api_client.base_url}/fake/path",
+            data=data,
+        )
+
+    @patch("eox_nelp.api_clients.authenticators.requests")
+    def test_failed_post(self, requests_mock):
+        """Test case when a POST request fails.
+
+        Expected behavior:
+            - Response is the expected value.
+            - POST was called with the given data and right url.
+            - Error was logged.
+        """
+        response = Mock()
+        response.ok = False
+        response.status_code = 400
+        response.text = "<result> xml response string from API </result>"
+        expected_value = response.text
+        requests_mock.Session.return_value.post.return_value = response
+        data = """
+            <soapenv:Envelope>
+                <soapenv:Header/>
+                    <soapenv:Body>
+                        <sch:pingServiceRequest/>
+                    </soapenv:Body>
+            </soapenv:Envelope>
+        """
+
+        log_error = (
+            "An error has occurred trying to make post request to https://testing.com/fake/path with status code 400 "
+            f"and message {response.text}"
+        )
+        with patch.object(self.api_class, "_authenticate") as auth_mock:
+            auth_mock.return_value = requests_mock.Session()
+            api_client = self.api_class()
+
+        with self.assertLogs(api_clients.__name__, level="ERROR") as logs:
+            response = api_client.make_post("fake/path", data)
+
+        self.assertEqual(response, expected_value)
+        requests_mock.Session.return_value.post.assert_called_with(
+            url=f"{api_client.base_url}/fake/path",
+            data=data,
+        )
+        self.assertEqual(logs.output, [
+            f"ERROR:{api_clients.__name__}:{log_error}"
+        ])
+
+    def test_invalid_data(self):
+        """Test that a TypeError exception is raised when the data is not  and string.
+
+        Expected behavior:
+            - Exception was raised
+        """
+        data = {"testing": True, "application": "futurex"}
+
+        with patch.object(self.api_class, "_authenticate"):
+            api_client = self.api_class()
+
+        with self.assertRaises(TypeError):
+            api_client.make_post("fake/path", data)
+
+
 class TestOauth2AuthenticatorMixin:
     """
     This test class contains test cases for the `AbstractOauth2ApiClient` class
@@ -223,3 +321,38 @@ class TestBasicAuthAuthenticatorMixin:
         session_mock.assert_called_once()
         self.assertEqual(api_client.session, session_mock.return_value)
         self.assertEqual(api_client.session.auth, expected_auth)
+
+
+class TestPKCS12AuthenticatorMixin:
+    """
+    This test class contains test cases for the `PKCS12Authenticator` class
+    to ensure that the authentication process using PFX certificate is working correctly.
+    """
+
+    @patch("eox_nelp.api_clients.authenticators.Pkcs12Adapter")
+    @patch("eox_nelp.api_clients.authenticators.requests.Session")
+    def test_authentication_call(self, session_mock, adapter_mock):
+        """
+        Test the authentication call for the API client.
+
+        This test case ensures that the `_authenticate` method of the `PKCS12Authenticator`
+        class sets the session object with the right adapter.
+
+        Expected behavior:
+            - Session mock is called once.
+            - Session mount method is called once with the right parameters.
+            - Adapter is called once with the right parameters.
+            - api client has the attribute session
+        """
+        api_client = self.api_class()
+
+        session_mock.assert_called_once()
+        session_mock.return_value.mount.assert_called_once_with(
+            api_client.base_url,
+            adapter_mock.return_value,
+        )
+        adapter_mock.assert_called_once_with(
+            pkcs12_filename=api_client.cert,
+            pkcs12_password=api_client.passphrase,
+        )
+        self.assertEqual(api_client.session, session_mock.return_value)

@@ -55,6 +55,10 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.SMS_VENDOR_PASSWORD = 'test-password'
     settings.SMS_VENDOR_MSG_SENDER = 'Nelc-test'
 
+    settings.PEARSON_RTI_WSDL_URL = 'https://testing.com'
+    settings.PEARSON_RTI_CERT = '/openedx/certs/cert.p12'
+    settings.PEARSON_RTI_PASSPHRASE = 'test-password'
+
 
 SETTINGS = SettingsClass()
 plugin_settings(SETTINGS)

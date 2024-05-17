@@ -116,3 +116,39 @@ class AbstractAPIRestClient(AbstractApiClient):
             "error": True,
             "message": f"Invalid response with status {response.status_code}"
         }
+
+
+class AbstractSOAPClient(AbstractApiClient):
+    """This abstract class is an extension of AbstractApiClient that includes
+    a common POST method whose expected result is a xml response.
+    """
+
+    def make_post(self, path, data):
+        """This method uses the session attribute to perform a POST request based on the
+        base_url attribute and the given path, if the status code is different from 200 this
+        will log the error and finally this will return the xml response in any case.
+
+        Arguments:
+            path <str>: makes reference to the url path.
+            data <str>: request body as xml string.
+
+        Return:
+            <str>: xml response.
+        """
+        if not isinstance(data, str):
+            raise TypeError("Invalid data type, the data argument must be a string")
+
+        url = f"{self.base_url}/{path}"
+
+        response = self.session.post(url=url, data=data)
+        content = response.text
+
+        if not response.ok:
+            LOGGER.error(
+                "An error has occurred trying to make post request to %s with status code %s and message %s",
+                url,
+                response.status_code,
+                content,
+            )
+
+        return content

@@ -1,64 +1,28 @@
-"""Utils that can be used for the pearson Vue integration"""
+"""Utils that can be used for the pearson Vue integration.
+This includes xml helpers:
+    - update_xml_with_dict
+"""
 import xmltodict
+from pydantic.v1.utils import deep_update
 
 
-def update_payload_cdd_request(payload, update_dict):
-    """Update the `sch:cddRequest` tag using its dict representation using xmltodict
-    nomenclature.
+def update_xml_with_dict(xml: str, update_dict: dict) -> str:
+    """Update an xml string using its dict representation, deep_update,
+    and auxiliar update_dict using xmltodict
+    nomenclature: (keys~tags, values~text, attrs~@keys).
     https://github.com/martinblech/xmltodict
     https://pypi.org/project/xmltodict/
+    To update the dict is used deep_update method of pydantic.https://docs.pydantic.dev/latest/
+    https://github.com/pydantic/pydantic/blob/15b82a90c9f20db0ce618caffe6b4cb3c05ba139/pydantic/v1/utils.py#L213
 
     Args:
-        payload (str): str xml payload to update in the `sch:cddRequest` tag.
-        update_dict (dict): Update dict representation to update xml_dict representation of payload in the
-        corresponding tag.
+        xml (str): str xml payload to update.
+        update_dict (dict): Update_dict representation to update xml_dict representation in the
+        corresponding tags.
 
     Returns:
-        updated_payload(str): string xml representation of the updated dict representation of payload.
+        updated_xml(str): string xml representation of the updated_dict representation.
     """
-    payload_dict = xmltodict.parse(payload)
-    payload_dict["soapenv:Envelope"]["soapenv:Body"]["sch:cddRequest"].update(update_dict)
-    return xmltodict.unparse(payload_dict, full_document=False)
-
-
-def update_payload_ead_request(payload, update_dict):
-    """Update the `sch:eadRequest` tag using its dict representation using xmltodict
-    nomenclature.
-    https://pypi.org/project/xmltodict/
-    https://github.com/martinblech/xmltodict
-
-    Args:
-        payload (str): str xml payload to update in the `sch:eadRequest` tag.
-        update_dict (dict): Update dict representation to update xml_dict representation of payload in the
-        corresponding tag.
-
-    Returns:
-        updated_payload(str): string xml representation of the updated dict representation of payload.
-    """
-    payload_dict = xmltodict.parse(payload)
-    payload_dict["soapenv:Envelope"]["soapenv:Body"]["sch:eadRequest"].update(update_dict)
-    return xmltodict.unparse(payload_dict, full_document=False)
-
-
-def update_payload_username_token(payload, username, password):
-    """Update the `sch:eadRequest` tag using its dict representation using xmltodict
-    nomenclature.
-    https://pypi.org/project/xmltodict/
-    https://github.com/martinblech/xmltodict
-
-    Args:
-        payload (str): str xml payload to update in the `wsse:UsernameToken` tag.
-        username (str): new username to set in the `wsse:Username` tag.
-        password (str): new password to set in the `wsse:Password` tag.
-
-    Returns:
-        updated_payload(str): string xml representation of the updated dict representation of payload.
-    """
-    payload_dict = xmltodict.parse(payload)
-    payload_dict["soapenv:Envelope"]["soapenv:Header"]["wsse:Security"]["wsse:UsernameToken"][
-        "wsse:Username"
-    ] = username
-    payload_dict["soapenv:Envelope"]["soapenv:Header"]["wsse:Security"]["wsse:UsernameToken"]["wsse:Password"][
-        "#text"
-    ] = password
-    return xmltodict.unparse(payload_dict, full_document=False)
+    xml_dict = xmltodict.parse(xml)
+    result = deep_update(xml_dict, update_dict)
+    return xmltodict.unparse(result, full_document=False)

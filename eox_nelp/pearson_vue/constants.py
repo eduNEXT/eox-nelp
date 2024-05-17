@@ -1,6 +1,6 @@
 """Module to add constants related Pearson Vue Integration"""
 # flake8: noqa: E501
-
+# pylint: disable=duplicate-code
 
 PAYLOAD_PING = """
 <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope" xmlns:sch="http://ws.pearsonvue.com/ping/schema">

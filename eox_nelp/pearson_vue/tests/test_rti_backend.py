@@ -2,7 +2,7 @@
 This module contains unit tests for the RealTimeImport class and its methods in rti_backend.py.
 """
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 from eox_nelp.pearson_vue.rti_backend import RealTimeImport
 
@@ -52,6 +52,48 @@ class TestRealTimeImport(unittest.TestCase):
                 "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
                 **func1(),  # Include data from func1
                 **func2(),  # Include data from func2
+            },
+        )
+
+    def test_pipeline_index(self):
+        """
+        Test that the pipeline start from the pipeline_index position.
+
+        Expected behavior:
+            - Pipeline method 1 is called once.
+            - Pipeline method 2 is called once.
+            - Pipeline method 3 is called twice
+            - backend_data attribute is the expected value.
+        """
+        # Mock pipeline functions
+        func1 = MagicMock(return_value={"updated_key": "value1"})
+        func2 = MagicMock(return_value={"additional_key": "value2"})
+        func3 = MagicMock()
+        func3_output = {"last_value": "value3"}
+        func3.side_effect = [Exception("Test exception"), func3_output]
+        rti = RealTimeImport(pipeline_index=0)
+        rti.get_pipeline = MagicMock(return_value=[func1, func2, func3])
+
+        with self.assertRaises(Exception):
+            # Running first time until the func3 raises an exception
+            rti.run_pipeline()
+
+        # This execution only runs the third method
+        rti.run_pipeline()
+
+        func1.assert_called_once_with(**{"pipeline_index": 0})
+        func2.assert_called_once_with(**{"updated_key": "value1", "pipeline_index": 1})
+        func3.assert_has_calls([
+            call(**{"updated_key": "value1", "additional_key": "value2", "pipeline_index": 2}),
+            call(**{"updated_key": "value1", "additional_key": "value2", "pipeline_index": 2}),
+        ])
+        self.assertDictEqual(
+            rti.backend_data,
+            {
+                "pipeline_index": len(rti.get_pipeline()) - 1,  # includes total of pipeline methods
+                **func1(),  # Include data from func1
+                **func2(),  # Include data from func2
+                **func3_output,  # Include data from func3
             },
         )
 

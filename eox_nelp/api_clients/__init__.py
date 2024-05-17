@@ -6,7 +6,6 @@ Classes:
 import logging
 from abc import ABC, abstractmethod
 
-from bs4 import BeautifulSoup
 from django.conf import settings
 
 from eox_nelp.api_clients.authenticators import UnAuthenticatedAuthenticator
@@ -134,8 +133,11 @@ class AbstractSOAPClient(AbstractApiClient):
             data <str>: request body as xml string.
 
         Return:
-            BeautifulSoup: xml response.
+            <str>: xml response.
         """
+        if not isinstance(data, str):
+            raise TypeError("Invalid data type, the data argument must be a string")
+
         url = f"{self.base_url}/{path}"
 
         response = self.session.post(url=url, data=data)
@@ -149,4 +151,4 @@ class AbstractSOAPClient(AbstractApiClient):
                 content,
             )
 
-        return BeautifulSoup(content, "xml")
+        return content

@@ -7,7 +7,6 @@ Classes:
     TestSOAPClientMixin: Basic tests that can be implemented by AbstractSOAPClient children.
     TestPKCS12AuthenticatorMixin: Basic tests that can be implemented by PKCS12Authenticator children.
 """
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
 from mock import Mock, patch
@@ -168,9 +167,16 @@ class TestSOAPClientMixin:
         response = Mock()
         response.ok = True
         response.text = "<result> xml response string from API </result>"
-        expected_value = BeautifulSoup(response.text, "xml")
+        expected_value = response.text
         requests_mock.Session.return_value.post.return_value = response
-        data = {"testing": True, "application": "pearson_vue"}
+        data = """
+            <soapenv:Envelope>
+                <soapenv:Header/>
+                    <soapenv:Body>
+                        <sch:pingServiceRequest/>
+                    </soapenv:Body>
+            </soapenv:Envelope>
+        """
 
         with patch.object(self.api_class, "_authenticate") as auth_mock:
             auth_mock.return_value = requests_mock.Session()
@@ -197,9 +203,16 @@ class TestSOAPClientMixin:
         response.ok = False
         response.status_code = 400
         response.text = "<result> xml response string from API </result>"
-        expected_value = BeautifulSoup(response.text, "xml")
+        expected_value = response.text
         requests_mock.Session.return_value.post.return_value = response
-        data = {"testing": True, "application": "futurex"}
+        data = """
+            <soapenv:Envelope>
+                <soapenv:Header/>
+                    <soapenv:Body>
+                        <sch:pingServiceRequest/>
+                    </soapenv:Body>
+            </soapenv:Envelope>
+        """
 
         log_error = (
             "An error has occurred trying to make post request to https://testing.com/fake/path with status code 400 "
@@ -220,6 +233,20 @@ class TestSOAPClientMixin:
         self.assertEqual(logs.output, [
             f"ERROR:{api_clients.__name__}:{log_error}"
         ])
+
+    def test_invalid_data(self):
+        """Test that a TypeError exception is raised when the data is not  and string.
+
+        Expected behavior:
+            - Exception was raised
+        """
+        data = {"testing": True, "application": "futurex"}
+
+        with patch.object(self.api_class, "_authenticate"):
+            api_client = self.api_class()
+
+        with self.assertRaises(TypeError):
+            api_client.make_post("fake/path", data)
 
 
 class TestOauth2AuthenticatorMixin:

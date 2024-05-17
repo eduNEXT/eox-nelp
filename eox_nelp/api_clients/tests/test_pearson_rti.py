@@ -33,7 +33,7 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
         expected_value = {
             "status": "success",
         }
-        post_mock.return_value = BeautifulSoup('<result status="success" env="Prod" inProduction="true"/>', "xml")
+        post_mock.return_value = '<result status="success" env="Prod" inProduction="true"/>'
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -54,7 +54,7 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
         expected_value = {
             "status": "failed",
         }
-        post_mock.return_value = BeautifulSoup('<error status="error" env="Prod" inProduction="true"/>', "xml")
+        post_mock.return_value = '<error status="error" env="Prod" inProduction="true"/>'
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -77,17 +77,14 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             "fault_code": "vue:AuthenticationFailure",
             "message": "Invalid user name or password.",
         }
-        post_mock.return_value = BeautifulSoup(
-            """
-                <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-                    <soapenv:Fault xmlns:vue="http://ws.pearsonvue.com">
-                        <faultcode>vue:AuthenticationFailure</faultcode>
-                        <faultstring>Invalid user name or password.</faultstring>
-                    </soapenv:Fault>
-                </soapenv:Envelope>
-            """,
-            "xml",
-        )
+        post_mock.return_value = """
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+                <soapenv:Fault xmlns:vue="http://ws.pearsonvue.com">
+                    <faultcode>vue:AuthenticationFailure</faultcode>
+                    <faultstring>Invalid user name or password.</faultstring>
+                </soapenv:Fault>
+            </soapenv:Envelope>
+        """
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -111,18 +108,15 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             "candidate_id": "12345",
             "client_candidate_id": "CC1234",
         }
-        post_mock.return_value = BeautifulSoup(
-            """
-                <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"
-                xmlns:cdd="http://ws.pearsonvue.com/rti/cdd/schema">
-                    <cdd:cddResponse candidateID="12345" clientCandidateID="CC1234">
-                        <status>Accepted</status>
-                        <message>ok</message>
-                    </sch:cddResponse>
-                </soapenv:Envelope>
-            """,
-            "xml",
-        )
+        post_mock.return_value = """
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:cdd="http://ws.pearsonvue.com/rti/cdd/schema">
+                <cdd:cddResponse candidateID="12345" clientCandidateID="CC1234">
+                    <status>Accepted</status>
+                    <message>ok</message>
+                </sch:cddResponse>
+            </soapenv:Envelope>
+        """
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -141,16 +135,17 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             - Post request was made with the required parameters.
             - Error was log
         """
-        post_mock.return_value = BeautifulSoup('<error status="error" env="Prod" inProduction="true"/>', "xml")
+        post_mock.return_value = '<error status="error" env="Prod" inProduction="true"/>'
+        xml_response = BeautifulSoup(post_mock.return_value, "xml")
         expected_value = {
             "status": "unexpected error",
-            "response": post_mock.return_value,
+            "response": xml_response,
         }
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
         log_error = (
             "An unexpected error has occurred trying to make a CDD request getting "
-            f"the following response: {post_mock.return_value}"
+            f"the following response: {xml_response}"
         )
 
         with self.assertLogs(pearson_rti.__name__, level="ERROR") as logs:
@@ -176,17 +171,14 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             "fault_code": "vue:AuthenticationFailure",
             "message": "Invalid user name or password.",
         }
-        post_mock.return_value = BeautifulSoup(
-            """
-                <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
-                    <soapenv:Fault xmlns:vue="http://ws.pearsonvue.com">
-                        <faultcode>vue:AuthenticationFailure</faultcode>
-                        <faultstring>Invalid user name or password.</faultstring>
-                    </soapenv:Fault>
-                </soapenv:Envelope>
-            """,
-            "xml",
-        )
+        post_mock.return_value = """
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+                <soapenv:Fault xmlns:vue="http://ws.pearsonvue.com">
+                    <faultcode>vue:AuthenticationFailure</faultcode>
+                    <faultstring>Invalid user name or password.</faultstring>
+                </soapenv:Fault>
+            </soapenv:Envelope>
+        """
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -209,19 +201,16 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             "message": "ok",
             "client_candidate_id": "CC1234",
         }
-        post_mock.return_value = BeautifulSoup(
-            """
-                <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"
-                xmlns:sch="http://ws.pearsonvue.com/rti/ead/schema">
-                    <sch:eadResponse authorizationID="1234" clientAuthorizationID="A1234">
-                        <clientCandidateID>CC1234</clientCandidateID>
-                        <status>Accepted</status>
-                        <message>ok</message>
-                    </sch:eadResponse>
-                </soapenv:Envelope>
-            """,
-            "xml",
-        )
+        post_mock.return_value = """
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:sch="http://ws.pearsonvue.com/rti/ead/schema">
+                <sch:eadResponse authorizationID="1234" clientAuthorizationID="A1234">
+                    <clientCandidateID>CC1234</clientCandidateID>
+                    <status>Accepted</status>
+                    <message>ok</message>
+                </sch:eadResponse>
+            </soapenv:Envelope>
+        """
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
 
@@ -240,16 +229,17 @@ class TestPearsonRTIApiClient(TestSOAPClientMixin, TestPKCS12AuthenticatorMixin,
             - Post request was made with the required parameters.
             - Error was log
         """
-        post_mock.return_value = BeautifulSoup('<error status="error" env="Prod" inProduction="true"/>', "xml")
+        post_mock.return_value = '<error status="error" env="Prod" inProduction="true"/>'
+        xml_response = BeautifulSoup(post_mock.return_value, "xml")
         expected_value = {
             "status": "unexpected error",
-            "response": post_mock.return_value,
+            "response": xml_response
         }
         payload = "<testing><user>Harry</user></testing>"
         api_client = self.api_class()
         log_error = (
             "An unexpected error has occurred trying to make a EAD request getting "
-            f"the following response: {post_mock.return_value}"
+            f"the following response: {xml_response}"
         )
 
         with self.assertLogs(pearson_rti.__name__, level="ERROR") as logs:

@@ -5,6 +5,7 @@ Classes:
 """
 import logging
 
+from bs4 import BeautifulSoup
 from django.conf import settings
 
 from eox_nelp.api_clients import AbstractSOAPClient
@@ -50,7 +51,10 @@ class PearsonRTIApiClient(AbstractSOAPClient):
         result = {
             "status": "failed",
         }
-        xml_response = self.make_post("cxfws2/services/Ping", payload)
+        xml_response = BeautifulSoup(
+            self.make_post("cxfws2/services/Ping", payload),
+            "xml",
+        )
         request_result = xml_response.find("result")
 
         if request_result and "status" in request_result.attrs:
@@ -69,7 +73,10 @@ class PearsonRTIApiClient(AbstractSOAPClient):
         Returns:
             <Dict>: Parsed xml response to Dict format.
         """
-        xml_response = self.make_post("cxfws2/services/CDDService", payload)
+        xml_response = BeautifulSoup(
+            self.make_post("cxfws2/services/CDDService", payload),
+            "xml",
+        )
         fault = xml_response.find("soapenv:Fault")
 
         # There are multiple kind of errors, some of them generates a soapenv:Fault section and others
@@ -112,7 +119,10 @@ class PearsonRTIApiClient(AbstractSOAPClient):
         Returns:
             <Dict>: Parsed xml response to Dict format.
         """
-        xml_response = self.make_post("cxfws2/services/EADService", payload)
+        xml_response = BeautifulSoup(
+            self.make_post("cxfws2/services/EADService", payload),
+            "xml",
+        )
         fault = xml_response.find("soapenv:Fault")
 
         # There are multiple kind of errors, some of them generates a soapenv:Fault section and others

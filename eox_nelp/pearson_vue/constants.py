@@ -107,3 +107,76 @@ PAYLOAD_EAD = """
     </soapenv:Body>
 </soapenv:Envelope>
 """
+from pydantic import BaseModel, Field, root_validator
+
+class Password(BaseModel):
+    type: str = Field(default='http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText', alias="@type")
+    text: str = Field(alias="#text")
+
+class UsernameToken(BaseModel):
+    xmlns_wsu: str = Field(default="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", alias="@xmlns:wsu")
+    id: str = Field(default="UsernameToken-26398355", alias="@wsu:Id")
+    username: str = Field(default="YourUsername", alias="wsse:Username")
+    password: Password = Field(alias="wsse:Password")
+
+class Security(BaseModel):
+    xmlns_wsse: str = Field(default="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", alias="@xmlns:wsse")
+    mustUnderstand: str = Field(default="1", alias="@soapenv:mustUnderstand")
+    usernameToken: UsernameToken = Field(alias="wsse:UsernameToken")
+
+class Header(BaseModel):
+    security: Security = Field(alias="wsse:Security")
+
+class Phone(BaseModel):
+    phoneNumber: str
+    phoneCountryCode: str
+
+class Mobile(BaseModel):
+    mobileNumber: str
+    mobileCountryCode: str
+
+class Address(BaseModel):
+    addressType: str
+    companyName: str = None
+    address1: str
+    address2: str = None
+    city: str
+    state: str
+    postalCode: str
+    country: str
+    phone: Phone = None
+    mobile: Mobile = None
+
+class PrimaryAddress(Address):
+    pass
+
+class AlternateAddress(Address):
+    pass
+
+class CandidateName(BaseModel):
+    firstName: str
+    lastName: str
+    middleName: str = None
+    salutation: str = None
+    suffix: str = None
+
+class WebAccountInfo(BaseModel):
+    email: str
+
+class CddRequest(BaseModel):
+    clientCandidateID: str = Field(alias="@clientCandidateID")
+    clientID: str = Field(alias="@clientID")
+    candidateName: CandidateName
+    webAccountInfo: WebAccountInfo
+    lastUpdate: str
+    primaryAddress: PrimaryAddress
+    alternateAddress: AlternateAddress
+
+class Body(BaseModel):
+    cddRequest: CddRequest = Field(alias="sch:cddRequest")
+
+class Envelope(BaseModel):
+    xmlns_sch: str = Field(default="http://ws.pearsonvue.com/rti/cdd/schema", alias="@xmlns:sch")
+    xmlns_soapenv: str = Field(default="http://www.w3.org/2003/05/soap-envelope", alias="@xmlns:soapenv")
+    soapenv_Header: Header = Field(alias="soapenv:Header")
+    soapenv_Body: Body = Field(alias="soapenv:Body")

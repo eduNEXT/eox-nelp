@@ -116,36 +116,36 @@ class Password(BaseModel):
 class UsernameToken(BaseModel):
     xmlns_wsu: str = Field(default="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd", alias="@xmlns:wsu")
     id: str = Field(default="UsernameToken-26398355", alias="@wsu:Id")
-    username: str = Field(default="YourUsername", alias="wsse:Username")
+    username: str = Field(alias="wsse:Username")
     password: Password = Field(alias="wsse:Password")
 
 class Security(BaseModel):
     xmlns_wsse: str = Field(default="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd", alias="@xmlns:wsse")
-    mustUnderstand: str = Field(default="1", alias="@soapenv:mustUnderstand")
-    usernameToken: UsernameToken = Field(alias="wsse:UsernameToken")
+    must_understand: str = Field(default="1", alias="@soapenv:mustUnderstand")
+    username_token: UsernameToken = Field(alias="wsse:UsernameToken")
 
 class Header(BaseModel):
     security: Security = Field(alias="wsse:Security")
 
 class Phone(BaseModel):
-    phoneNumber: str
-    phoneCountryCode: str
+    phone_number: str = Field(alias="phoneNumber")
+    phone_country_code: str = Field(alias="phoneCountryCode")
 
 class Mobile(BaseModel):
-    mobileNumber: str
-    mobileCountryCode: str
+    mobile_number: str = Field(alias="mobileNumber")
+    mobile_country_code: str = Field(alias="mobileCountryCode")
 
 class Address(BaseModel):
-    addressType: str
-    companyName: str = None
-    address1: str
-    address2: str = None
-    city: str
-    state: str
-    postalCode: str
-    country: str
-    phone: Phone = None
-    mobile: Mobile = None
+    adress_type: str = Field(alias="addressType")
+    company_name: str = Field(alias="companyName")
+    address1: str = Field(alias="address1")
+    address2: str = Field(alias="address2")
+    city: str = Field(alias="city")
+    state: str = Field(alias="state")
+    postal_code: str = Field(alias="postalCode")
+    country: str = Field(alias="country")
+    phone: Phone = Field(alias="phone")
+    mobile: Mobile = Field(alias="mobile")
 
 class PrimaryAddress(Address):
     pass
@@ -154,29 +154,29 @@ class AlternateAddress(Address):
     pass
 
 class CandidateName(BaseModel):
-    firstName: str
-    lastName: str
-    middleName: str = None
-    salutation: str = None
-    suffix: str = None
+    first_name: str = Field(alias="firstName")
+    last_name: str = Field(alias="lastName")
+    middle_name: str = Field(alias="middleName")
+    salutation: str = Field(alias="salutation")
+    suffix: str = Field(alias="suffix")
 
 class WebAccountInfo(BaseModel):
-    email: str
+    email: str = Field(alias="email")
 
 class CddRequest(BaseModel):
-    clientCandidateID: str = Field(alias="@clientCandidateID")
-    clientID: str = Field(alias="@clientID")
-    candidateName: CandidateName
-    webAccountInfo: WebAccountInfo
-    lastUpdate: str
-    primaryAddress: PrimaryAddress
-    alternateAddress: AlternateAddress
+    client_candidate_id: str = Field(alias="@clientCandidateID")
+    client_id: str = Field(alias="@clientID")
+    candidate_name: CandidateName = Field(alias="candidateName")
+    web_account_info: WebAccountInfo = Field(alias="webAccountInfo")
+    last_update: str = Field(alias="lastUpdate")
+    primary_address: PrimaryAddress = Field(alias="primaryAddress")
+    alternat_address: AlternateAddress = Field(alias="alternateAddress")
 
 class Body(BaseModel):
-    cddRequest: CddRequest = Field(alias="sch:cddRequest")
+    cdd_request: CddRequest = Field(alias="sch:cddRequest")
 
 class Envelope(BaseModel):
     xmlns_sch: str = Field(default="http://ws.pearsonvue.com/rti/cdd/schema", alias="@xmlns:sch")
     xmlns_soapenv: str = Field(default="http://www.w3.org/2003/05/soap-envelope", alias="@xmlns:soapenv")
-    soapenv_Header: Header = Field(alias="soapenv:Header")
-    soapenv_Body: Body = Field(alias="soapenv:Body")
+    soapenv_header: Header = Field(alias="soapenv:Header")
+    soapenv_body: Body = Field(alias="soapenv:Body")

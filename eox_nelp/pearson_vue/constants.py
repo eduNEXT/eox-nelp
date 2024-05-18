@@ -128,24 +128,24 @@ class Header(BaseModel):
     security: Security = Field(alias="wsse:Security")
 
 class Phone(BaseModel):
-    phone_number: str = Field(alias="phoneNumber")
-    phone_country_code: str = Field(alias="phoneCountryCode")
+    phone_number: str = Field(alias="phoneNumber", max_length=20)
+    phone_country_code: str = Field(alias="phoneCountryCode", max_length=3)
 
 class Mobile(BaseModel):
-    mobile_number: str = Field(alias="mobileNumber")
-    mobile_country_code: str = Field(alias="mobileCountryCode")
+    mobile_number: str = Field(alias="mobileNumber", max_length=20)
+    mobile_country_code: str = Field(alias="mobileCountryCode", max_length=3)
 
 class Address(BaseModel):
-    adress_type: str = Field(alias="addressType")
-    company_name: str = Field(alias="companyName")
-    address1: str = Field(alias="address1")
-    address2: str = Field(alias="address2")
-    city: str = Field(alias="city")
-    state: str = Field(alias="state")
-    postal_code: str = Field(alias="postalCode")
-    country: str = Field(alias="country")
-    phone: Phone = Field(alias="phone")
-    mobile: Mobile = Field(alias="mobile")
+    adress_type: Optional[str] = Field(alias="addressType", default=None)
+    company_name: Optional[str] = Field(alias="companyName", default=None, max_length=50)
+    address1: str = Field(alias="address1", max_length=40)
+    address2: Optional[str] = Field(alias="address2", default=None, max_length=40)
+    city: str = Field(alias="city", max_length=32)
+    state: Optional[str] = Field(alias="state", default=None, max_length=50)
+    postal_code: Optional[str] = Field(alias="postalCode", default=None, max_length=16)
+    country: str = Field(alias="country", max_length=3)
+    phone: Optional = Field(alias="phone")
+    mobile: Optional = Field(alias="mobile")
 
 class PrimaryAddress(Address):
     pass
@@ -154,23 +154,24 @@ class AlternateAddress(Address):
     pass
 
 class CandidateName(BaseModel):
-    first_name: str = Field(alias="firstName")
-    last_name: str = Field(alias="lastName")
-    middle_name: str = Field(alias="middleName")
-    salutation: str = Field(alias="salutation")
-    suffix: str = Field(alias="suffix")
+    first_name: str = Field(alias="firstName", max_length=30)
+    last_name: str = Field(alias="lastName",max_length=50)
+    middle_name: Optional[str] = Field(alias="middleName", default= None, max_length=30)
+    salutation: Optional[str] = Field(alias="salutation", default=None, max_length=50)
+    suffix: Optional[str] = Field(alias="suffix", default=None, max_length=10)
 
 class WebAccountInfo(BaseModel):
-    email: str = Field(alias="email")
+    email: str = Field(alias="email", max_length=255)
 
 class CddRequest(BaseModel):
-    client_candidate_id: str = Field(alias="@clientCandidateID")
+    candidate_id: Optional[str] = Field(alias="@candidateID", default=None)
+    client_candidate_id: Optional[str] = Field(alias="@clientCandidateID", default=None, max_length=50)
     client_id: str = Field(alias="@clientID")
     candidate_name: CandidateName = Field(alias="candidateName")
     web_account_info: WebAccountInfo = Field(alias="webAccountInfo")
     last_update: str = Field(alias="lastUpdate")
     primary_address: PrimaryAddress = Field(alias="primaryAddress")
-    alternat_address: AlternateAddress = Field(alias="alternateAddress")
+    alternate_address: Optional[AlternateAddress] = Field(alias="alternateAddress", default=None)
 
 class Body(BaseModel):
     cdd_request: CddRequest = Field(alias="sch:cddRequest")

@@ -181,3 +181,16 @@ class Envelope(BaseModel):
     xmlns_soapenv: str = Field(default="http://www.w3.org/2003/05/soap-envelope", alias="@xmlns:soapenv")
     soapenv_header: Header = Field(alias="soapenv:Header")
     soapenv_body: Body = Field(alias="soapenv:Body")
+
+
+class EadRequest(BaseModel):
+    client_id: str = Field(alias="@clientID")
+    authorization_transaction_type: str = Field(alias="@authorizationTransactionType")
+    authorization_id: Optional[str] = Field(alias="@authorizationID", default=None)
+    client_authorization_id: Optional[str] = Field(alias="@clientAuthorizationID", default=None, max_length=25)
+    client_candidate_id: Optional[str] = Field(alias="clientCandidateID", default=None, max_length=50)
+    exam_authorization_count: str = Field(alias="examAuthorizationCount")
+    exam_series_code: str = Field(alias="examSeriesCode", max_length=20)
+    elegibility_appt_date_first: str = Field(alias="eligibilityApptDateFirst")
+    elegibility_appt_date_last: str = Field(alias="eligibilityApptDateLast")
+    last_update: str = Field(alias="lastUpdate")

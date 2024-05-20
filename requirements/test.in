@@ -1,6 +1,7 @@
 -c constraints.txt
 -r base.txt
 
+django-countries
 pycodestyle
 pylint
 coverage

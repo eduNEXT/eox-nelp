@@ -24,6 +24,7 @@ asgiref==3.8.1
     # via
     #   -r requirements/base.txt
     #   django
+    #   django-countries
     #   django-simple-history
 astroid==3.2.2
     # via pylint
@@ -133,6 +134,8 @@ django==3.2.25
     #   openedx-events
     #   openedx-filters
     #   social-auth-app-django
+django-countries==7.6.1
+    # via -r requirements/test.in
 django-crum==0.7.9
     # via
     #   -r requirements/base.txt
@@ -551,6 +554,7 @@ typing-extensions==4.11.0
     #   -r requirements/base.txt
     #   asgiref
     #   astroid
+    #   django-countries
     #   edx-opaque-keys
     #   jwcrypto
     #   pydantic

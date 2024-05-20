@@ -39,6 +39,9 @@ class RealTimeImport:
             self.backend_data["pipeline_index"] = pipeline_index + idx
             result = func(**self.backend_data) or {}
             self.backend_data.update(result)
+            if result.get("safely_pipeline_termination"):
+                self.backend_data["pipeline_index"] = len(pipeline) - 1
+                break
 
     def get_pipeline(self):
         """

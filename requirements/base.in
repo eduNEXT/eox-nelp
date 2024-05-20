@@ -19,6 +19,7 @@ event-tracking
 mako
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters
+phonenumbers
 pydantic
 requests-oauthlib
 requests-pkcs12==1.22

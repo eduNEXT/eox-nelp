@@ -109,7 +109,7 @@ django-model-utils==4.5.1
     # via
     #   edx-proctoring
     #   edx-when
-django-oauth-toolkit==2.3.0
+django-oauth-toolkit==2.4.0
     # via eox-core
 django-oauth2-provider==0.2.6.1
     # via eox-core
@@ -255,6 +255,8 @@ path==16.14.0
     # via edx-i18n-tools
 pbr==6.0.0
     # via stevedore
+phonenumbers==8.13.37
+    # via -r requirements/base.in
 polib==1.2.0
     # via edx-i18n-tools
 prompt-toolkit==3.0.43
@@ -301,6 +303,7 @@ python3-openid==3.2.0
 pytz==2024.1
     # via
     #   django
+    #   django-oauth-toolkit
     #   drf-yasg
     #   edx-proctoring
     #   event-tracking
@@ -328,7 +331,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 requests-pkcs12==1.22
     # via -r requirements/base.in
-rules==3.3
+rules==3.4
     # via edx-proctoring
 semantic-version==2.10.0
     # via edx-drf-extensions

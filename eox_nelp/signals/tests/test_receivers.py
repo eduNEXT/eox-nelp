@@ -33,6 +33,8 @@ from eox_nelp.signals.receivers import (
     mt_course_completion_handler,
     mt_course_failed_handler,
     mt_course_passed_handler,
+    pearson_vue_course_completion_handler,
+    pearson_vue_course_passed_handler,
     update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
@@ -685,4 +687,82 @@ class MtCourseFailedHandlerTestCase(unittest.TestCase):
             course_id=course_id,
             stage_result=2,
             force_graded=True,
+        )
+
+
+class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
+    """Test class for pearson_vue_course_completion_handler function."""
+
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
+    def test_invalid_feature_flag(self, task_mock):
+        """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is False.
+
+        Expected behavior:
+            - real_time_import_task mock has not been called.
+        """
+        instance = Mock()
+        instance.user_id = 17
+        course_id = "course-v1:test+Cx105+2022_T4"
+        instance.context_key = CourseKey.from_string(course_id)
+
+        pearson_vue_course_completion_handler(instance)
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
+    def test_call_async_task(self, task_mock):
+        """Test that the async task is called with the right parameters
+
+        Expected behavior:
+            - delay method is called with the right values.
+        """
+        instance = Mock()
+        instance.user_id = 5
+        course_id = "course-v1:test+Cx105+2022_T4"
+        instance.context_key = CourseKey.from_string(course_id)
+
+        pearson_vue_course_completion_handler(instance)
+
+        task_mock.delay.assert_called_with(
+            user_id=instance.user_id,
+            course_id=course_id,
+        )
+
+
+class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
+    """Test class for mt_course_passed_handler function."""
+
+    @patch("eox_nelp.signals.receivers.update_mt_training_stage")
+    def test_invalid_feature_flag(self, task_mock):
+        """Test when the PEARSON_RTI_ACTIVATE_GRADED_GATE settings is False.
+
+        Expected behavior:
+            - real_time_import_task mock has not been called.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user_instance, _ = User.objects.get_or_create(username="Severus")
+
+        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(course_id))
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True)
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
+    def test_call_async_task(self, task_mock):
+        """Test that the async task is called with the right parameters
+
+        Expected behavior:
+            - delay method is called with the right values.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user_instance, _ = User.objects.get_or_create(username="Severus")
+
+        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(course_id))
+
+        task_mock.delay.assert_called_with(
+            course_id=course_id,
+            user_id=user_instance.id,
+            is_passing=True,
+            is_graded=True
         )

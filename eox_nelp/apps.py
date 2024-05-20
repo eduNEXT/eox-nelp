@@ -101,6 +101,17 @@ class EoxNelpConfig(AppConfig):
                         'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_FAILED',
                         'dispatch_uid': 'mt_course_failed_receiver',
                     },
+                    {
+                        'receiver_func_name': 'pearson_vue_course_completion_handler',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'pearson_vue_course_completion_receiver',
+                        'sender_path': 'completion.models.BlockCompletion',
+                    },
+                    {
+                        'receiver_func_name': 'pearson_vue_course_passed_handler',
+                        'signal_path': 'openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_PASSED',
+                        'dispatch_uid': 'pearson_vue_course_passed_receiver',
+                    },
                 ],
             },
         },

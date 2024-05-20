@@ -7,6 +7,8 @@ called sequentially, where each function processes data and passes it along to t
 Functions:
     get_user_data(data: dict) -> dict: Retrieves and processes user data.
 """
+import logging
+
 import phonenumbers
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,8 +18,44 @@ from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.utils import update_xml_with_dict
+from eox_nelp.signals.utils import get_completed_and_graded
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+
+def check_completion_metadata(user_id, course_id, **kwargs):
+    """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
+    has 3 behaviours depending the case:
+        - is_passing is true means the course is graded(passed) and dont needs this pipe validation.
+          The pipeline continues without changes.
+        - is_complete=True and is_graded=False pipeline should continue with uploaded metadata
+          (completed courses and not graded).
+        - Otherwise the pipeline will stop, for grading-courses the COURSE_GRADE_NOW_PASSED signal would act.
+
+    Args:
+        user_id (int): The ID of the user whose data is to be retrieved.
+        course_id (str): course_id to check completion or graded.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        dict: Pipeline dict
+    """
+    if kwargs.get("is_passing"):
+        return None
+
+    is_complete, is_graded = get_completed_and_graded(user_id, course_id)
+
+    if is_complete and not is_graded:
+        return {
+            "is_complete": is_complete,
+            "is_graded": is_graded,
+        }
+
+    return {
+        "safely_pipeline_termination": True,
+    }
 
 
 def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument

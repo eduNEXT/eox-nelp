@@ -14,6 +14,7 @@ from django_countries.fields import Country
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
+    check_completion_metadata,
     check_service_availability,
     get_exam_data,
     get_user_data,
@@ -22,6 +23,129 @@ from eox_nelp.pearson_vue.pipeline import (
 )
 
 User = get_user_model()
+
+
+class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
+    """
+    Unit tests for the check_completion_metadata function.
+    """
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.user_id = 1
+        self.course_id = "course-v1:edX+213+2121"
+
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_check_is_passing_bypass(self, get_completed_and_graded_mock):
+        """Test the pipeline dont do anything if is_passing kwarg is truthy.
+        Expected behavior:
+            - get_completed_and_graded_mock is not called.
+            - Returned value is an empty dict
+
+        """
+        pipeline_kwargs = {"is_passing": True}
+
+        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+
+        get_completed_and_graded_mock.assert_not_called()
+        self.assertIsNone(result)
+
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_check_is_complete_not_graded(self, get_completed_and_graded_mock):
+        """Test the pipeline return expected dict with empty `is_passing`, and
+           is_complete=True, is_graded=False.
+        Expected behavior:
+            - Returned value is dict with is_complete and is_graded.
+
+        """
+        pipeline_kwargs = {}
+        get_complete_and_graded_output = {
+            "is_complete": True,
+            "is_graded": False,
+        }
+        expected_output = get_complete_and_graded_output
+        get_completed_and_graded_mock.return_value = (
+            get_complete_and_graded_output["is_complete"],
+            get_complete_and_graded_output["is_graded"],
+        )
+
+        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+
+        self.assertDictEqual(expected_output, result)
+
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_check_not_complete_not_graded(self, get_completed_and_graded_mock):
+        """Test the pipeline return expected dict(safely_pipeline_termination) with empty `is_passing`, and
+           is_complete=False, is_graded=False.
+        Expected behavior:
+            - Returned value is dict with `safely_pipeline_termination`
+        """
+        pipeline_kwargs = {}
+        get_complete_and_graded_output = {
+            "is_complete": False,
+            "is_graded": False,
+        }
+        expected_output = {
+            "safely_pipeline_termination": True,
+        }
+        get_completed_and_graded_mock.return_value = (
+            get_complete_and_graded_output["is_complete"],
+            get_complete_and_graded_output["is_graded"],
+        )
+
+        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+
+        self.assertDictEqual(expected_output, result)
+
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_check_not_complete_graded(self, get_completed_and_graded_mock):
+        """Test the pipeline return expected dict(safely_pipeline_termination) with empty `is_passing`, and
+           is_complete=False, is_graded=True.
+        Expected behavior:
+            - Returned value is dict with `safely_pipeline_termination`
+        """
+        pipeline_kwargs = {}
+        get_complete_and_graded_output = {
+            "is_complete": False,
+            "is_graded": True,
+        }
+        expected_output = {
+            "safely_pipeline_termination": True,
+        }
+        get_completed_and_graded_mock.return_value = (
+            get_complete_and_graded_output["is_complete"],
+            get_complete_and_graded_output["is_graded"],
+        )
+
+        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+
+        self.assertDictEqual(expected_output, result)
+
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_check_complete_graded(self, get_completed_and_graded_mock):
+        """Test the pipeline return expected dict(safely_pipeline_termination) with empty `is_passing`, and
+           is_complete=True, is_graded=True.
+        Expected behavior:
+            - Returned value is dict with `safely_pipeline_termination`
+        """
+        pipeline_kwargs = {}
+        get_complete_and_graded_output = {
+            "is_complete": False,
+            "is_graded": True,
+        }
+        expected_output = {
+            "safely_pipeline_termination": True,
+        }
+        get_completed_and_graded_mock.return_value = (
+            get_complete_and_graded_output["is_complete"],
+            get_complete_and_graded_output["is_graded"],
+        )
+
+        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+
+        self.assertDictEqual(expected_output, result)
 
 
 @ddt

@@ -58,6 +58,9 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.PEARSON_RTI_WSDL_URL = 'https://testing.com'
     settings.PEARSON_RTI_CERT = '/openedx/certs/cert.p12'
     settings.PEARSON_RTI_PASSPHRASE = 'test-password'
+    settings.PEARSON_RTI_WSDL_USERNAME = "testing"
+    settings.PEARSON_RTI_WSDL_PASSWORD = "12345678p"
+    settings.PEARSON_RTI_WSDL_CLIENT_ID = "12345678"
 
 
 SETTINGS = SettingsClass()

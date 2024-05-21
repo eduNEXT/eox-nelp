@@ -32,3 +32,11 @@ def get_student_roles():
         Mock class.
     """
     return Mock()
+
+
+def get_anonymous_id_for_user():
+    """Return test class.
+    Returns:
+        Mock class.
+    """
+    return Mock()

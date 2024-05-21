@@ -24,8 +24,9 @@ asgiref==3.8.1
     # via
     #   -r requirements/base.txt
     #   django
+    #   django-countries
     #   django-simple-history
-astroid==3.2.0
+astroid==3.2.2
     # via pylint
 attrs==23.2.0
     # via
@@ -133,6 +134,8 @@ django==3.2.25
     #   openedx-events
     #   openedx-filters
     #   social-auth-app-django
+django-countries==7.6.1
+    # via -r requirements/test.in
 django-crum==0.7.9
     # via
     #   -r requirements/base.txt
@@ -155,7 +158,7 @@ django-model-utils==4.5.1
     #   -r requirements/base.txt
     #   edx-proctoring
     #   edx-when
-django-oauth-toolkit==2.3.0
+django-oauth-toolkit==2.4.0
     # via
     #   -r requirements/base.txt
     #   eox-core
@@ -369,6 +372,8 @@ pbr==6.0.0
     # via
     #   -r requirements/base.txt
     #   stevedore
+phonenumbers==8.13.37
+    # via -r requirements/base.txt
 platformdirs==4.2.2
     # via pylint
 polib==1.2.0
@@ -416,7 +421,7 @@ pyjwt[crypto]==2.8.0
     #   edx-proctoring
     #   edx-rest-api-client
     #   social-auth-core
-pylint==3.2.0
+pylint==3.2.2
     # via -r requirements/test.in
 pymongo==3.13.0
     # via
@@ -450,6 +455,7 @@ pytz==2024.1
     # via
     #   -r requirements/base.txt
     #   django
+    #   django-oauth-toolkit
     #   drf-yasg
     #   edx-proctoring
     #   event-tracking
@@ -479,7 +485,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 requests-pkcs12==1.22
     # via -r requirements/base.txt
-rules==3.3
+rules==3.4
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -548,6 +554,7 @@ typing-extensions==4.11.0
     #   -r requirements/base.txt
     #   asgiref
     #   astroid
+    #   django-countries
     #   edx-opaque-keys
     #   jwcrypto
     #   pydantic

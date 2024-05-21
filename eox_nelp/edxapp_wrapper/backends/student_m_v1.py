@@ -7,6 +7,7 @@ from common.djangoapps.student.models import (  # pylint: disable=import-error
     CourseAccessRole,
     CourseEnrollment,
     UserProfile,
+    anonymous_id_for_user,
 )
 
 
@@ -44,3 +45,13 @@ def get_student_roles():
         Roles module.
     """
     return roles
+
+
+def get_anonymous_id_for_user():
+    """Allow to get anonymous_id_for_user function from
+    https://github.com/nelc/edx-platform/blob/open-release/palm.nelp/common/djangoapps/student/models/user.py#L92
+
+    Returns:
+        anonymous_id_for_user function.
+    """
+    return anonymous_id_for_user

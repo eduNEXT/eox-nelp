@@ -5,6 +5,7 @@ and executing various processes related to rti.
 Classes:
     RealTimeImport: Class for managing RTI operations and executing the pipeline.
 """
+from eox_nelp.pearson_vue.pipeline import get_user_data
 
 
 class RealTimeImport:
@@ -45,5 +46,5 @@ class RealTimeImport:
         Returns the RTI pipeline, which is a list of functions to be executed.
         """
         return [
-            # Add RTI pipeline functions here
+            get_user_data,
         ]

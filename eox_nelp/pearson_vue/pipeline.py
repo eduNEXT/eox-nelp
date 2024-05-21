@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def check_completion_metadata(user_id, course_id, **kwargs):
+def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
     """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
     has 3 behaviours depending the case:
         - is_passing is true means the course is graded(passed) and dont needs this pipe validation.
@@ -48,10 +48,7 @@ def check_completion_metadata(user_id, course_id, **kwargs):
     is_complete, is_graded = get_completed_and_graded(user_id, course_id)
 
     if is_complete and not is_graded:
-        return {
-            "is_complete": is_complete,
-            "is_graded": is_graded,
-        }
+        return None
 
     return {
         "safely_pipeline_termination": True,

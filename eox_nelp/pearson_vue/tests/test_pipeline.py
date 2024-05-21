@@ -14,12 +14,12 @@ from django_countries.fields import Country
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
-    check_completion_metadata,
     check_service_availability,
     get_exam_data,
     get_user_data,
     import_candidate_demographics,
     import_exam_authorization,
+    terminate_not_full_completion_cases,
 )
 
 User = get_user_model()
@@ -27,7 +27,7 @@ User = get_user_model()
 
 class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
     """
-    Unit tests for the check_completion_metadata function.
+    Unit tests for the terminate_not_full_completion_cases function.
     """
 
     def setUp(self):
@@ -47,7 +47,7 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
         """
         pipeline_kwargs = {"is_passing": True}
 
-        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
 
         get_completed_and_graded_mock.assert_not_called()
         self.assertIsNone(result)
@@ -65,15 +65,14 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
             "is_complete": True,
             "is_graded": False,
         }
-        expected_output = get_complete_and_graded_output
         get_completed_and_graded_mock.return_value = (
             get_complete_and_graded_output["is_complete"],
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
 
-        self.assertDictEqual(expected_output, result)
+        self.assertIsNone(result)
 
     @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
     def test_check_not_complete_not_graded(self, get_completed_and_graded_mock):
@@ -95,7 +94,7 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 
@@ -119,7 +118,7 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 
@@ -143,7 +142,7 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = check_completion_metadata(self.user_id, self.course_id, **pipeline_kwargs)
+        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 

@@ -13,10 +13,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
-from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eventtracking import tracker
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import UsageKey
 
 from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.futurex import FuturexApiClient
@@ -25,9 +24,8 @@ from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
-from eox_nelp.signals.utils import _user_has_passing_grade
+from eox_nelp.signals.utils import _user_has_passing_grade, get_completed_and_graded, get_completion_summary
 
-courses = get_courseware_courses()
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
@@ -73,21 +71,6 @@ def _post_futurex_progress(data):
     )
 
 
-def _get_completion_summary(user, course_id):
-    """Get completion summary of a user in a course.
-
-    Args:
-        user (User): User object
-        course_id (CourseLocator): Unique course identifier.
-
-    Returns:
-        completion_summary(dict): Completion summary of the user in the course.
-    """
-    course_key = CourseKey.from_string(course_id)
-
-    return courses.get_course_blocks_completion_summary(course_key, user)
-
-
 def _generate_progress_enrollment_data(user, course_id, user_has_passing_grade):
     """Generate the data that with the shape that use progress-enrollment endpoint of futurex.
 
@@ -100,7 +83,7 @@ def _generate_progress_enrollment_data(user, course_id, user_has_passing_grade):
     Returns:
         progress_enrollment_data (dict): dict to send to futurex enrollment progress.
     """
-    completion_summary = _get_completion_summary(user, course_id)
+    completion_summary = get_completion_summary(user, course_id)
 
     if completion_summary:
         complete_units = completion_summary["complete_count"]
@@ -245,12 +228,7 @@ def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=
         national_id (str): User identifier.
     """
     user = User.objects.get(id=user_id)
-    course_key = CourseKey.from_string(course_id)
-    descriptor = modulestore().get_course(course_key)
-    grading_policy = descriptor.grading_policy
-    completion_summary = _get_completion_summary(user, course_id)
-    is_complete = completion_summary["incomplete_count"] == 0
-    graded = bool(grading_policy["GRADER"])
+    is_complete, graded = get_completed_and_graded(user_id, course_id)
 
     if not is_complete or (force_graded and not graded) or (not force_graded and graded):
         return

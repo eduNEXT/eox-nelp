@@ -6,13 +6,16 @@ Functions:
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from eox_core.edxapp_wrapper.courseware import get_courseware_courses
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.utils import is_valid_national_id
 
 CourseGradeFactory = get_course_grade_factory()
 User = get_user_model()
+courses = get_courseware_courses()
 
 
 def _generate_external_certificate_data(time, certificate_data):
@@ -81,3 +84,40 @@ def generate_reference_id(national_id, course_id):
     is_valid_national_id(national_id, raise_exception=True)
 
     return f"{national_id}~{course_id}"
+
+
+def get_completion_summary(user, course_id):
+    """Get completion summary of a user in a course.
+
+    Args:
+        user (User): User object
+        course_id (CourseLocator): Unique course identifier.
+
+    Returns:
+        completion_summary(dict): Completion summary of the user in the course.
+    """
+    course_key = CourseKey.from_string(course_id)
+
+    return courses.get_course_blocks_completion_summary(course_key, user)
+
+
+def get_completed_and_graded(user_id, course_id):
+    """Get the is_complete or is graded info related user and course.
+    Returns a tuple with that info.
+
+    Args:
+        user_id (str): User id to analize completion and grading.
+        course_id (str): CourseId to analize completion and grading.
+
+    Returns:
+        is_complete(bool), is_graded(bool): bool flags telling that the course is complete or graded.
+    """
+    user = User.objects.get(id=user_id)
+    course_key = CourseKey.from_string(course_id)
+    descriptor = modulestore().get_course(course_key)
+    grading_policy = descriptor.grading_policy
+    completion_summary = get_completion_summary(user, course_id)
+    is_complete = completion_summary["incomplete_count"] == 0
+    is_graded = bool(grading_policy["GRADER"])
+
+    return is_complete, is_graded

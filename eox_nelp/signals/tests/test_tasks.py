@@ -1,7 +1,7 @@
 """This file contains all the test for tasks.py file.
 
 Classes:
-    GetCompletionSummaryTestCase: Test _get_completion_summary method.
+    GetCompletionSummaryTestCase: Test get_completion_summary method.
     GenerateProgressEnrollmentDataTestCase: Test _generate_progress_enrollment_data method.
     UpdateMtTrainingStageTestCase: Test update_mt_training_stage task.
     CourseCompletionMtUpdaterTestCase: Test course_completion_mt_updater task.
@@ -23,7 +23,6 @@ from eox_nelp.edxapp_wrapper.modulestore import modulestore
 from eox_nelp.signals import tasks
 from eox_nelp.signals.tasks import (
     _generate_progress_enrollment_data,
-    _get_completion_summary,
     _post_futurex_progress,
     course_completion_mt_updater,
     create_external_certificate,
@@ -31,6 +30,7 @@ from eox_nelp.signals.tasks import (
     emit_subsection_attempt_event_task,
     update_mt_training_stage,
 )
+from eox_nelp.signals.utils import get_completion_summary
 from eox_nelp.tests.utils import generate_list_mock_data
 
 User = get_user_model()
@@ -170,9 +170,9 @@ class PostFuturexProgressTestCase(unittest.TestCase):
 
 
 class GetCompletionSummaryTestCase(unittest.TestCase):
-    """Test class for _get_completion_summary"""
+    """Test class for get_completion_summary"""
 
-    @patch("eox_nelp.signals.tasks.courses")
+    @patch("eox_nelp.signals.utils.courses")
     def test_get_course_blocks(self, courses_mock):
         """Test standard call with the required parameters.
 
@@ -183,7 +183,7 @@ class GetCompletionSummaryTestCase(unittest.TestCase):
         course_id = "course-v1:test+Cx105+2022_T4"
         course_key = CourseKey.from_string(course_id)
 
-        _get_completion_summary(user, course_id)
+        get_completion_summary(user, course_id)
 
         courses_mock.get_course_blocks_completion_summary.assert_called_with(course_key, user)
 
@@ -193,7 +193,7 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
 
     def setUp(self):
         """ Set common conditions for test cases."""
-        patcher1 = patch("eox_nelp.signals.tasks._get_completion_summary")
+        patcher1 = patch("eox_nelp.signals.tasks.get_completion_summary")
         patcher2 = patch("eox_nelp.signals.tasks.get_enrollment")
         patcher3 = patch("eox_nelp.signals.tasks.CourseOverview")
 
@@ -226,7 +226,7 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
             patcher.stop()
 
     def test_empty_completion_summary(self):
-        """Test when _get_completion_summary returns an empty list.
+        """Test when get_completion_summary returns an empty list.
 
         Expected behavior:
             - completion_summary is called with the right values.
@@ -266,7 +266,7 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
         self.assertDictEqual(expected_data, progress_data)
 
     def test_populated_completion_summary(self):
-        """Test when _get_completion_summary returns a dictionary with the standard data.
+        """Test when get_completion_summary returns a dictionary with the standard data.
 
         Expected behavior:
             - completion_summary is called with the right values.
@@ -559,7 +559,7 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         store.get_course.assert_called_once_with(course_key)
 
     @data(([], True), ([1, 2, 3], False))
-    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.utils.get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_invalid_grading_conditions(self, test_data, updater_mock, completion_summary_mock):
         """Test when following conditions are not met:
@@ -583,7 +583,7 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
 
         updater_mock.assert_not_called()
 
-    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.utils.get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_invalid_completion_summary(self, updater_mock, completion_summary_mock):
         """Test when completion summary incomplete count is different from 0.
@@ -606,7 +606,7 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
         self.mock_validations()
 
     @data(([1, 2, 3], True), ([], False))
-    @patch("eox_nelp.signals.tasks._get_completion_summary")
+    @patch("eox_nelp.signals.utils.get_completion_summary")
     @patch("eox_nelp.signals.tasks.update_mt_training_stage")
     def test_update_mt_training_stage_call(self, test_data, updater_mock, completion_summary_mock):
         """Test when following conditions are met and the update_mt_training_stage is called.

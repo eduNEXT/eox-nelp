@@ -41,6 +41,10 @@ class RealTimeImport:
             result = func(**self.backend_data) or {}
             self.backend_data.update(result)
 
+            if result.get("safely_pipeline_termination"):
+                self.backend_data["pipeline_index"] = len(pipeline) - 1
+                break
+
     def get_pipeline(self):
         """
         Returns the RTI pipeline, which is a list of functions to be executed.

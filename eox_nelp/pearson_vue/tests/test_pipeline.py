@@ -124,7 +124,6 @@ class TestCheckServiceAvailability(unittest.TestCase):
                 },
             },
         }
-
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.ping.return_value = {"status": "success"}
 
@@ -190,21 +189,21 @@ class TestImportCandidateDemographics(unittest.TestCase):
         mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_candidate_demographics.return_value = {"status": "accepted"}
-
         input_data = {
-            "anonymous_user_id": "12345",
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@example.com",
-            "address": "123 Main St",
-            "city": "Anytown",
-            "country": "USA",
-            "phone_number": "5551234567",
-            "phone_country_code": "1",
-            "mobile_number": "5551234567",
-            "mobile_country_code": "1",
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john.doe@example.com",
+                "address": "123 Main St",
+                "city": "Anytown",
+                "country": "US",
+                "phone_number": "5551234567",
+                "phone_country_code": "1",
+                "mobile_number": "5551234567",
+                "mobile_country_code": "1",
+            },
         }
-
         expected_payload = {
             "soapenv:Envelope": {
                 "soapenv:Header": {
@@ -219,27 +218,27 @@ class TestImportCandidateDemographics(unittest.TestCase):
                 },
                 "soapenv:Body": {
                     "sch:cddRequest": {
-                        "@clientCandidateID": f'NELC{input_data["anonymous_user_id"]}',
+                        "@clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
                         "candidateName": {
-                            "firstName": input_data["first_name"],
-                            "lastName": input_data["last_name"],
+                            "firstName": input_data["profile_metadata"]["first_name"],
+                            "lastName": input_data["profile_metadata"]["last_name"],
                         },
                         "webAccountInfo": {
-                            "email": input_data["email"],
+                            "email": input_data["profile_metadata"]["email"],
                         },
                         "lastUpdate": mock_timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                         "primaryAddress": {
-                            "address1": input_data["address"],
-                            "city": input_data["city"],
-                            "country": input_data["country"],
+                            "address1": input_data["profile_metadata"]["address"],
+                            "city": input_data["profile_metadata"]["city"],
+                            "country": input_data["profile_metadata"]["country"],
                             "phone": {
-                                "phoneNumber": input_data["phone_number"],
-                                "phoneCountryCode": input_data["phone_country_code"],
+                                "phoneNumber": input_data["profile_metadata"]["phone_number"],
+                                "phoneCountryCode": input_data["profile_metadata"]["phone_country_code"],
                             },
                             "mobile": {
-                                "mobileNumber": input_data["mobile_number"],
-                                "mobileCountryCode": input_data["mobile_country_code"],
+                                "mobileNumber": input_data["profile_metadata"]["mobile_number"],
+                                "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
                             }
                         }
                     },
@@ -269,21 +268,21 @@ class TestImportCandidateDemographics(unittest.TestCase):
         mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_candidate_demographics.return_value = {"status": "error"}
-
         input_data = {
-            "anonymous_user_id": "12345",
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@example.com",
-            "address": "123 Main St",
-            "city": "Anytown",
-            "country": "US",
-            "phone_number": "5551234567",
-            "phone_country_code": "1",
-            "mobile_number": "5551234567",
-            "mobile_country_code": "1",
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john.doe@example.com",
+                "address": "123 Main St",
+                "city": "Anytown",
+                "country": "US",
+                "phone_number": "5551234567",
+                "phone_country_code": "1",
+                "mobile_number": "5551234567",
+                "mobile_country_code": "1",
+            },
         }
-
         expected_payload = {
             "soapenv:Envelope": {
                 "soapenv:Header": {
@@ -298,27 +297,27 @@ class TestImportCandidateDemographics(unittest.TestCase):
                 },
                 "soapenv:Body": {
                     "sch:cddRequest": {
-                        "@clientCandidateID": f'NELC{input_data["anonymous_user_id"]}',
+                        "@clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
                         "candidateName": {
-                            "firstName": input_data["first_name"],
-                            "lastName": input_data["last_name"],
+                            "firstName": input_data["profile_metadata"]["first_name"],
+                            "lastName": input_data["profile_metadata"]["last_name"],
                         },
                         "webAccountInfo": {
-                            "email": input_data["email"],
+                            "email": input_data["profile_metadata"]["email"],
                         },
                         "lastUpdate": mock_timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                         "primaryAddress": {
-                            "address1": input_data["address"],
-                            "city": input_data["city"],
-                            "country": input_data["country"],
+                            "address1": input_data["profile_metadata"]["address"],
+                            "city": input_data["profile_metadata"]["city"],
+                            "country": input_data["profile_metadata"]["country"],
                             "phone": {
-                                "phoneNumber": input_data["phone_number"],
-                                "phoneCountryCode": input_data["phone_country_code"],
+                                "phoneNumber": input_data["profile_metadata"]["phone_number"],
+                                "phoneCountryCode": input_data["profile_metadata"]["phone_country_code"],
                             },
                             "mobile": {
-                                "mobileNumber": input_data["mobile_number"],
-                                "mobileCountryCode": input_data["mobile_country_code"],
+                                "mobileNumber": input_data["profile_metadata"]["mobile_number"],
+                                "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
                             }
                         }
                     },
@@ -353,13 +352,15 @@ class TestImportExamAuthorization(unittest.TestCase):
         mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_exam_authorization.return_value = {"status": "accepted"}
-
         input_data = {
-            "anonymous_user_id": "12345",
-            "exam_authorization_count": 3,
-            "exam_series_code": "ABC",
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+            },
+            "exam_metadata": {
+                "exam_authorization_count": 3,
+                "exam_series_code": "ABC",
+            },
         }
-
         expected_payload = {
             "soapenv:Envelope": {
                 "soapenv:Header": {
@@ -376,9 +377,9 @@ class TestImportExamAuthorization(unittest.TestCase):
                     "sch:eadRequest": {
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
                         "@authorizationTransactionType": "Add",
-                        "clientCandidateID": f'NELC{input_data["anonymous_user_id"]}',
-                        "examAuthorizationCount": input_data["exam_authorization_count"],
-                        "examSeriesCode": input_data["exam_series_code"],
+                        "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
+                        "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
+                        "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
                         "eligibilityApptDateFirst": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
                         "eligibilityApptDateLast": (
                             mock_now() + timezone.timedelta(days=365)
@@ -410,11 +411,14 @@ class TestImportExamAuthorization(unittest.TestCase):
         mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_exam_authorization.return_value = {"status": "error"}
-
         input_data = {
-            "anonymous_user_id": "12345",
-            "exam_authorization_count": 3,
-            "exam_series_code": "ABC",
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+            },
+            "exam_metadata": {
+                "exam_authorization_count": 3,
+                "exam_series_code": "ABC",
+            },
         }
         expected_payload = {
             "soapenv:Envelope": {
@@ -432,9 +436,9 @@ class TestImportExamAuthorization(unittest.TestCase):
                     "sch:eadRequest": {
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
                         "@authorizationTransactionType": "Add",
-                        "clientCandidateID": f'NELC{input_data["anonymous_user_id"]}',
-                        "examAuthorizationCount": input_data["exam_authorization_count"],
-                        "examSeriesCode": input_data["exam_series_code"],
+                        "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
+                        "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
+                        "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
                         "eligibilityApptDateFirst": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
                         "eligibilityApptDateLast": (
                             mock_now() + timezone.timedelta(days=365)

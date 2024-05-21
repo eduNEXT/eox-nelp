@@ -119,7 +119,7 @@ def check_service_availability(**kwargs):  # pylint: disable=unused-argument
         raise Exception("The pearson vue service is not available")  # pylint: disable=broad-exception-raised
 
 
-def import_candidate_demographics(**kwargs):
+def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disable=unused-argument
     """
     Imports candidate demographics data into the Pearson VUE RTI system.
 
@@ -160,27 +160,27 @@ def import_candidate_demographics(**kwargs):
             },
             "soapenv:Body": {
                 "sch:cddRequest": {
-                    "@clientCandidateID": f'NELC{kwargs["anonymous_user_id"]}',
+                    "@clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
                     "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
                     "candidateName": {
-                        "firstName": kwargs["first_name"],
-                        "lastName": kwargs["last_name"],
+                        "firstName": profile_metadata["first_name"],
+                        "lastName": profile_metadata["last_name"],
                     },
                     "webAccountInfo": {
-                        "email": kwargs["email"],
+                        "email": profile_metadata["email"],
                     },
                     "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                     "primaryAddress": {
-                        "address1": kwargs["address"],
-                        "city": kwargs["city"],
-                        "country": kwargs["country"],
+                        "address1": profile_metadata["address"],
+                        "city": profile_metadata["city"],
+                        "country": profile_metadata["country"],
                         "phone": {
-                            "phoneNumber": kwargs["phone_number"],
-                            "phoneCountryCode": kwargs["phone_country_code"],
+                            "phoneNumber": profile_metadata["phone_number"],
+                            "phoneCountryCode": profile_metadata["phone_country_code"],
                         },
                         "mobile": {
-                            "mobileNumber": kwargs["mobile_number"],
-                            "mobileCountryCode": kwargs["mobile_country_code"],
+                            "mobileNumber": profile_metadata["mobile_number"],
+                            "mobileCountryCode": profile_metadata["mobile_country_code"],
                         }
                     }
                 },
@@ -195,7 +195,12 @@ def import_candidate_demographics(**kwargs):
         raise Exception("Error trying to process import candidate demographics request.")
 
 
-def import_exam_authorization(transaccion_type="Add", **kwargs):
+def import_exam_authorization(
+    profile_metadata,
+    exam_metadata,
+    transaccion_type="Add",
+    **kwargs
+):  # pylint: disable=unused-argument
     """
     Imports exam authorization data into the Pearson VUE RTI system.
 
@@ -230,9 +235,9 @@ def import_exam_authorization(transaccion_type="Add", **kwargs):
                 "sch:eadRequest": {
                     "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
                     "@authorizationTransactionType": transaccion_type,
-                    "clientCandidateID": f'NELC{kwargs["anonymous_user_id"]}',
-                    "examAuthorizationCount": kwargs["exam_authorization_count"],
-                    "examSeriesCode": kwargs["exam_series_code"],
+                    "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
+                    "examAuthorizationCount": exam_metadata["exam_authorization_count"],
+                    "examSeriesCode": exam_metadata["exam_series_code"],
                     "eligibilityApptDateFirst": timezone.now().strftime("%Y/%m/%d %H:%M:%S"),
                     "eligibilityApptDateLast": (
                         timezone.now() + timezone.timedelta(days=365)

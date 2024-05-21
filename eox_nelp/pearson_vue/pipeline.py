@@ -119,18 +119,8 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
     If the import request is not accepted, the function raises an exception.
 
     Args:
-        **kwargs: A dictionary containing the following key-value pairs:
-            - anonymous_user_id (str): An anonymized identifier for the user.
-            - first_name (str): The candidate's first name.
-            - last_name (str): The candidate's last name.
-            - email (str): The candidate's email address.
-            - address (str): The candidate's mailing address.
-            - city (str): The city of the candidate's address.
-            - country (str): The country code of the candidate's address.
-            - phone_number (str): The candidate's phone number in national format.
-            - phone_country_code (str): The country code of the candidate's phone number.
-            - mobile_number (str): The candidate's mobile number in national format.
-            - mobile_country_code (str): The country code of the candidate's mobile number.
+        profile_metadata (dict): Basic user data.
+        **kwargs: Additional keyword arguments.
 
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
@@ -201,6 +191,8 @@ def import_exam_authorization(
     an exception.
 
     Args:
+        profile_metadata (dict): Basic user data.
+        exam_metadata (dict): Exam information.
         transaccion_type (str): The type of transaction for the authorization (default is "Add").
         **kwargs: A dictionary containing the following key-value pairs:
             - anonymous_user_id (str): An anonymized identifier for the user.
@@ -228,10 +220,8 @@ def import_exam_authorization(
                     "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
                     "examAuthorizationCount": exam_metadata["exam_authorization_count"],
                     "examSeriesCode": exam_metadata["exam_series_code"],
-                    "eligibilityApptDateFirst": timezone.now().strftime("%Y/%m/%d %H:%M:%S"),
-                    "eligibilityApptDateLast": (
-                        timezone.now() + timezone.timedelta(days=365)
-                    ).strftime("%Y/%m/%d %H:%M:%S"),
+                    "eligibilityApptDateFirst": exam_metadata["eligibility_appt_date_first"],
+                    "eligibilityApptDateLast": exam_metadata["eligibility_appt_date_last"],
                     "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                 },
             },
@@ -243,3 +233,43 @@ def import_exam_authorization(
     if response.get("status", "error") != "accepted":
         # pylint: disable=broad-exception-raised
         raise Exception("Error trying to process import exam authorization request.")
+
+
+def get_exam_data(course_id, **kwargs):  # pylint: disable=unused-argument
+    """
+    Retrieves exam data from Django settings.
+
+    This function fetches the exam data from the settings using the given course ID.
+
+    Args:
+        course_id (str): Unique course identifier.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        dict: A dictionary containing the processed user data, including:
+            - eligibility_appt_date_first (str): First date an appointment can be made.
+            - eligibility_appt_date_last (str): Last date an appointment can be made.
+            - exam_authorization_count (str): Number of times the authorization can be consumed for registrations.
+            - exam_series_code (str): Exam Series code in VUE system.
+
+    Raises:
+        Exception: If the Pearson VUE RTI service does not accept the import request.
+    """
+    courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
+    exam_metadata = courses_data[course_id]
+    required_fields = {
+        "eligibility_appt_date_first",
+        "eligibility_appt_date_last",
+        "exam_authorization_count",
+        "exam_series_code",
+    }
+
+    if required_fields.issubset(exam_metadata.keys()):
+        return {"exam_metadata": exam_metadata}
+
+    raise Exception(  # pylint: disable=broad-exception-raised
+        (
+            "Error trying to get exam data, some fields are missing for course"
+            f"{course_id}. Please check PEARSON_RTI_COURSES_DATA setting."
+        ),
+    )

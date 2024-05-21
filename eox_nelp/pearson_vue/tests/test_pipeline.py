@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.utils import timezone
 from django_countries.fields import Country
 
@@ -14,6 +15,7 @@ from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
     check_service_availability,
+    get_exam_data,
     get_user_data,
     import_candidate_demographics,
     import_exam_authorization,
@@ -350,6 +352,8 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "anonymous_user_id": "12345",
             },
             "exam_metadata": {
+                "eligibility_appt_date_first": "2024/07/15 11:59:59",
+                "eligibility_appt_date_last": "2025/07/15 11:59:59",
                 "exam_authorization_count": 3,
                 "exam_series_code": "ABC",
             },
@@ -373,10 +377,8 @@ class TestImportExamAuthorization(unittest.TestCase):
                         "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
                         "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
-                        "eligibilityApptDateFirst": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
-                        "eligibilityApptDateLast": (
-                            mock_now() + timezone.timedelta(days=365)
-                        ).strftime("%Y/%m/%d %H:%M:%S"),
+                        "eligibilityApptDateFirst": input_data["exam_metadata"]["eligibility_appt_date_first"],
+                        "eligibilityApptDateLast": input_data["exam_metadata"]["eligibility_appt_date_last"],
                         "lastUpdate": mock_now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                     },
                 },
@@ -409,6 +411,8 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "anonymous_user_id": "12345",
             },
             "exam_metadata": {
+                "eligibility_appt_date_first": "2024/07/15 11:59:59",
+                "eligibility_appt_date_last": "2025/07/15 11:59:59",
                 "exam_authorization_count": 3,
                 "exam_series_code": "ABC",
             },
@@ -432,10 +436,8 @@ class TestImportExamAuthorization(unittest.TestCase):
                         "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
                         "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
-                        "eligibilityApptDateFirst": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
-                        "eligibilityApptDateLast": (
-                            mock_now() + timezone.timedelta(days=365)
-                        ).strftime("%Y/%m/%d %H:%M:%S"),
+                        "eligibilityApptDateFirst": input_data["exam_metadata"]["eligibility_appt_date_first"],
+                        "eligibilityApptDateLast": input_data["exam_metadata"]["eligibility_appt_date_last"],
                         "lastUpdate": mock_now().strftime("%Y/%m/%d %H:%M:%S GMT"),
                     },
                 },
@@ -448,3 +450,63 @@ class TestImportExamAuthorization(unittest.TestCase):
         self.assertEqual(str(context.exception), "Error trying to process import exam authorization request.")
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_EAD, expected_payload)
         mock_api_client.return_value.import_exam_authorization.assert_called_once_with(mock_update_xml_with_dict())
+
+
+class TestGetExamData(unittest.TestCase):
+    """
+    Unit tests for the get_exam_data function.
+    """
+
+    @override_settings()
+    def test_get_exam_data_success(self):
+        """
+        Test that the get_exam_data function return the set values.
+
+            Expected behavior:
+            - The result is the expected value.
+        """
+        exam_data = {
+            "eligibility_appt_date_first": "2024/05/05 12:00:00",
+            "eligibility_appt_date_last": "2025/05/05 12:00:00",
+            "exam_authorization_count": 3,
+            "exam_series_code": "ABD",
+        }
+        course_id = "course-v1:FutureX+guide+2023"
+        course_settings = {
+            course_id: exam_data
+        }
+        setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
+
+        result = get_exam_data(course_id)
+
+        self.assertEqual(result["exam_metadata"], exam_data)
+
+    @override_settings()
+    def test_get_exam_data_failure(self):
+        """
+        Test that the get_exam_data function raises an exception when the required settings are not found.
+
+            Expected behavior:
+            - Function raises an exception.
+            - Exception message is the expected.
+        """
+        course_id = "course-v1:FutureX+guide+2023"
+        course_settings = {
+            course_id: {
+                "invalid_key": "test",
+                "eligibility_appt_date_last": "2024/05/05 12:00:00",
+                "exam_authorization_count": 4,
+            }
+        }
+        setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
+
+        with self.assertRaises(Exception) as context:
+            get_exam_data(course_id)
+
+        self.assertEqual(
+            str(context.exception),
+            (
+                "Error trying to get exam data, some fields are missing for course"
+                f"{course_id}. Please check PEARSON_RTI_COURSES_DATA setting."
+            ),
+        )

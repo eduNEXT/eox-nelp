@@ -28,14 +28,13 @@ class TestGetUserData(unittest.TestCase):
             username="Gamekeeper2024",
             first_name="Rubeus",
             last_name="Hagrid",
-            email="rubeus.hagrid@hogwarts.com"
+            email="rubeus.hagrid@hogwarts.com",
 
         )
         self.profile = MagicMock(
-            phone_number="+443214567895",
             mailing_address="Abbey Road 25",
             city="London",
-            country=Country("GB")
+            country=Country("GB"),
 
         )
         anonymous_id_for_user.return_value = "ABCDF1245678899"
@@ -59,18 +58,20 @@ class TestGetUserData(unittest.TestCase):
         self.profile.phone_number = phone
 
         expected_output = {
-            "anonymous_user_id": anonymous_id_for_user(self.user, None),
-            "username": self.user.username,
-            "first_name": self.user.first_name,
-            "last_name": self.user.last_name,
-            "email": self.user.email,
-            "address": self.profile.mailing_address,
-            "city": self.profile.city,
-            "country": self.profile.country.code,
-            "phone_number": phone_number,
-            "phone_country_code": country_code,
-            "mobile_number": phone_number,
-            "mobile_country_code": country_code,
+            "profile_metadata": {
+                "anonymous_user_id": anonymous_id_for_user(self.user, None),
+                "username": self.user.username,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+                "email": self.user.email,
+                "address": self.profile.mailing_address,
+                "city": self.profile.city,
+                "country": self.profile.country.code,
+                "phone_number": phone_number,
+                "phone_country_code": country_code,
+                "mobile_number": phone_number,
+                "mobile_country_code": country_code,
+            },
         }
 
         result = get_user_data(self.user.id)

@@ -51,16 +51,18 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
     phone_country_code = str(pn.country_code)
 
     return {
-        "anonymous_user_id": anonymous_id_for_user(user, None),
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "address": profile.mailing_address,
-        "city": profile.city,
-        "country": profile.country.code,
-        "phone_number": phone,
-        "phone_country_code": phone_country_code,
-        "mobile_number": phone,
-        "mobile_country_code": phone_country_code,
+        "profile_metadata": {
+            "anonymous_user_id": anonymous_id_for_user(user, None),
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "address": profile.mailing_address,
+            "city": profile.city,
+            "country": profile.country.code,
+            "phone_number": phone,
+            "phone_country_code": phone_country_code,
+            "mobile_number": phone,
+            "mobile_country_code": phone_country_code,
+        },
     }

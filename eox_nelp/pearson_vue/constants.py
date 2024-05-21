@@ -76,6 +76,7 @@ PAYLOAD_EAD = """
     </soapenv:Header>
     <soapenv:Body>
         <sch:eadRequest clientID="" authorizationTransactionType="">
+            <clientCandidateID></clientCandidateID>
             <examAuthorizationCount></examAuthorizationCount>
             <examSeriesCode></examSeriesCode>
             <eligibilityApptDateFirst></eligibilityApptDateFirst>

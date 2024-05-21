@@ -11,20 +11,13 @@ from django.utils import timezone
 from django_countries.fields import Country
 
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
+from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
     check_service_availability,
     get_user_data,
     import_candidate_demographics,
     import_exam_authorization,
 )
-
-try:
-    from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
-except ImportError:
-    PAYLOAD_CDD = None
-    PAYLOAD_EAD = None
-    PAYLOAD_PING_DATABASE = None
-
 
 User = get_user_model()
 
@@ -81,7 +74,7 @@ class TestGetUserData(unittest.TestCase):
                 "email": self.user.email,
                 "address": self.profile.mailing_address,
                 "city": self.profile.city,
-                "country": self.profile.country.code,
+                "country": self.profile.country.alpha3,
                 "phone_number": phone_number,
                 "phone_country_code": country_code,
                 "mobile_number": phone_number,

@@ -14,18 +14,8 @@ from django.utils import timezone
 
 from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
-
-try:
-    from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
-    from eox_nelp.pearson_vue.utils import update_xml_with_dict
-except ImportError:
-    PAYLOAD_PING_DATABASE = None
-    PAYLOAD_CDD = None
-    PAYLOAD_EAD = None
-
-    def update_xml_with_dict(x, y):  # pylint: disable=unused-argument
-        """fake methiod this requires the real implementation"""
-        return y
+from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
+from eox_nelp.pearson_vue.utils import update_xml_with_dict
 
 User = get_user_model()
 
@@ -74,7 +64,7 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
             "email": user.email,
             "address": profile.mailing_address,
             "city": profile.city,
-            "country": profile.country.code,
+            "country": profile.country.alpha3,
             "phone_number": phone,
             "phone_country_code": phone_country_code,
             "mobile_number": phone,

@@ -86,7 +86,7 @@ def generate_reference_id(national_id, course_id):
     return f"{national_id}~{course_id}"
 
 
-def _get_completion_summary(user, course_id):
+def get_completion_summary(user, course_id):
     """Get completion summary of a user in a course.
 
     Args:
@@ -116,7 +116,7 @@ def get_completed_and_graded(user_id, course_id):
     course_key = CourseKey.from_string(course_id)
     descriptor = modulestore().get_course(course_key)
     grading_policy = descriptor.grading_policy
-    completion_summary = _get_completion_summary(user, course_id)
+    completion_summary = get_completion_summary(user, course_id)
     is_complete = completion_summary["incomplete_count"] == 0
     is_graded = bool(grading_policy["GRADER"])
 

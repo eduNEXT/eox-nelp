@@ -24,7 +24,7 @@ from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
-from eox_nelp.signals.utils import _get_completion_summary, _user_has_passing_grade, get_completed_and_graded
+from eox_nelp.signals.utils import _user_has_passing_grade, get_completed_and_graded, get_completion_summary
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -83,7 +83,7 @@ def _generate_progress_enrollment_data(user, course_id, user_has_passing_grade):
     Returns:
         progress_enrollment_data (dict): dict to send to futurex enrollment progress.
     """
-    completion_summary = _get_completion_summary(user, course_id)
+    completion_summary = get_completion_summary(user, course_id)
 
     if completion_summary:
         complete_units = completion_summary["complete_count"]

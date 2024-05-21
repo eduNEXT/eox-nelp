@@ -62,7 +62,6 @@ class PearsonRTIApiClient(AbstractSOAPClient):
 
         return result
 
-    @audit_method(action="Import Candidate Demographics")
     def import_candidate_demographics(self, payload):
         """The CDD service imports candidate demographic data in to the VUE system. This
         method performs the required action to store the data into the Pearson service.
@@ -73,42 +72,46 @@ class PearsonRTIApiClient(AbstractSOAPClient):
         Returns:
             <Dict>: Parsed xml response to Dict format.
         """
-        xml_response = BeautifulSoup(
-            self.make_post("cxfws2/services/CDDService", payload),
-            "xml",
-        )
-        fault = xml_response.find("soapenv:Fault")
+        @audit_method(action="Import Candidate Demographics")
+        def import_candidate_demographics_request(payload):
+            """This is a wrapper that allows to make audit-able the import_candidate_demographics method."""
+            xml_response = BeautifulSoup(
+                self.make_post("cxfws2/services/CDDService", payload),
+                "xml",
+            )
+            fault = xml_response.find("soapenv:Fault")
 
-        # There are multiple kind of errors, some of them generates a soapenv:Fault section and others
-        # generates an status error section, the following condition handles the first case.
-        if fault:
+            # There are multiple kind of errors, some of them generates a soapenv:Fault section and others
+            # generates an status error section, the following condition handles the first case.
+            if fault:
+                return {
+                    "status": "error",
+                    "fault_code": xml_response.find("faultcode").text,
+                    "message": xml_response.find("faultstring").text,
+                }
+
+            status = xml_response.find("status")
+
+            if status:
+                return {
+                    "status": status.text.lower(),
+                    "message": xml_response.find("message").text,
+                    "candidate_id": xml_response.find("cdd:cddResponse").attrs.get("candidateID"),
+                    "client_candidate_id": xml_response.find("cdd:cddResponse").attrs.get("clientCandidateID"),
+                }
+
+            LOGGER.error(
+                "An unexpected error has occurred trying to make a CDD request getting the following response: %s",
+                xml_response,
+            )
+
             return {
-                "status": "error",
-                "fault_code": xml_response.find("faultcode").text,
-                "message": xml_response.find("faultstring").text,
+                "status": "unexpected error",
+                "response": xml_response,
             }
 
-        status = xml_response.find("status")
+        return import_candidate_demographics_request(payload)
 
-        if status:
-            return {
-                "status": status.text.lower(),
-                "message": xml_response.find("message").text,
-                "candidate_id": xml_response.find("cdd:cddResponse").attrs.get("candidateID"),
-                "client_candidate_id": xml_response.find("cdd:cddResponse").attrs.get("clientCandidateID"),
-            }
-
-        LOGGER.error(
-            "An unexpected error has occurred trying to make a CDD request getting the following response: %s",
-            xml_response,
-        )
-
-        return {
-            "status": "unexpected error",
-            "response": xml_response,
-        }
-
-    @audit_method(action="Import Exam Authorization")
     def import_exam_authorization(self, payload):
         """The EAD service imports exam authorization data into the Pearson VUE system. This
         method performs the required action to store the data into the Pearson service.
@@ -119,36 +122,41 @@ class PearsonRTIApiClient(AbstractSOAPClient):
         Returns:
             <Dict>: Parsed xml response to Dict format.
         """
-        xml_response = BeautifulSoup(
-            self.make_post("cxfws2/services/EADService", payload),
-            "xml",
-        )
-        fault = xml_response.find("soapenv:Fault")
+        @audit_method(action="Import Exam Authorization")
+        def import_exam_authorization_request(payload):
+            """This is a wrapper that allows to make audit-able the import_exam_authorization method."""
+            xml_response = BeautifulSoup(
+                self.make_post("cxfws2/services/EADService", payload),
+                "xml",
+            )
+            fault = xml_response.find("soapenv:Fault")
 
-        # There are multiple kind of errors, some of them generates a soapenv:Fault section and others
-        # generates an status error section, the following condition handles the first case.
-        if fault:
+            # There are multiple kind of errors, some of them generates a soapenv:Fault section and others
+            # generates an status error section, the following condition handles the first case.
+            if fault:
+                return {
+                    "status": "error",
+                    "fault_code": xml_response.find("faultcode").text,
+                    "message": xml_response.find("faultstring").text,
+                }
+
+            status = xml_response.find("status")
+
+            if status:
+                return {
+                    "status": status.text.lower(),
+                    "message": xml_response.find("message").text if xml_response.find("message") else "",
+                    "client_candidate_id": xml_response.find("clientCandidateID").text,
+                }
+
+            LOGGER.error(
+                "An unexpected error has occurred trying to make a EAD request getting the following response: %s",
+                xml_response,
+            )
+
             return {
-                "status": "error",
-                "fault_code": xml_response.find("faultcode").text,
-                "message": xml_response.find("faultstring").text,
+                "status": "unexpected error",
+                "response": xml_response,
             }
 
-        status = xml_response.find("status")
-
-        if status:
-            return {
-                "status": status.text.lower(),
-                "message": xml_response.find("message").text if xml_response.find("message") else "",
-                "client_candidate_id": xml_response.find("clientCandidateID").text,
-            }
-
-        LOGGER.error(
-            "An unexpected error has occurred trying to make a EAD request getting the following response: %s",
-            xml_response,
-        )
-
-        return {
-            "status": "unexpected error",
-            "response": xml_response,
-        }
+        return import_exam_authorization_request(payload)

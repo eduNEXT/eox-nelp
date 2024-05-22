@@ -3,6 +3,7 @@ This file contains all the necessary student dependencies from
 https://github.com/eduNEXT/edunext-platform/tree/ednx-release/mango.master/common/djangoapps/student
 """
 from common.djangoapps.student import roles
+from common.djangoapps.student.admin import CourseEnrollmentAdmin
 from common.djangoapps.student.models import (  # pylint: disable=import-error
     CourseAccessRole,
     CourseEnrollment,
@@ -55,3 +56,13 @@ def get_anonymous_id_for_user():
         anonymous_id_for_user function.
     """
     return anonymous_id_for_user
+
+
+def get_course_enrollment_admin():
+    """Allow to get CourseEnrollmentAdmin model from
+    https://github.com/nelc/edx-platform/blob/open-release/palm.nelp/common/djangoapps/student/admin.py#L285
+
+    Returns:
+        CourseEnrollmentAdmin model.
+    """
+    return CourseEnrollmentAdmin

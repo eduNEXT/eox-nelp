@@ -32,4 +32,5 @@ urlpatterns = [  # pylint: disable=invalid-name
     path('stats/', include('eox_nelp.stats.urls', namespace='stats')),
     path('payment-notifications/', include('eox_nelp.payment_notifications.urls', namespace='payment-notifications')),
     path('api/phone-validation/', include('eox_nelp.phone_validation.api.urls', namespace='phone-validation-api')),
+    path('api/pearson_vue/', include('eox_nelp.pearson_vue.api.urls', namespace='pearson-vue-api')),
 ]

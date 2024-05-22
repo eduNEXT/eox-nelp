@@ -40,3 +40,11 @@ def get_anonymous_id_for_user():
         Mock class.
     """
     return Mock()
+
+
+def get_course_enrollment_admin():
+    """Return test class.
+    Returns:
+        Mock class.
+    """
+    return object

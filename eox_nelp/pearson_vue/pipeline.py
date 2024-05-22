@@ -28,7 +28,8 @@ User = get_user_model()
 def handle_course_completion_status(user_id, course_id, **kwargs):
     """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
     has 4 behaviours depending the case:
-        - skip this pipeline if setting PEARSON_RTI_TESTING_SKIP_CHECK_COMPLETION is truthy. Pipeline continues.
+        - skip this pipeline if setting PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS is truthy.
+          Pipeline continues.
         - is_passing is true means the course is graded(passed) and dont needs this pipe validation.
           The pipeline continues without changes.
         - is_complete=True and is_graded=False pipeline should continue.

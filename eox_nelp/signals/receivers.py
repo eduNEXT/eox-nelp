@@ -24,6 +24,7 @@ from openedx_events.learning.data import CertificateData, CourseData, UserData, 
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
+from eox_nelp.pearson_vue.tasks import real_time_import_task
 from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     create_external_certificate,
@@ -342,4 +343,43 @@ def mt_course_failed_handler(user, course_id, **kwargs):  # pylint: disable=unus
         course_id=str(course_id),
         stage_result=2,
         force_graded=True,
+    )
+
+
+def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the post_save BlockCompletion signal and this executes
+    the pearson vue real_time_import_task , that basically runs the RTI pipeline
+    on the completion logic.
+    This sends only the user_id and course_id kwargs.
+
+    Arguments:
+        instance<Blockcompletion>: Instance of BlockCompletion model.
+    """
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False):
+        return
+
+    real_time_import_task.delay(
+        user_id=instance.user_id,
+        course_id=str(instance.context_key),
+    )
+
+
+def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unused-argument
+    """This receiver is connected to the COURSE_GRADE_NOW_PASSED
+    https://github.com/openedx/edx-platform/blob/open-release/palm.master/openedx/core/djangoapps/signals/signals.py#L23
+    signal and this execute the pearson vue real_time_import_task , that basically runs the RTI pipeline.(PASS)
+    This sends the user_id, course_id, is_passing, and is_graded kwargs.
+
+    Arguments:
+        user <User>: Instance of auth user model.
+        course_id <CourseLocator>: Course locator.
+    """
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False):
+        return
+
+    real_time_import_task.delay(
+        course_id=str(course_id),
+        user_id=user.id,
+        is_passing=True,
+        is_graded=True,
     )

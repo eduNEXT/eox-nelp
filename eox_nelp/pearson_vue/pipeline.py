@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
+def handle_course_completion_status(user_id, course_id, **kwargs):
     """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
     has 4 behaviours depending the case:
         - skip this pipeline if setting PEARSON_RTI_TESTING_SKIP_CHECK_COMPLETION is truthy. Pipeline continues.
@@ -33,7 +33,8 @@ def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
           The pipeline continues without changes.
         - is_complete=True and is_graded=False pipeline should continue.
           (completed courses and not graded).
-        - Otherwise the pipeline will stop, for grading-courses the COURSE_GRADE_NOW_PASSED signal would act.
+        - Otherwise this indicates that the pipeline execution would be stopped,
+          for grading-courses the COURSE_GRADE_NOW_PASSED signal would act.
 
     Args:
         user_id (int): The ID of the user whose data is to be retrieved.
@@ -43,9 +44,9 @@ def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
     Returns:
         dict: Pipeline dict
     """
-    if getattr(settings, "PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES", False):
+    if getattr(settings, "PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS", False):
         logger.info(
-            "Skipping `terminate_not_full_completion_cases` pipe for user_id:%s and course_id: %s",
+            "Skipping `handle_course_completion_status` pipe for user_id:%s and course_id: %s",
             str(user_id),
             course_id
         )

@@ -18,9 +18,9 @@ from eox_nelp.pearson_vue.pipeline import (
     check_service_availability,
     get_exam_data,
     get_user_data,
+    handle_course_completion_status,
     import_candidate_demographics,
     import_exam_authorization,
-    terminate_not_full_completion_cases,
 )
 
 User = get_user_model()
@@ -28,7 +28,7 @@ User = get_user_model()
 
 class TestTerminateNotFullCompletionCases(unittest.TestCase):
     """
-    Unit tests for the terminate_not_full_completion_cases function.
+    Unit tests for the handle_course_completion_status function.
     """
 
     def setUp(self):
@@ -38,26 +38,25 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
         self.user_id = 1
         self.course_id = "course-v1:edX+213+2121"
 
-    @override_settings()
+    @override_settings(PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS=True)
     @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
     def test_skip_pipe_with_settings(self, get_completed_and_graded_mock):
         """Test the pipeline is skipped with truthy
-        `PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES` setting.
+        `PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS` setting.
         Expected behavior:
             - logger info message expected
             - get_completed_and_graded_mock is not called.
             - Returned value is None
 
         """
-        setattr(settings, "PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES", True)
         pipeline_kwargs = {}
         log_info = (
-            f"INFO:{pipeline.__name__}:Skipping `terminate_not_full_completion_cases` "
+            f"INFO:{pipeline.__name__}:Skipping `handle_course_completion_status` "
             f"pipe for user_id:{self.user_id} and course_id: {self.course_id}"
         )
 
         with self.assertLogs(pipeline.__name__, level="INFO") as logs:
-            result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+            result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertEqual(logs.output, [log_info])
         get_completed_and_graded_mock.assert_not_called()
@@ -73,7 +72,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
         """
         pipeline_kwargs = {"is_passing": True}
 
-        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+        result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         get_completed_and_graded_mock.assert_not_called()
         self.assertIsNone(result)
@@ -83,7 +82,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
         """Test the pipeline return expected dict with empty `is_passing`, and
            is_complete=True, is_graded=False.
         Expected behavior:
-            - Returned value is dict with is_complete and is_graded.
+            - Returned value is None
 
         """
         pipeline_kwargs = {}
@@ -96,7 +95,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+        result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertIsNone(result)
 
@@ -120,7 +119,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+        result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 
@@ -144,7 +143,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+        result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 
@@ -157,7 +156,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
         """
         pipeline_kwargs = {}
         get_complete_and_graded_output = {
-            "is_complete": False,
+            "is_complete": True,
             "is_graded": True,
         }
         expected_output = {
@@ -168,7 +167,7 @@ class TestTerminateNotFullCompletionCases(unittest.TestCase):
             get_complete_and_graded_output["is_graded"],
         )
 
-        result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+        result = handle_course_completion_status(self.user_id, self.course_id, **pipeline_kwargs)
 
         self.assertDictEqual(expected_output, result)
 

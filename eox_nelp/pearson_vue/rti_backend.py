@@ -9,9 +9,9 @@ from eox_nelp.pearson_vue.pipeline import (
     check_service_availability,
     get_exam_data,
     get_user_data,
+    handle_course_completion_status,
     import_candidate_demographics,
     import_exam_authorization,
-    terminate_not_full_completion_cases,
 )
 
 
@@ -57,7 +57,7 @@ class RealTimeImport:
         Returns the RTI pipeline, which is a list of functions to be executed.
         """
         return [
-            terminate_not_full_completion_cases,
+            handle_course_completion_status,
             get_user_data,
             get_exam_data,
             check_service_availability,

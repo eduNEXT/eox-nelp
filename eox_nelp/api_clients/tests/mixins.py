@@ -187,7 +187,7 @@ class TestSOAPClientMixin:
         self.assertEqual(response, expected_value)
         requests_mock.Session.return_value.post.assert_called_with(
             url=f"{api_client.base_url}/fake/path",
-            data=data,
+            data=data.encode("utf-8"),
         )
 
     @patch("eox_nelp.api_clients.authenticators.requests")
@@ -228,7 +228,7 @@ class TestSOAPClientMixin:
         self.assertEqual(response, expected_value)
         requests_mock.Session.return_value.post.assert_called_with(
             url=f"{api_client.base_url}/fake/path",
-            data=data,
+            data=data.encode("utf-8"),
         )
         self.assertEqual(logs.output, [
             f"ERROR:{api_clients.__name__}:{log_error}"

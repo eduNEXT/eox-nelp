@@ -140,7 +140,7 @@ class AbstractSOAPClient(AbstractApiClient):
 
         url = f"{self.base_url}/{path}"
 
-        response = self.session.post(url=url, data=data)
+        response = self.session.post(url=url, data=data.encode("utf-8"))
         content = response.text
 
         if not response.ok:

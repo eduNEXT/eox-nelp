@@ -27,10 +27,11 @@ User = get_user_model()
 
 def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
     """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
-    has 3 behaviours depending the case:
+    has 4 behaviours depending the case:
+        - skip this pipeline if setting PEARSON_RTI_TESTING_SKIP_CHECK_COMPLETION is truthy. Pipeline continues.
         - is_passing is true means the course is graded(passed) and dont needs this pipe validation.
           The pipeline continues without changes.
-        - is_complete=True and is_graded=False pipeline should continue with uploaded metadata
+        - is_complete=True and is_graded=False pipeline should continue.
           (completed courses and not graded).
         - Otherwise the pipeline will stop, for grading-courses the COURSE_GRADE_NOW_PASSED signal would act.
 
@@ -42,6 +43,14 @@ def terminate_not_full_completion_cases(user_id, course_id, **kwargs):
     Returns:
         dict: Pipeline dict
     """
+    if getattr(settings, "PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES", False):
+        logger.info(
+            "Skipping `terminate_not_full_completion_cases` pipe for user_id:%s and course_id: %s",
+            str(user_id),
+            course_id
+        )
+        return None
+
     if kwargs.get("is_passing"):
         return None
 

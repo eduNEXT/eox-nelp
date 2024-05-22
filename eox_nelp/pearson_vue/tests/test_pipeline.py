@@ -12,6 +12,7 @@ from django.utils import timezone
 from django_countries.fields import Country
 
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
+from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
     check_service_availability,
@@ -25,7 +26,7 @@ from eox_nelp.pearson_vue.pipeline import (
 User = get_user_model()
 
 
-class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
+class TestTerminateNotFullCompletionCases(unittest.TestCase):
     """
     Unit tests for the terminate_not_full_completion_cases function.
     """
@@ -37,12 +38,37 @@ class TestCheckCompletionAndGradedMetadata(unittest.TestCase):
         self.user_id = 1
         self.course_id = "course-v1:edX+213+2121"
 
+    @override_settings()
+    @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
+    def test_skip_pipe_with_settings(self, get_completed_and_graded_mock):
+        """Test the pipeline is skipped with truthy
+        `PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES` setting.
+        Expected behavior:
+            - logger info message expected
+            - get_completed_and_graded_mock is not called.
+            - Returned value is None
+
+        """
+        setattr(settings, "PEARSON_RTI_TESTING_SKIP_FULL_COMPLETION_CASES", True)
+        pipeline_kwargs = {}
+        log_info = (
+            f"INFO:{pipeline.__name__}:Skipping `terminate_not_full_completion_cases` "
+            f"pipe for user_id:{self.user_id} and course_id: {self.course_id}"
+        )
+
+        with self.assertLogs(pipeline.__name__, level="INFO") as logs:
+            result = terminate_not_full_completion_cases(self.user_id, self.course_id, **pipeline_kwargs)
+
+        self.assertEqual(logs.output, [log_info])
+        get_completed_and_graded_mock.assert_not_called()
+        self.assertIsNone(result)
+
     @patch("eox_nelp.pearson_vue.pipeline.get_completed_and_graded")
     def test_check_is_passing_bypass(self, get_completed_and_graded_mock):
         """Test the pipeline dont do anything if is_passing kwarg is truthy.
         Expected behavior:
             - get_completed_and_graded_mock is not called.
-            - Returned value is an empty dict
+            - Returned value is None
 
         """
         pipeline_kwargs = {"is_passing": True}

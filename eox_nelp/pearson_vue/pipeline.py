@@ -212,7 +212,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
                             "mobileCountryCode": profile_metadata["mobile_country_code"],
                         },
                         "nativeAddress": {
-                            "language": "AR",
+                            "language": "ara",
                             "potentialMismatch": "false",
                             "firstName": profile_metadata["arabic_name"],
                             "lastName": profile_metadata["arabic_name"],

@@ -195,12 +195,17 @@ class TestGetUserData(unittest.TestCase):
             country=Country("GB"),
 
         )
+        self.extrainfo = MagicMock(
+            arabic_name="كلارك كينت",
+        )
         anonymous_id_for_user.return_value = "ABCDF1245678899"
         setattr(User, "profile", self.profile)
+        setattr(User, "extrainfo", self.extrainfo)
 
     def tearDown(self):  # pylint: disable=invalid-name
         """Reset mocks"""
         anonymous_id_for_user.reset_mock()
+        delattr(User, "extrainfo")
 
     @data("+443214567895", "3214567895")
     def test_get_user_data(self, phone):
@@ -229,9 +234,9 @@ class TestGetUserData(unittest.TestCase):
                 "phone_country_code": country_code,
                 "mobile_number": phone_number,
                 "mobile_country_code": country_code,
+                "arabic_name": self.extrainfo.arabic_name,
             },
         }
-
         result = get_user_data(self.user.id)
 
         self.assertEqual(result, expected_output)
@@ -345,6 +350,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                 "phone_country_code": "1",
                 "mobile_number": "5551234567",
                 "mobile_country_code": "1",
+                "arabic_name": "فلان الفلاني",
             },
         }
         expected_payload = {
@@ -382,7 +388,15 @@ class TestImportCandidateDemographics(unittest.TestCase):
                             "mobile": {
                                 "mobileNumber": input_data["profile_metadata"]["mobile_number"],
                                 "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
-                            }
+                            },
+                            "nativeAddress": {
+                                "language": "AR",
+                                "potentialMismatch": "false",
+                                "firstName": input_data["profile_metadata"]["arabic_name"],
+                                "lastName": input_data["profile_metadata"]["arabic_name"],
+                                "address1": input_data["profile_metadata"]["address"],
+                                "city": input_data["profile_metadata"]["city"]
+                            },
                         }
                     },
                 },
@@ -424,6 +438,8 @@ class TestImportCandidateDemographics(unittest.TestCase):
                 "phone_country_code": "1",
                 "mobile_number": "5551234567",
                 "mobile_country_code": "1",
+                "arabic_name": "فلان الفلاني",
+
             },
         }
         expected_payload = {
@@ -461,7 +477,15 @@ class TestImportCandidateDemographics(unittest.TestCase):
                             "mobile": {
                                 "mobileNumber": input_data["profile_metadata"]["mobile_number"],
                                 "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
-                            }
+                            },
+                            "nativeAddress": {
+                                "language": "AR",
+                                "potentialMismatch": "false",
+                                "firstName": input_data["profile_metadata"]["arabic_name"],
+                                "lastName": input_data["profile_metadata"]["arabic_name"],
+                                "address1": input_data["profile_metadata"]["address"],
+                                "city": input_data["profile_metadata"]["city"]
+                            },
                         }
                     },
                 },

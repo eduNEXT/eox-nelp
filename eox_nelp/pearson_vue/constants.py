@@ -59,6 +59,14 @@ PAYLOAD_CDD = """
                     <mobileNumber></mobileNumber>
                     <mobileCountryCode></mobileCountryCode>
                 </mobile>
+                <nativeAddress>
+                    <language></language>
+                    <potentialMismatch></potentialMismatch>
+                    <firstName></firstName>
+                    <lastName></lastName>
+                    <address1></address1>
+                    <city></city>
+                </nativeAddress>
             </primaryAddress>
         </sch:cddRequest>
     </soapenv:Body>

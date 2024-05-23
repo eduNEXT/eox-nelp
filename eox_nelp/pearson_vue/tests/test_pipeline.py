@@ -395,7 +395,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                                 "firstName": input_data["profile_metadata"]["arabic_name"],
                                 "lastName": input_data["profile_metadata"]["arabic_name"],
                                 "address1": input_data["profile_metadata"]["address"],
-                                "city": input_data["profile_metadata"]["city"]
+                                "city": input_data["profile_metadata"]["city"],
                             },
                         }
                     },
@@ -484,7 +484,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                                 "firstName": input_data["profile_metadata"]["arabic_name"],
                                 "lastName": input_data["profile_metadata"]["arabic_name"],
                                 "address1": input_data["profile_metadata"]["address"],
-                                "city": input_data["profile_metadata"]["city"]
+                                "city": input_data["profile_metadata"]["city"],
                             },
                         }
                     },

@@ -217,7 +217,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
                             "firstName": profile_metadata["arabic_name"],
                             "lastName": profile_metadata["arabic_name"],
                             "address1": profile_metadata["address"],
-                            "city": profile_metadata["city"]
+                            "city": profile_metadata["city"],
                         },
                     }
                 },

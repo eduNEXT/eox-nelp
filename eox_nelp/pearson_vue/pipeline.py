@@ -100,6 +100,8 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
     pn = phonenumbers.parse(phone) if phone.startswith("+") else phonenumbers.parse(phone, profile.country.code)
     phone = str(pn.national_number)
     phone_country_code = str(pn.country_code)
+    extrainfo = getattr(user, "extrainfo", None)
+    arabic_name = extrainfo.arabic_name if extrainfo else ""
 
     return {
         "profile_metadata": {
@@ -115,6 +117,7 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
             "phone_country_code": phone_country_code,
             "mobile_number": phone,
             "mobile_country_code": phone_country_code,
+            "arabic_name": arabic_name,
         },
     }
 
@@ -207,7 +210,15 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
                         "mobile": {
                             "mobileNumber": profile_metadata["mobile_number"],
                             "mobileCountryCode": profile_metadata["mobile_country_code"],
-                        }
+                        },
+                        "nativeAddress": {
+                            "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
+                            "potentialMismatch": "false",
+                            "firstName": profile_metadata["arabic_name"],
+                            "lastName": profile_metadata["arabic_name"],
+                            "address1": profile_metadata["address"],
+                            "city": profile_metadata["city"],
+                        },
                     }
                 },
             },

@@ -215,6 +215,14 @@ class UpdatePayloadCddRequestTestCase(TestCase):
                                 "mobileNumber": "88888888",
                                 "mobileCountryCode": "1"
                             },
+                            "nativeAddress": {
+                                "language": "UKN",
+                                "potentialMismatch": "false",
+                                "firstName": "kalel",
+                                "lastName": "-el",
+                                "address1": "123 Antartic",
+                                "city": "new york"
+                            },
                         },
                         "alternateAddress": {
                             "addressType": "Home",
@@ -228,7 +236,7 @@ class UpdatePayloadCddRequestTestCase(TestCase):
                                 "extension": "89",
                                 "phoneCountryCode": "1"
                             }
-                        }
+                        },
                     }
                 }
             }

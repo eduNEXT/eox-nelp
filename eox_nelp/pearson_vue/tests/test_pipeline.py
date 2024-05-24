@@ -390,7 +390,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                                 "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
                             },
                             "nativeAddress": {
-                                "language": "ARA",
+                                "language": "UKN",
                                 "potentialMismatch": "false",
                                 "firstName": input_data["profile_metadata"]["arabic_name"],
                                 "lastName": input_data["profile_metadata"]["arabic_name"],
@@ -479,7 +479,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                                 "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
                             },
                             "nativeAddress": {
-                                "language": "ARA",
+                                "language": "UKN",
                                 "potentialMismatch": "false",
                                 "firstName": input_data["profile_metadata"]["arabic_name"],
                                 "lastName": input_data["profile_metadata"]["arabic_name"],

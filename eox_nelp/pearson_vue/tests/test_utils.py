@@ -216,7 +216,7 @@ class UpdatePayloadCddRequestTestCase(TestCase):
                                 "mobileCountryCode": "1"
                             },
                             "nativeAddress": {
-                                "language": "ARA",
+                                "language": "UKN",
                                 "potentialMismatch": "false",
                                 "firstName": "kalel",
                                 "lastName": "-el",

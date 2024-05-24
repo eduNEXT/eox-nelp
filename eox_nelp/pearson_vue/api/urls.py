@@ -1,4 +1,7 @@
 """
+Top-level URL configuration for the pearson vue api..
+
+This module defines the URL patterns for the pearson vue api..
 """
 from django.urls import include, path
 

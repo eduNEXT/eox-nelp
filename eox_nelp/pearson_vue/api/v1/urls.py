@@ -1,3 +1,18 @@
+"""
+URL configuration for Pearson VUE API views.
+
+This module defines the URL patterns for the Pearson VUE API endpoints.
+Each endpoint corresponds to a specific view that handles a particular
+type of event related to Pearson VUE.
+
+URL Patterns:
+    - resultNotification: Endpoint for handling result notifications.
+    - placeHold: Endpoint for placing a hold.
+    - releaseHold: Endpoint for releasing a hold.
+    - modifyResultStatus: Endpoint for modifying the result status.
+    - revokeResult: Endpoint for revoking a result.
+    - unrevokeResult: Endpoint for unrevoking a result.
+"""
 from django.urls import path
 
 from eox_nelp.pearson_vue.api.v1.views import (

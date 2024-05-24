@@ -1,4 +1,9 @@
 """
+Admin configuration for the Pearson vue models.
+
+This module defines the admin configuration for multiple models,
+allowing administrators to view and manage instances of the model
+in the Django admin interface.
 """
 
 from django.contrib import admin
@@ -10,10 +15,12 @@ User = get_user_model()
 
 
 class PearsonRTENModelAdmin(admin.ModelAdmin):
-    """Base class that allow to extract username from author field.
+    """
+    Admin class for the PearsonRTENModel model.
 
-    methods:
-        get_author_username: Returns username from User instance.
+    Attributes:
+        list_display (list): List of fields to display in the admin list view.
+        readonly_fields (tuple): Tuple of fields that are read-only in the admin interface.
     """
     list_display = ("event_type", "created_at")
     readonly_fields = ("created_at",)

@@ -23,14 +23,22 @@ from eox_nelp.pearson_vue.api.v1.views import (
     RevokeResultView,
     UnrevokeResultView,
 )
+from eox_nelp.pearson_vue.constants import (
+    MODIFY_RESULT_STATUS,
+    PLACE_HOLD,
+    RELEASE_HOLD,
+    RESULT_NOTIFICATION,
+    REVOKE_RESULT,
+    UNREVOKE_RESULT,
+)
 
 app_name = "eox_nelp"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path('resultNotification/', ResultNotificationView.as_view(), name='resultNotification'),
-    path('placeHold/', PlaceHoldView.as_view(), name='placeHold'),
-    path('releaseHold/', ReleaseHoldView.as_view(), name='releaseHold'),
-    path('modifyResultStatus/', ModifyResultStatusView.as_view(), name='modifyResultStatus'),
-    path('revokeResult/', RevokeResultView.as_view(), name='revokeResult'),
-    path('unrevokeResult/', UnrevokeResultView.as_view(), name='unrevokeResult'),
+    path('resultNotification/', ResultNotificationView.as_view(), name=RESULT_NOTIFICATION),
+    path('placeHold/', PlaceHoldView.as_view(), name=PLACE_HOLD),
+    path('releaseHold/', ReleaseHoldView.as_view(), name=RELEASE_HOLD),
+    path('modifyResultStatus/', ModifyResultStatusView.as_view(), name=MODIFY_RESULT_STATUS),
+    path('revokeResult/', RevokeResultView.as_view(), name=REVOKE_RESULT),
+    path('unrevokeResult/', UnrevokeResultView.as_view(), name=UNREVOKE_RESULT),
 ]

@@ -17,6 +17,14 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from eox_nelp.pearson_vue.constants import (
+    MODIFY_RESULT_STATUS,
+    PLACE_HOLD,
+    RELEASE_HOLD,
+    RESULT_NOTIFICATION,
+    REVOKE_RESULT,
+    UNREVOKE_RESULT,
+)
 from eox_nelp.pearson_vue.models import PearsonRTENModel
 
 User = get_user_model()
@@ -62,39 +70,39 @@ class TestResultNotificationView(RTENMixin, unittest.TestCase):
     """
     Unit tests for ResultNotificationView.
     """
-    event_type = "resultNotification"
+    event_type = RESULT_NOTIFICATION
 
 
 class TestPlaceHoldView(RTENMixin, unittest.TestCase):
     """
     Unit tests for PlaceHoldView.
     """
-    event_type = "placeHold"
+    event_type = PLACE_HOLD
 
 
 class TestReleaseHoldView(RTENMixin, unittest.TestCase):
     """
     Unit tests for ReleaseHoldView.
     """
-    event_type = "releaseHold"
+    event_type = RELEASE_HOLD
 
 
 class TestModifyResultStatusView(RTENMixin, unittest.TestCase):
     """
     Unit tests for ModifyResultStatusView.
     """
-    event_type = "modifyResultStatus"
+    event_type = MODIFY_RESULT_STATUS
 
 
 class TestRevokeResultView(RTENMixin, unittest.TestCase):
     """
     Unit tests for RevokeResultView.
     """
-    event_type = "revokeResult"
+    event_type = REVOKE_RESULT
 
 
 class TestUnrevokeResultView(RTENMixin, unittest.TestCase):
     """
     Unit tests for UnrevokeResultView.
     """
-    event_type = "unrevokeResult"
+    event_type = UNREVOKE_RESULT

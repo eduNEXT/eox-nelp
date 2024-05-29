@@ -18,6 +18,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from eox_nelp.pearson_vue.api.v1.serializers import PearsonRTENSerializer
+from eox_nelp.pearson_vue.constants import (
+    MODIFY_RESULT_STATUS,
+    PLACE_HOLD,
+    RELEASE_HOLD,
+    RESULT_NOTIFICATION,
+    REVOKE_RESULT,
+    UNREVOKE_RESULT,
+)
 from eox_nelp.pearson_vue.models import PearsonRTENModel
 
 
@@ -81,7 +89,7 @@ class ResultNotificationView(PearsonRTENBaseView):
     The `event_type` attribute is set to "resultNotification".
     """
 
-    event_type = "resultNotification"
+    event_type = RESULT_NOTIFICATION
 
 
 class PlaceHoldView(PearsonRTENBaseView):
@@ -92,7 +100,7 @@ class PlaceHoldView(PearsonRTENBaseView):
     The `event_type` attribute is set to "placeHold".
     """
 
-    event_type = "placeHold"
+    event_type = PLACE_HOLD
 
 
 class ReleaseHoldView(PearsonRTENBaseView):
@@ -103,7 +111,7 @@ class ReleaseHoldView(PearsonRTENBaseView):
     The `event_type` attribute is set to "releaseHold".
     """
 
-    event_type = "releaseHold"
+    event_type = RELEASE_HOLD
 
 
 class ModifyResultStatusView(PearsonRTENBaseView):
@@ -114,7 +122,7 @@ class ModifyResultStatusView(PearsonRTENBaseView):
     The `event_type` attribute is set to "modifyResultStatus".
     """
 
-    event_type = "modifyResultStatus"
+    event_type = MODIFY_RESULT_STATUS
 
 
 class RevokeResultView(PearsonRTENBaseView):
@@ -125,7 +133,7 @@ class RevokeResultView(PearsonRTENBaseView):
     The `event_type` attribute is set to "revokeResult".
     """
 
-    event_type = "revokeResult"
+    event_type = REVOKE_RESULT
 
 
 class UnrevokeResultView(PearsonRTENBaseView):
@@ -136,4 +144,4 @@ class UnrevokeResultView(PearsonRTENBaseView):
     The `event_type` attribute is set to "unrevokeResult".
     """
 
-    event_type = "unrevokeResult"
+    event_type = UNREVOKE_RESULT

@@ -12,13 +12,22 @@ Constants:
 """
 from django.db import models
 
+from eox_nelp.pearson_vue.constants import (
+    MODIFY_RESULT_STATUS,
+    PLACE_HOLD,
+    RELEASE_HOLD,
+    RESULT_NOTIFICATION,
+    REVOKE_RESULT,
+    UNREVOKE_RESULT,
+)
+
 EVENT_TYPE_CHOICES = [
-    ("resultNotification", "Result Notification"),
-    ("placeHold", "Place Hold"),
-    ("releaseHold", "Release Hold"),
-    ("modifyResultStatus", "Modify Result Status"),
-    ("revokeResult", "Revoke Result"),
-    ("unrevokeResult", "Unrevoke Result"),
+    (RESULT_NOTIFICATION, "Result Notification"),
+    (PLACE_HOLD, "Place Hold"),
+    (RELEASE_HOLD, "Release Hold"),
+    (MODIFY_RESULT_STATUS, "Modify Result Status"),
+    (REVOKE_RESULT, "Revoke Result"),
+    (UNREVOKE_RESULT, "Unrevoke Result"),
 ]
 
 

@@ -65,6 +65,32 @@ class RTENMixin:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {})
 
+    def test_get_event(self):
+        """
+        Test retrieving an event.
+
+        Expected behavior:
+            - The response returns a 200 status code.
+            - The response data contains the correct event details.
+        """
+        # This will create a record to ensure that  there is at least one element
+        PearsonRTENModel.objects.create(event_type=self.event_type, content={})  # pylint: disable=no-member
+        # Retrieve all the events of the same type
+        events = PearsonRTENModel.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
+        expected_results = []
+
+        for event in events:
+            expected_results.append({
+                'event_type': event.event_type,
+                'content': event.content,
+                'created_at': event.created_at.isoformat(),
+            })
+
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}"), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], len(events))
+
 
 class TestResultNotificationView(RTENMixin, unittest.TestCase):
     """

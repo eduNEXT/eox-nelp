@@ -29,7 +29,7 @@ from eox_nelp.pearson_vue.constants import (
 from eox_nelp.pearson_vue.models import PearsonRTENModel
 
 
-class PearsonRTENBaseView(generics.CreateAPIView):
+class PearsonRTENBaseView(generics.ListCreateAPIView):
     """
     Base view for Pearson RTEN (Real Time Event Notification) API endpoints.
 
@@ -47,6 +47,17 @@ class PearsonRTENBaseView(generics.CreateAPIView):
     serializer_class = PearsonRTENSerializer
     queryset = PearsonRTENModel.objects.all()  # pylint: disable=no-member
     authentication_classes = [JwtAuthentication]
+
+    def get_queryset(self):
+        """
+        Get the queryset for the view.
+
+        This method filters the queryset to return only the events that match the specified event_type.
+
+        Returns:
+            QuerySet: The filtered queryset.
+        """
+        return PearsonRTENModel.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
 
     def perform_create(self, serializer):
         """

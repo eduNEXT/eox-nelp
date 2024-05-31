@@ -83,7 +83,7 @@ PAYLOAD_EAD = """
         </wsse:Security>
     </soapenv:Header>
     <soapenv:Body>
-        <sch:eadRequest clientID="" authorizationTransactionType="">
+        <sch:eadRequest clientID="" authorizationTransactionType="" clientAuthorizationID="" >
             <clientCandidateID></clientCandidateID>
             <examAuthorizationCount></examAuthorizationCount>
             <examSeriesCode></examSeriesCode>

@@ -272,6 +272,7 @@ def import_exam_authorization(
             },
             "soapenv:Body": {
                 "sch:eadRequest": {
+                    "@clientAuthorizationID": exam_metadata["client_authorization_id"],
                     "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
                     "@authorizationTransactionType": transaccion_type,
                     "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
@@ -292,7 +293,7 @@ def import_exam_authorization(
         raise Exception("Error trying to process import exam authorization request.")
 
 
-def get_exam_data(course_id, **kwargs):  # pylint: disable=unused-argument
+def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Retrieves exam data from Django settings.
 
@@ -314,6 +315,13 @@ def get_exam_data(course_id, **kwargs):  # pylint: disable=unused-argument
     """
     courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
     exam_metadata = courses_data[course_id]
+
+    # This generates the clientAuthorizationID based on the user_id and course_id
+    exam_metadata["client_authorization_id"] = anonymous_id_for_user(
+        User.objects.get(id=user_id),
+        course_id,
+    )
+
     required_fields = {
         "eligibility_appt_date_first",
         "eligibility_appt_date_last",

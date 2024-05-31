@@ -528,6 +528,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "eligibility_appt_date_last": "2025/07/15 11:59:59",
                 "exam_authorization_count": 3,
                 "exam_series_code": "ABC",
+                "client_authorization_id": "12345678954",
             },
         }
         expected_payload = {
@@ -545,6 +546,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "soapenv:Body": {
                     "sch:eadRequest": {
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
+                        "@clientAuthorizationID": input_data["exam_metadata"]["client_authorization_id"],
                         "@authorizationTransactionType": "Add",
                         "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
@@ -587,6 +589,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "eligibility_appt_date_last": "2025/07/15 11:59:59",
                 "exam_authorization_count": 3,
                 "exam_series_code": "ABC",
+                "client_authorization_id": "12345678954",
             },
         }
         expected_payload = {
@@ -604,6 +607,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                 "soapenv:Body": {
                     "sch:eadRequest": {
                         "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
+                        "@clientAuthorizationID": input_data["exam_metadata"]["client_authorization_id"],
                         "@authorizationTransactionType": "Add",
                         "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
                         "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
@@ -629,6 +633,18 @@ class TestGetExamData(unittest.TestCase):
     Unit tests for the get_exam_data function.
     """
 
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.user, _ = User.objects.get_or_create(
+            username="Gamekeeper2024",
+            first_name="Rubeus",
+            last_name="Hagrid",
+            email="rubeus.hagrid@hogwarts.com",
+
+        )
+
     @override_settings()
     def test_get_exam_data_success(self):
         """
@@ -649,7 +665,7 @@ class TestGetExamData(unittest.TestCase):
         }
         setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
 
-        result = get_exam_data(course_id)
+        result = get_exam_data(self.user.id, course_id)
 
         self.assertEqual(result["exam_metadata"], exam_data)
 
@@ -673,7 +689,7 @@ class TestGetExamData(unittest.TestCase):
         setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
 
         with self.assertRaises(Exception) as context:
-            get_exam_data(course_id)
+            get_exam_data(self.user.id, course_id)
 
         self.assertEqual(
             str(context.exception),

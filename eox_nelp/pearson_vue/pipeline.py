@@ -5,7 +5,12 @@ Each function in this module is designed to perform a specific step in the pipel
 called sequentially, where each function processes data and passes it along to the next step in the pipeline.
 
 Functions:
-    get_user_data(data: dict) -> dict: Retrieves and processes user data.
+    handle_course_completion_status: Pipeline function to handle course completion status.
+    get_user_data: Retrieves and processes user data.
+    check_service_availability: Checks the availability of the Pearson VUE RTI service.
+    import_candidate_demographics: Imports candidate demographics data.
+    import_exam_authorization: Imports exam authorization data.
+    get_exam_data: Retrieves exam data.
 """
 import logging
 
@@ -272,6 +277,7 @@ def import_exam_authorization(
             },
             "soapenv:Body": {
                 "sch:eadRequest": {
+                    "@clientAuthorizationID": exam_metadata["client_authorization_id"],
                     "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
                     "@authorizationTransactionType": transaccion_type,
                     "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
@@ -292,13 +298,14 @@ def import_exam_authorization(
         raise Exception("Error trying to process import exam authorization request.")
 
 
-def get_exam_data(course_id, **kwargs):  # pylint: disable=unused-argument
+def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argument
     """
     Retrieves exam data from Django settings.
 
     This function fetches the exam data from the settings using the given course ID.
 
     Args:
+        user_id (int): Unique user identifier.
         course_id (str): Unique course identifier.
         **kwargs: Additional keyword arguments.
 
@@ -308,12 +315,20 @@ def get_exam_data(course_id, **kwargs):  # pylint: disable=unused-argument
             - eligibility_appt_date_last (str): Last date an appointment can be made.
             - exam_authorization_count (str): Number of times the authorization can be consumed for registrations.
             - exam_series_code (str): Exam Series code in VUE system.
+            - client_authorization_id (str): Authorization ID in the client system.
 
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
     courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
     exam_metadata = courses_data[course_id]
+
+    # This generates the clientAuthorizationID based on the user_id and course_id
+    exam_metadata["client_authorization_id"] = anonymous_id_for_user(
+        User.objects.get(id=user_id),
+        course_id,
+    )
+
     required_fields = {
         "eligibility_appt_date_first",
         "eligibility_appt_date_last",

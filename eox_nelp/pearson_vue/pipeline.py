@@ -5,7 +5,12 @@ Each function in this module is designed to perform a specific step in the pipel
 called sequentially, where each function processes data and passes it along to the next step in the pipeline.
 
 Functions:
-    get_user_data(data: dict) -> dict: Retrieves and processes user data.
+    handle_course_completion_status: Pipeline function to handle course completion status.
+    get_user_data: Retrieves and processes user data.
+    check_service_availability: Checks the availability of the Pearson VUE RTI service.
+    import_candidate_demographics: Imports candidate demographics data.
+    import_exam_authorization: Imports exam authorization data.
+    get_exam_data: Retrieves exam data.
 """
 import logging
 
@@ -300,6 +305,7 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
     This function fetches the exam data from the settings using the given course ID.
 
     Args:
+        user_id (int): Unique user identifier.
         course_id (str): Unique course identifier.
         **kwargs: Additional keyword arguments.
 
@@ -309,6 +315,7 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
             - eligibility_appt_date_last (str): Last date an appointment can be made.
             - exam_authorization_count (str): Number of times the authorization can be consumed for registrations.
             - exam_series_code (str): Exam Series code in VUE system.
+            - client_authorization_id (str): Authorization ID in the client system.
 
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.

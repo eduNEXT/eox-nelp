@@ -26,7 +26,7 @@ from eox_nelp.pearson_vue.constants import (
     REVOKE_RESULT,
     UNREVOKE_RESULT,
 )
-from eox_nelp.pearson_vue.models import PearsonRTENModel
+from eox_nelp.pearson_vue.models import PearsonRTENEvent
 
 
 class PearsonRTENBaseView(generics.ListCreateAPIView):
@@ -45,7 +45,7 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
     event_type = None
     permission_classes = [IsAuthenticated]
     serializer_class = PearsonRTENSerializer
-    queryset = PearsonRTENModel.objects.all()  # pylint: disable=no-member
+    queryset = PearsonRTENEvent.objects.all()  # pylint: disable=no-member
     authentication_classes = [JwtAuthentication]
 
     def get_queryset(self):
@@ -57,7 +57,7 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
         Returns:
             QuerySet: The filtered queryset.
         """
-        return PearsonRTENModel.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
+        return PearsonRTENEvent.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
 
     def perform_create(self, serializer):
         """

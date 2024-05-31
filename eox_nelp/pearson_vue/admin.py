@@ -9,14 +9,14 @@ in the Django admin interface.
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from eox_nelp.pearson_vue.models import PearsonRTENModel
+from eox_nelp.pearson_vue.models import PearsonRTENEvent
 
 User = get_user_model()
 
 
-class PearsonRTENModelAdmin(admin.ModelAdmin):
+class PearsonRTENEventAdmin(admin.ModelAdmin):
     """
-    Admin class for the PearsonRTENModel model.
+    Admin class for the PearsonRTENEvent model.
 
     Attributes:
         list_display (list): List of fields to display in the admin list view.
@@ -26,4 +26,4 @@ class PearsonRTENModelAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-admin.site.register(PearsonRTENModel, PearsonRTENModelAdmin)
+admin.site.register(PearsonRTENEvent, PearsonRTENEventAdmin)

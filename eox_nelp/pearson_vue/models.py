@@ -4,7 +4,7 @@ Database models for Pearson VUE service.
 This module defines models for storing data related to the Pearson VUE service.
 
 Classes:
-    PearsonRTENModel: A model representing an event for the Pearson VUE RTEN service.
+    PearsonRTENEvent: A model representing an event for the Pearson VUE RTEN service.
 
 Constants:
     EVENT_TYPE_CHOICES: A list of tuples representing the possible choices
@@ -31,7 +31,7 @@ EVENT_TYPE_CHOICES = [
 ]
 
 
-class PearsonRTENModel(models.Model):
+class PearsonRTENEvent(models.Model):
     """
     A model representing a Pearson VUE RTEN event.
 

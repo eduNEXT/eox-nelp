@@ -25,7 +25,7 @@ from eox_nelp.pearson_vue.constants import (
     REVOKE_RESULT,
     UNREVOKE_RESULT,
 )
-from eox_nelp.pearson_vue.models import PearsonRTENModel
+from eox_nelp.pearson_vue.models import PearsonRTENEvent
 
 User = get_user_model()
 
@@ -55,11 +55,11 @@ class RTENMixin:
 
         """
         # pylint: disable=no-member
-        initial_count = PearsonRTENModel.objects.filter(event_type=self.event_type).count()
+        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
 
         response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
 
-        final_count = PearsonRTENModel.objects.filter(event_type=self.event_type).count()
+        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
 
         self.assertEqual(final_count, initial_count + 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -74,9 +74,9 @@ class RTENMixin:
             - The response data contains the correct event details.
         """
         # This will create a record to ensure that  there is at least one element
-        PearsonRTENModel.objects.create(event_type=self.event_type, content={})  # pylint: disable=no-member
+        PearsonRTENEvent.objects.create(event_type=self.event_type, content={})  # pylint: disable=no-member
         # Retrieve all the events of the same type
-        events = PearsonRTENModel.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
+        events = PearsonRTENEvent.objects.filter(event_type=self.event_type)  # pylint: disable=no-member
         expected_results = []
 
         for event in events:

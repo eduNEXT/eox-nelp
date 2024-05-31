@@ -13,6 +13,7 @@ Classes:
 import unittest
 
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -90,6 +91,36 @@ class RTENMixin:
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], len(events))
+
+    @override_settings(PEARSON_RTEN_API_ENABLED=False)
+    def test_create_result_notification_event_disabled(self):
+        """
+        Test creating an event when PEARSON_RTEN_ENABLED is False.
+
+        Expected behavior:
+            - No new record is created.
+            - Response returns a 404 status code.
+        """
+        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()  # pylint: disable=no-member
+
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
+
+        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()  # pylint: disable=no-member
+
+        self.assertEqual(final_count, initial_count)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @override_settings(PEARSON_RTEN_API_ENABLED=False)
+    def test_get_event_disabled(self):
+        """
+        Test retrieving an event when PEARSON_RTEN_ENABLED is False.
+
+        Expected behavior:
+            - Response returns a 404 status code.
+        """
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}"), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestResultNotificationView(RTENMixin, unittest.TestCase):

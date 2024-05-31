@@ -106,6 +106,7 @@ REST_FRAMEWORK = {
     },
 }
 EVENT_TRACKING_ENABLED = True
+PEARSON_RTEN_API_ENABLED = True
 
 # ------------external plugins configuration backends----------------
 

@@ -12,6 +12,8 @@ Classes:
     RevokeResultView: A view for handling revoke result events.
     UnrevokeResultView: A view for handling unrevoke result events.
 """
+from django.conf import settings
+from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eox_core.edxapp_wrapper.bearer_authentication import BearerAuthentication
 from rest_framework import generics, status
@@ -48,6 +50,30 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
     serializer_class = PearsonRTENSerializer
     queryset = PearsonRTENEvent.objects.all()  # pylint: disable=no-member
     authentication_classes = [BearerAuthentication, JwtAuthentication]
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Override the dispatch method to check if the PEARSON_RTEN_API_ENABLED setting is active.
+
+        This method checks if the PEARSON_RTEN_API_ENABLED setting is set to True. If it is not,
+        it raises an Http404 exception, resulting in a 404 Not Found response. If the setting
+        is active, it proceeds with the normal dispatch process.
+
+        Args:
+            request (Request): The request object containing the data.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: Parent dispatch result.
+
+        Raises:
+            Http404: If the PEARSON_RTEN_API_ENABLED setting is not active.
+        """
+        if not getattr(settings, "PEARSON_RTEN_API_ENABLED", False):
+            raise Http404
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         """

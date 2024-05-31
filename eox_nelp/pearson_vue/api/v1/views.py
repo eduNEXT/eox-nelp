@@ -13,6 +13,7 @@ Classes:
     UnrevokeResultView: A view for handling unrevoke result events.
 """
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from eox_core.edxapp_wrapper.bearer_authentication import BearerAuthentication
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -46,7 +47,7 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PearsonRTENSerializer
     queryset = PearsonRTENEvent.objects.all()  # pylint: disable=no-member
-    authentication_classes = [JwtAuthentication]
+    authentication_classes = [BearerAuthentication, JwtAuthentication]
 
     def get_queryset(self):
         """

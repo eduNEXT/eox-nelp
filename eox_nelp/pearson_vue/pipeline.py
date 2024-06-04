@@ -240,7 +240,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
 def import_exam_authorization(
     profile_metadata,
     exam_metadata,
-    transaccion_type="Add",
+    transaction_type="Add",
     **kwargs
 ):  # pylint: disable=unused-argument
     """
@@ -255,7 +255,7 @@ def import_exam_authorization(
     Args:
         profile_metadata (dict): Basic user data.
         exam_metadata (dict): Exam information.
-        transaccion_type (str): The type of transaction for the authorization (default is "Add").
+        transaction_type (str): The type of transaction for the authorization (default is "Add").
         **kwargs: A dictionary containing the following key-value pairs:
             - anonymous_user_id (str): An anonymized identifier for the user.
 
@@ -279,7 +279,7 @@ def import_exam_authorization(
                 "sch:eadRequest": {
                     "@clientAuthorizationID": exam_metadata["client_authorization_id"],
                     "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
-                    "@authorizationTransactionType": transaccion_type,
+                    "@authorizationTransactionType": transaction_type,
                     "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
                     "examAuthorizationCount": exam_metadata["exam_authorization_count"],
                     "examSeriesCode": exam_metadata["exam_series_code"],

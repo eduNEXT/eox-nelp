@@ -64,3 +64,30 @@ class RealTimeImport:
             import_candidate_demographics,
             import_exam_authorization,
         ]
+
+
+class ExamAuthorizationDataImport(RealTimeImport):
+    """Class for EAD requests (Exam Authorization Data operations) and executing the pipeline."""
+    def get_pipeline(self):
+        """
+        Returns the EAD pipeline, which is a list of functions to be executed.
+        """
+        return [
+            get_user_data,
+            get_exam_data,
+            check_service_availability,
+            import_exam_authorization,
+        ]
+
+
+class CandidateDemographicsDataImport(RealTimeImport):
+    """Class for CDD requests (Candidate Demographics Data operations) and executing the pipeline."""
+    def get_pipeline(self):
+        """
+        Returns the CDD pipeline, which is a list of functions to be executed.
+        """
+        return [
+            get_user_data,
+            check_service_availability,
+            import_candidate_demographics,
+        ]

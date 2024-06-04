@@ -2,6 +2,13 @@
 # flake8: noqa: E501
 # pylint: disable=duplicate-code
 
+RESULT_NOTIFICATION = "result-notification"
+PLACE_HOLD = "place-hold"
+RELEASE_HOLD = "release-hold"
+MODIFY_RESULT_STATUS = "modify-result-status"
+REVOKE_RESULT = "revoke-result"
+UNREVOKE_RESULT = "unrevoke-result"
+
 PAYLOAD_PING = """
 <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope" xmlns:sch="http://ws.pearsonvue.com/ping/schema">
     <soapenv:Header/>

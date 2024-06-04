@@ -16,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from eox_nelp.one_time_password.generators import generate_otp_code
+from eox_nelp.one_time_password.view_decorators import validate_otp
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ def generate_otp(request):
     """ View for generate OTP.
     ## Usage
 
-    ### **POST** /eox-nelp/api/one-time-password/v1/generate-otp/
+    ### **POST** /eox-nelp/api/one-time-password/v1/generate/
 
     request example data:
     ``` json
@@ -61,3 +62,32 @@ def generate_otp(request):
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
 
     return Response({"message": "Success generate-otp!"}, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@authentication_classes((
+    SessionAuthenticationAllowInactiveUser,
+))
+@permission_classes((IsAuthenticated,))
+@validate_otp
+def validate(request):  # pylint: disable=unused-argument
+    """ View for generate OTP.
+    ## Usage
+
+    ### **POST** /eox-nelp/api/one-time-password/v1/validate/
+
+    request example data:
+    ``` json
+    {
+        "phone_number": 3213123123,
+        "one_time_password": "234fasds"
+    }
+    ```
+    **POST Response Values**
+    ``` json
+    {
+        "message": "Valid OTP code"
+    }
+    ```
+    """
+    return Response({"message": "Valid OTP code"}, status=status.HTTP_200_OK)

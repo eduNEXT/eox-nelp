@@ -4,12 +4,18 @@ Classes:
     UpdatePayloadCddRequestTestCase: Tests cases for update_xml_with_dict using payload with cdd request tag cases.
     UpdatePayloadEadRequestTestCase: Test cased for update_xml_with_dict using payload with ead request tag cases.
 """
+from unittest.mock import MagicMock
+
 import xmltodict
 from bs4 import BeautifulSoup
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
-from eox_nelp.pearson_vue.utils import update_xml_with_dict
+from eox_nelp.edxapp_wrapper.student import CourseEnrollment
+from eox_nelp.pearson_vue.constants import CLIENT_AUTHORIZATION_ID_OFFSET, PAYLOAD_CDD, PAYLOAD_EAD
+from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
+
+User = get_user_model()
 
 
 class UpdatePayloadCddRequestTestCase(TestCase):
@@ -367,3 +373,41 @@ class UpdatePayloadEadRequestTestCase(TestCase):
         self.assertNotEqual(xmltodict.parse(self.payload_base), xmltodict.parse(payload_result))
         for key, value in update_dict["soapenv:Envelope"]["soapenv:Body"]["sch:eadRequest"].items():
             self.assertEqual(payload_result_bs.find(key).text, value)
+
+
+class GenerateClientAuthorizationIDTestCase(TestCase):
+    """Test case for generate_client_authorization_id."""
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.user, _ = User.objects.get_or_create(
+            username="Superman",
+            first_name="Clark",
+            last_name="Kent",
+            email="superman@justiceleague.com",
+
+        )
+        self.course_id = "course-v1:Doomsday+Demo+2023"
+        CourseEnrollment.objects.get.return_value = MagicMock(
+            user=self.user,
+            course_id=self.course_id,
+            id=1,
+        )
+
+    def tearDown(self):
+        """Restore mocks' state"""
+        CourseEnrollment.reset_mock()
+
+    def test_generate_client_authorization_id(self):
+        """
+        Test generate_client_authorization_id function return the set values.
+            Expected behavior:
+            - The result is the expected value.(300001)
+        """
+        expected_result = str(1 + CLIENT_AUTHORIZATION_ID_OFFSET)
+
+        result = generate_client_authorization_id(self.user.id, self.course_id)
+
+        self.assertEqual(expected_result, result)

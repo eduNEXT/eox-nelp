@@ -11,7 +11,7 @@ from django.test import override_settings
 from django.utils import timezone
 from django_countries.fields import Country
 
-from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
+from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
@@ -644,6 +644,16 @@ class TestGetExamData(unittest.TestCase):
             email="rubeus.hagrid@hogwarts.com",
 
         )
+        self.course_id = "course-v1:FutureX+guide+2023"
+        CourseEnrollment.objects.get.return_value = MagicMock(
+            user=self.user,
+            id=1,
+            course_id=self.course_id
+        )
+
+    def tearDown(self):
+        """Restore mocks' state"""
+        CourseEnrollment.reset_mock()
 
     @override_settings()
     def test_get_exam_data_success(self):
@@ -659,7 +669,7 @@ class TestGetExamData(unittest.TestCase):
             "exam_authorization_count": 3,
             "exam_series_code": "ABD",
         }
-        course_id = "course-v1:FutureX+guide+2023"
+        course_id = self.course_id
         course_settings = {
             course_id: exam_data
         }
@@ -678,7 +688,7 @@ class TestGetExamData(unittest.TestCase):
             - Function raises an exception.
             - Exception message is the expected.
         """
-        course_id = "course-v1:FutureX+guide+2023"
+        course_id = self.course_id
         course_settings = {
             course_id: {
                 "invalid_key": "test",

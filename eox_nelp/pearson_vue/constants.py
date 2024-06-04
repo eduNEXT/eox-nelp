@@ -94,3 +94,4 @@ PAYLOAD_EAD = """
     </soapenv:Body>
 </soapenv:Envelope>
 """
+CLIENT_AUTHORIZATION_ID_OFFSET = 300000

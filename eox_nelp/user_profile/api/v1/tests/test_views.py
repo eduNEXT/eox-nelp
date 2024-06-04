@@ -2,7 +2,7 @@
 Classes:
     OTPMixin: Mixin for OTP views.
     GenerateOTPTestCase: Class to test GenerateOTP view
-    ValidateOTPTestCase: Class to test ValidateOTP view
+    UpdateUserDataTestCase: Class to test update_user_data view
 """
 
 from ddt import data, ddt
@@ -166,9 +166,9 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
 
 
 @ddt
-class ValidateOTPTestCase(OTPMixin, APITestCase):
-    """Test case for validate OTP view."""
-    reverse_viewname = "user-profile-api:v1:validate-otp"
+class UpdateUserDataTestCase(OTPMixin, APITestCase):
+    """Test case for update user data view."""
+    reverse_viewname = "user-profile-api:v1:update-user-data"
 
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):
@@ -236,7 +236,7 @@ class ValidateOTPTestCase(OTPMixin, APITestCase):
         self.assertEqual(logs.output, [
             f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
         ])
-        self.assertDictEqual(response.json(), {"message": "Success validate-otp! Saved phone_number"})
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user.profile.phone_number, payload["phone_number"])
         self.user.profile.save.assert_called_once()

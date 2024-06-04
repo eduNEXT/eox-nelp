@@ -70,11 +70,11 @@ def generate_otp(request):
     SessionAuthenticationAllowInactiveUser,
 ))
 @permission_classes((IsAuthenticated,))
-def validate_otp(request):
-    """ View for validate OTP.
+def update_user_data(request):
+    """ View to update user's fields.
     ## Usage
 
-    ### **POST** /eox-nelp/api/user-profile/v1/validate-otp/
+    ### **POST** /eox-nelp/api/user-profile/v1/update-user-data/
 
     request example data:
     ``` json
@@ -86,7 +86,7 @@ def validate_otp(request):
     **POST Response Values**
     ``` json
     {
-        "message": "Success validate-otp! Saved phone_number"
+        "message": "User's fields has been updated successfully"
     }
     ```
     """
@@ -109,4 +109,4 @@ def validate_otp(request):
     user.profile.phone_number = user_phone_number
     user.profile.save()
 
-    return Response({"message": "Success validate-otp! Saved phone_number"}, status=status.HTTP_201_CREATED)
+    return Response({"message": "User's fields has been updated successfully"}, status=status.HTTP_200_OK)

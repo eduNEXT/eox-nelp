@@ -45,7 +45,7 @@ def generate_otp(request):
     }
     ```
     """
-    user_phone_number = request.data.get("phone_number", None)
+    user_phone_number = request.data.get("phone_number", request.user.profile.phone_number)
 
     if not user_phone_number:
         return JsonResponse(

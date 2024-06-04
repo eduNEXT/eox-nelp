@@ -7,6 +7,7 @@ Classes:
 from ddt import data, ddt
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from mock import Mock
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -26,6 +27,7 @@ class POSTAuthenticatedTestMixin:
         self.client = APIClient()
         self.user, _ = User.objects.get_or_create(username="vader")
         self.client.force_authenticate(self.user)
+        setattr(self.user, "profile", Mock(phone_number=None))
 
     @data(*NOT_ALLOWED_HTTP_METHODS)
     def test_method_not_allowed(self, method_name):

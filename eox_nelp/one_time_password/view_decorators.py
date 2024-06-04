@@ -40,7 +40,7 @@ def validate_otp(func):
     @functools.wraps(func)
     def wrapper(request):
         if getattr(settings, "ENABLE_OTP_VALIDATION", True):
-            user_phone_number = request.data.get("phone_number", None)
+            user_phone_number = request.data.get("phone_number", request.user.profile.phone_number)
             proposed_user_otp = request.data.get("one_time_password", None)
 
             if not user_phone_number or not proposed_user_otp:

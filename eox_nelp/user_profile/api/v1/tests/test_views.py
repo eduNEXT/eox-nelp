@@ -1,4 +1,4 @@
-"""This file contains all the test for the phone_validation views.py file.
+"""This file contains all the test for the user_profile API V1 views.py file.
 Classes:
     OTPMixin: Mixin for OTP views.
     GenerateOTPTestCase: Class to test GenerateOTP view
@@ -15,8 +15,8 @@ from mock import Mock
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from eox_nelp.phone_validation.api.v1 import views
 from eox_nelp.tests.utils import get_cache_expiration_time
+from eox_nelp.user_profile.api.v1 import views
 
 User = get_user_model()
 
@@ -80,7 +80,7 @@ class OTPMixin:
 @ddt
 class GenerateOTPTestCase(OTPMixin, APITestCase):
     """Test case for generate OTP view."""
-    reverse_viewname = "phone-validation-api:v1:generate-otp"
+    reverse_viewname = "user-profile-api:v1:generate-otp"
 
     @data({}, {"not_phone_number": 3123123123})
     def test_generate_otp_without_right_payload(self, wrong_payload):
@@ -168,7 +168,7 @@ class GenerateOTPTestCase(OTPMixin, APITestCase):
 @ddt
 class ValidateOTPTestCase(OTPMixin, APITestCase):
     """Test case for validate OTP view."""
-    reverse_viewname = "phone-validation-api:v1:validate-otp"
+    reverse_viewname = "user-profile-api:v1:validate-otp"
 
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):

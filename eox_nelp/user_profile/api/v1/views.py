@@ -1,6 +1,6 @@
-"""Generic views for NELP OTP to confirm phone number.
+"""Generic views for NELP user's profile application.
 
-function-views:
+Function-views:
   - generate_otp: generate and send via SMS the OTP related a user. Saved in cache.
   - validate_otp: Compare and check if the proposed OTP match the User OTP saved in cache.
     If match, updates the profile phone_number.
@@ -31,7 +31,7 @@ def generate_otp(request):
     """ View for generate OTP.
     ## Usage
 
-    ### **POST** /eox-nelp/api/phone-validation/v1/generate-otp/
+    ### **POST** /eox-nelp/api/user-profile/v1/generate-otp/
 
     request example data:
     ``` json
@@ -74,7 +74,7 @@ def validate_otp(request):
     """ View for validate OTP.
     ## Usage
 
-    ### **POST** /eox-nelp/api/phone-validation/v1/validate-otp/
+    ### **POST** /eox-nelp/api/user-profile/v1/validate-otp/
 
     request example data:
     ``` json

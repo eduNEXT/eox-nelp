@@ -11,10 +11,10 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
-from mock import Mock
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
+from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.tests.utils import get_cache_expiration_time
 from eox_nelp.user_profile.api.v1 import views
 
@@ -33,12 +33,11 @@ class OTPMixin:
         """
         self.client = APIClient()
         self.user, _ = User.objects.get_or_create(username="vader")
-        setattr(self.user, "profile", Mock())
         self.client.force_authenticate(self.user)
 
     def tearDown(self):  # pylint: disable=invalid-name
         """Reset some mock variables"""
-        self.user.profile.reset_mock()
+        accounts.api.update_account_settings.reset_mock()
 
     @data(*NOT_ALLOWED_HTTP_METHODS)
     def test_method_not_allowed(self, method_name):
@@ -170,6 +169,11 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
     """Test case for update user data view."""
     reverse_viewname = "user-profile-api:v1:update-user-data"
 
+    def tearDown(self):  # pylint: disable=invalid-name
+        """Reset Mocks"""
+        accounts.api.update_account_settings.side_effect = None
+        super().tearDown()
+
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):
         """
@@ -177,8 +181,7 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
         Expected behavior:
             - Check the response say is missing some keys.
             - Status code 400.
-            - Check that user profile mock is not assigned and still is Mock.
-            - Check that profile mock save method has not been called.
+            - Check that update_account_settings method has not been called.
         """
         url_endpoint = reverse(self.reverse_viewname)
 
@@ -186,8 +189,7 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
 
         self.assertDictEqual(response.json(), {"detail": "missing phone_number or one_time_password in data."})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIsInstance(getattr(self.user.profile, "phone_number"), Mock)
-        self.user.profile.save.assert_not_called()
+        accounts.api.update_account_settings.assert_not_called()
 
     def test_validate_otp_without_right_validation_code(self):
         """
@@ -195,8 +197,7 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
         Expected behavior:
             - Check logging validation msg
             - Status code 403.
-            - Check that user profile mock is not assigned and still is Mock.
-            - Check that profile mock save method has not been called.
+            - Check that update_account_settings method has not been called.
         """
         correct_otp = "correct17"
         payload = {"phone_number": 3219990000, "one_time_password": "password"}
@@ -211,8 +212,7 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
             f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
         ])
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertIsInstance(getattr(self.user.profile, "phone_number"), Mock)
-        self.user.profile.save.assert_not_called()
+        accounts.api.update_account_settings.assert_not_called()
 
     def test_validate_otp_right_validation_code(self):
         """
@@ -220,9 +220,8 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
         Expected behavior:
             - Check loggin validation msg
             - Check the response say success validate-otp.
-            - Status code 201.
-            - Check that user profile mock has the phone_number
-            - Check that profile mock save method has called once.
+            - Status code 200.
+            - Check that update_account_settings method has called once.
         """
         correct_otp = "correct26"
         payload = {"phone_number": 3219990000, "one_time_password": correct_otp}
@@ -238,5 +237,66 @@ class UpdateUserDataTestCase(OTPMixin, APITestCase):
         ])
         self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.user.profile.phone_number, payload["phone_number"])
-        self.user.profile.save.assert_called_once()
+        accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+
+    def test_account_validation_error(self):
+        """
+        Test that a bad request is returned when an AccountValidationError is raised.
+
+        Expected behavior:
+            - Check logging validation msg
+            - Check the response contains fields_errors.
+            - Status code 400.
+            - Check that update_account_settings method has called once.
+        """
+        correct_otp = "correct26"
+        payload = {"phone_number": 3219990000, "one_time_password": correct_otp}
+        url_endpoint = reverse(self.reverse_viewname)
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
+        cache.set(user_otp_key, correct_otp, timeout=600)
+        accounts.api.update_account_settings.side_effect = errors.AccountValidationError(
+            field_errors="Invalid phone number",
+        )
+
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
+        self.assertDictEqual(response.json(), {"field_errors": "Invalid phone number"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+
+    def test_account_update_error(self):
+        """
+        Test that a bad request is returned when an AccountUpdateError is raised.
+
+        Expected behavior:
+            - Check logging validation msg
+            - Check the response contains developer and user message.
+            - Status code 400.
+            - Check that update_account_settings method has called once.
+        """
+        correct_otp = "correct26"
+        payload = {"phone_number": 3219990000, "one_time_password": correct_otp}
+        url_endpoint = reverse(self.reverse_viewname)
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
+        cache.set(user_otp_key, correct_otp, timeout=600)
+        expected_response = {
+            "developer_message": "The testing method failed",
+            "user_message": "You user wasn't updated",
+        }
+        accounts.api.update_account_settings.side_effect = errors.AccountUpdateError(
+            **expected_response,
+        )
+
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
+        self.assertDictEqual(response.json(), expected_response)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        accounts.api.update_account_settings.assert_called_once_with(self.user, payload)

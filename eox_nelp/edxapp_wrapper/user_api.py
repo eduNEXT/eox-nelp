@@ -15,3 +15,4 @@ from django.conf import settings
 backend = import_module(settings.EOX_NELP_USER_API)
 
 accounts = backend.get_accounts()
+errors = backend.get_errors()

@@ -3,7 +3,7 @@
 This file contains all the necessary dependencies from
 https://github.com/eduNEXT/edunext-platform/tree/master/openedx/core/djangoapps/user_api
 """
-from openedx.core.djangoapps.user_api import accounts  # pylint: disable=import-error
+from openedx.core.djangoapps.user_api import accounts, errors  # pylint: disable=import-error
 
 
 def get_accounts():
@@ -14,3 +14,13 @@ def get_accounts():
         accounts module.
     """
     return accounts
+
+
+def get_errors():
+    """Allow to get the module errors from
+    https://github.com/eduNEXT/edunext-platform/tree/master/openedx/core/djangoapps/user_api/errors
+
+    Returns:
+        errors module.
+    """
+    return errors

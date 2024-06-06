@@ -24,6 +24,7 @@ class PearsonRTENEventAdmin(admin.ModelAdmin):
     """
     list_display = ("event_type", "created_at")
     readonly_fields = ("created_at",)
+    list_filter = ["event_type",]
 
 
 admin.site.register(PearsonRTENEvent, PearsonRTENEventAdmin)

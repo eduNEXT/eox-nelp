@@ -2,25 +2,75 @@
 Unit tests for the student admin module.
 
 Classes:
-    TestPearsonRealTimeAction: Tests for the pearson_real_time_action admin action.
+    TestPearsonAction: Tests for pearson_action admin actions.
     TestNelpCourseEnrollmentAdmin: Tests for the NelpCourseEnrollmentAdmin admin class.
 """
 from unittest.mock import MagicMock, patch
 
+from ddt import data, ddt, unpack
 from django.test import RequestFactory, TestCase
 
-from eox_nelp.admin import NelpCourseEnrollmentAdmin, pearson_real_time_action
+from eox_nelp.admin import (
+    NelpCourseEnrollmentAdmin,
+    pearson_add_ead_action,
+    pearson_cdd_action,
+    pearson_delete_ead_action,
+    pearson_real_time_action,
+    pearson_update_ead_action,
+)
 
 
-class TestPearsonRealTimeAction(TestCase):
+@ddt
+class TestPearsonAction(TestCase):
     """
-    Unit tests for the pearson_real_time_action function.
+    Unit tests for the pearson actions functions.
     """
 
-    @patch("eox_nelp.pearson_vue.tasks.real_time_import_task.delay")
-    def test_pearson_real_time_action(self, mock_delay):
+    @data(
+        {
+            "mock_task": "eox_nelp.pearson_vue.tasks.real_time_import_task.delay",
+            "admin_action": pearson_real_time_action,
+            "call_args": ["user_id", "course_id"],
+            "extra_call_kwargs": {
+            },
+        },
+        {
+            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
+            "admin_action": pearson_add_ead_action,
+            "call_args": ["user_id", "course_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Add",
+            },
+
+        },
+        {
+            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
+            "admin_action": pearson_update_ead_action,
+            "call_args": ["user_id", "course_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Update",
+            },
+        },
+        {
+            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
+            "admin_action": pearson_delete_ead_action,
+            "call_args": ["user_id", "course_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Delete",
+            },
+        },
+        {
+            "mock_task": "eox_nelp.pearson_vue.tasks.cdd_task.delay",
+            "admin_action": pearson_cdd_action,
+            "call_args": ["user_id"],
+            "extra_call_kwargs": {
+            },
+        },
+    )
+    @unpack
+    def test_pearson_course_enrollment_action(self, mock_task, admin_action, call_args, extra_call_kwargs):
         """
-        Test that the pearson_real_time_action function calls the real_time_import_task.delay with correct parameters.
+        Test that a pearson_action function calls the a task delay with correct parameters.
         """
         user = MagicMock()
         user.id = 1
@@ -30,6 +80,20 @@ class TestPearsonRealTimeAction(TestCase):
         course_enrollment_2 = MagicMock()
         course_enrollment_2.course_id = "course-v1:FutureX+T102+2025_T1"
         course_enrollment_2.user = user
+        mocks_call_kwargs = [
+            {
+                "course_id": course_enrollment_1.course_id,
+                "user_id": user.id,
+            },
+            {
+                "course_id": course_enrollment_2.course_id,
+                "user_id": user.id,
+            }
+        ]
+        for mock_call_kwargs in mocks_call_kwargs:
+            for key in set(mock_call_kwargs.keys()).difference(call_args):  # set main call args
+                del mock_call_kwargs[key]
+            mock_call_kwargs.update(extra_call_kwargs)
 
         queryset = [course_enrollment_1, course_enrollment_2]
         modeladmin = MagicMock()
@@ -37,13 +101,15 @@ class TestPearsonRealTimeAction(TestCase):
         request = RequestFactory().get("/admin")
 
         # Call the admin action
-        pearson_real_time_action(modeladmin, request, queryset)
+        with patch(mock_task) as mocked_task:
+            admin_action(modeladmin, request, queryset)
+            for mock_call_kwargs in mocks_call_kwargs:
+                mocked_task.assert_any_call(**mock_call_kwargs)
+                mocked_task.assert_any_call(**mock_call_kwargs)
+            self.assertEqual(mocked_task.call_count, len(mocks_call_kwargs))
 
-        mock_delay.assert_any_call(course_id=course_enrollment_1.course_id, user_id=user.id)
-        mock_delay.assert_any_call(course_id=course_enrollment_2.course_id, user_id=user.id)
-        self.assertEqual(mock_delay.call_count, 2)
 
-
+@ddt
 class TestNelpCourseEnrollmentAdmin(TestCase):
     """
     Unit tests for the NelpCourseEnrollmentAdmin class.
@@ -55,11 +121,18 @@ class TestNelpCourseEnrollmentAdmin(TestCase):
         """
         self.modeladmin = NelpCourseEnrollmentAdmin()
 
-    def test_actions(self):
+    @data(
+        pearson_add_ead_action,
+        pearson_cdd_action,
+        pearson_delete_ead_action,
+        pearson_real_time_action,
+        pearson_update_ead_action,
+    )
+    def test_actions(self, admin_action):
         """
         Test that the actions list contains pearson_real_time_action.
 
         Expected behavior:
             - pearson_real_time_action method is in model actions.
         """
-        self.assertIn(pearson_real_time_action, self.modeladmin.actions)
+        self.assertIn(admin_action, self.modeladmin.actions)

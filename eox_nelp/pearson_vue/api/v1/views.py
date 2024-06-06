@@ -11,6 +11,8 @@ Classes:
     ModifyResultStatusView: A view for handling modify result status events.
     RevokeResultView: A view for handling revoke result events.
     UnrevokeResultView: A view for handling unrevoke result events.
+    ModifyAppointmentView: A view for handling Modify Appoinments  events.
+    CancelAppointmentView: A view for handling Cancel Appoinments events.
 """
 from django.conf import settings
 from django.http import Http404
@@ -22,6 +24,8 @@ from rest_framework.response import Response
 
 from eox_nelp.pearson_vue.api.v1.serializers import PearsonRTENSerializer
 from eox_nelp.pearson_vue.constants import (
+    CANCEL_APPOINTMENT,
+    MODIFY_APPOINTMENT,
     MODIFY_RESULT_STATUS,
     PLACE_HOLD,
     RELEASE_HOLD,
@@ -183,3 +187,25 @@ class UnrevokeResultView(PearsonRTENBaseView):
     """
 
     event_type = UNREVOKE_RESULT
+
+
+class ModifyAppointmentView(PearsonRTENBaseView):
+    """
+    View for handling Modify Appointment events.
+
+    This view handles the creation of Modify Appointment events in the Pearson RTEN system.
+    The `event_type` attribute is set to "modifyAppointment".
+    """
+
+    event_type = MODIFY_APPOINTMENT
+
+
+class CancelAppointmentView(PearsonRTENBaseView):
+    """
+    View for handling Cancel Appointment events.
+
+    This view handles the creation of Cancel Appointment events in the Pearson RTEN system.
+    The `event_type` attribute is set to "CancelAppointment".
+    """
+
+    event_type = CANCEL_APPOINTMENT

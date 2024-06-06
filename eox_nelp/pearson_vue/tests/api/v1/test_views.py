@@ -19,6 +19,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from eox_nelp.pearson_vue.constants import (
+    CANCEL_APPOINTMENT,
+    MODIFY_APPOINTMENT,
     MODIFY_RESULT_STATUS,
     PLACE_HOLD,
     RELEASE_HOLD,
@@ -163,3 +165,17 @@ class TestUnrevokeResultView(RTENMixin, unittest.TestCase):
     Unit tests for UnrevokeResultView.
     """
     event_type = UNREVOKE_RESULT
+
+
+class TestModifyAppointmentView(RTENMixin, unittest.TestCase):
+    """
+    Unit tests for ModifyAppointmentView.
+    """
+    event_type = MODIFY_APPOINTMENT
+
+
+class TestCancelAppointmentView(RTENMixin, unittest.TestCase):
+    """
+    Unit tests for CancelAppointmentView.
+    """
+    event_type = CANCEL_APPOINTMENT

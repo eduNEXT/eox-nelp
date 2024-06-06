@@ -13,6 +13,8 @@ Constants:
 from django.db import models
 
 from eox_nelp.pearson_vue.constants import (
+    CANCEL_APPOINTMENT,
+    MODIFY_APPOINTMENT,
     MODIFY_RESULT_STATUS,
     PLACE_HOLD,
     RELEASE_HOLD,
@@ -28,6 +30,8 @@ EVENT_TYPE_CHOICES = [
     (MODIFY_RESULT_STATUS, "Modify Result Status"),
     (REVOKE_RESULT, "Revoke Result"),
     (UNREVOKE_RESULT, "Unrevoke Result"),
+    (MODIFY_APPOINTMENT, "Modify Appointment"),
+    (CANCEL_APPOINTMENT, "Cancel Appointment"),
 ]
 
 

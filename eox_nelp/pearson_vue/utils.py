@@ -5,6 +5,9 @@ This includes xml helpers:
 import xmltodict
 from pydantic.v1.utils import deep_update
 
+from eox_nelp.edxapp_wrapper.student import CourseEnrollment
+from eox_nelp.pearson_vue.constants import CLIENT_AUTHORIZATION_ID_OFFSET
+
 
 def update_xml_with_dict(xml: str, update_dict: dict) -> str:
     """Update an xml string using its dict representation, deep_update,
@@ -26,3 +29,16 @@ def update_xml_with_dict(xml: str, update_dict: dict) -> str:
     xml_dict = xmltodict.parse(xml)
     result = deep_update(xml_dict, update_dict)
     return xmltodict.unparse(result, full_document=False)
+
+
+def generate_client_authorization_id(user_id: int, course_id: str) -> str:
+    """Use course_enrollment_id to generate client_authorization_id for EAD requests.
+    Args:
+        user_id (int): user id
+        course_id (str): course id
+    Returns:
+        str: string that represents the client_auth_id
+    """
+    course_enrollment = CourseEnrollment.objects.get(user_id=user_id, course_id=course_id)
+
+    return str(course_enrollment.id + CLIENT_AUTHORIZATION_ID_OFFSET)

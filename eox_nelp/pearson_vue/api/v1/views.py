@@ -10,7 +10,9 @@ Classes:
     ReleaseHoldView: A view for handling release hold events.
     ModifyResultStatusView: A view for handling modify result status events.
     RevokeResultView: A view for handling revoke result events.
-    UnrevokeResultView: A view for handling Modify Appointment events.
+    UnrevokeResultView: A view for handling unrevoke result events.
+    ModifyAppointmentView: A view for handling Modify Appoinments  events.
+    CancelAppointmentView: A view for handling Cancel Appoinments events.
 """
 from django.conf import settings
 from django.http import Http404

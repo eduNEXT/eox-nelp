@@ -16,6 +16,8 @@ URL Patterns:
 from django.urls import path
 
 from eox_nelp.pearson_vue.api.v1.views import (
+    CancelAppointmentView,
+    ModifyAppointmentView,
     ModifyResultStatusView,
     PlaceHoldView,
     ReleaseHoldView,
@@ -24,6 +26,8 @@ from eox_nelp.pearson_vue.api.v1.views import (
     UnrevokeResultView,
 )
 from eox_nelp.pearson_vue.constants import (
+    CANCEL_APPOINTMENT,
+    MODIFY_APPOINTMENT,
     MODIFY_RESULT_STATUS,
     PLACE_HOLD,
     RELEASE_HOLD,
@@ -41,4 +45,6 @@ urlpatterns = [
     path('modifyResultStatus/', ModifyResultStatusView.as_view(), name=MODIFY_RESULT_STATUS),
     path('revokeResult/', RevokeResultView.as_view(), name=REVOKE_RESULT),
     path('unrevokeResult/', UnrevokeResultView.as_view(), name=UNREVOKE_RESULT),
+    path('modifyAppointment/', ModifyAppointmentView.as_view(), name=MODIFY_APPOINTMENT),
+    path('cancelAppointment/', CancelAppointmentView.as_view(), name=CANCEL_APPOINTMENT),
 ]

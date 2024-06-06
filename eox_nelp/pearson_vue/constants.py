@@ -8,6 +8,9 @@ RELEASE_HOLD = "release-hold"
 MODIFY_RESULT_STATUS = "modify-result-status"
 REVOKE_RESULT = "revoke-result"
 UNREVOKE_RESULT = "unrevoke-result"
+MODIFY_APPOINTMENT = "modify-appointment"
+CANCEL_APPOINTMENT = "cancel-appointment"
+
 
 PAYLOAD_PING = """
 <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope" xmlns:sch="http://ws.pearsonvue.com/ping/schema">

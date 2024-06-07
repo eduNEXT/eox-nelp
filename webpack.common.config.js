@@ -17,9 +17,9 @@ const entries = {
     js: './eox_nelp/course_experience/frontend/src/components/FeedbackCarousel/index',
     template: 'eox_nelp/course_experience/frontend/templates/feedback_courses.html',
   },
-  phone_validation: {
-    js: './eox_nelp/phone_validation/frontend/src/components/PhoneValidation/index',
-    template: 'eox_nelp/phone_validation/templates/phone_validation.html',
+  user_profile: {
+    js: './eox_nelp/user_profile/frontend/src/components/UserProfileForm/index',
+    template: 'eox_nelp/user_profile/templates/user_profile_form.html',
   },
 }
 

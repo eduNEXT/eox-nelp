@@ -4,20 +4,25 @@ This module contains unit tests for the RealTimeImport class and its methods in 
 import unittest
 from unittest.mock import MagicMock, call
 
-from eox_nelp.pearson_vue.rti_backend import RealTimeImport
+from eox_nelp.pearson_vue.rti_backend import (
+    CandidateDemographicsDataImport,
+    ExamAuthorizationDataImport,
+    RealTimeImport,
+)
 
 
 class TestRealTimeImport(unittest.TestCase):
     """
     Unit tests for the RealTimeImport class.
     """
+    rti_backend_class = RealTimeImport
 
     def setUp(self):
         """
         Set up the test environment.
         """
         self.backend_data = {"pipeline_index": 0}
-        self.rti = RealTimeImport(**self.backend_data)
+        self.rti = self.rti_backend_class(**self.backend_data)
 
     def test_init(self):
         """
@@ -71,7 +76,7 @@ class TestRealTimeImport(unittest.TestCase):
         func3 = MagicMock()
         func3_output = {"last_value": "value3"}
         func3.side_effect = [Exception("Test exception"), func3_output]
-        rti = RealTimeImport(pipeline_index=0)
+        rti = self.rti_backend_class(pipeline_index=0)
         rti.get_pipeline = MagicMock(return_value=[func1, func2, func3])
 
         with self.assertRaises(Exception):
@@ -146,3 +151,17 @@ class TestRealTimeImport(unittest.TestCase):
 
         self.assertIsInstance(pipeline, list)
         self.assertTrue(all(callable(func) for func in pipeline))
+
+
+class TestExamAuthorizationDataImport(TestRealTimeImport):
+    """
+    Unit tests for the rti_backend class.
+    """
+    rti_backend_class = ExamAuthorizationDataImport
+
+
+class TestCandidateDemographicsDataImport(TestRealTimeImport):
+    """
+    Unit tests for the rti_backend class.
+    """
+    rti_backend_class = CandidateDemographicsDataImport

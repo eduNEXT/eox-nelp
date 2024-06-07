@@ -4,7 +4,7 @@ This module contains unit tests for the tasks.py module and its functions.
 import unittest
 from unittest.mock import MagicMock, call
 
-from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task  # Importa tu función aquí
+from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task
 
 
 class TestRealTimeImportTask(unittest.TestCase):

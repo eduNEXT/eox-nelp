@@ -13,6 +13,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from eox_nelp.one_time_password import view_decorators
 from eox_nelp.one_time_password.api.v1 import views
 from eox_nelp.tests.mixins import POSTAuthenticatedTestMixin
 from eox_nelp.tests.utils import get_cache_expiration_time
@@ -106,3 +107,74 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         )
         self.assertEqual(len(otp_stored), settings.PHONE_VALIDATION_OTP_LENGTH)
         self.assertIn(settings.PHONE_VALIDATION_OTP_CHARSET[0], otp_stored)
+
+
+@ddt
+class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
+    """Test case for validate OTP view."""
+    reverse_viewname = "one-time-password-api:v1:validate-otp"
+
+    @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
+    def test_validate_otp_without_right_payload(self, wrong_payload):
+        """
+        Test  the post request to validate otp is not running due missing keys in the payload sent.
+        Expected behavior:
+            - Check the response say is missing some keys.
+            - Status code 400.
+        """
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.post(url_endpoint, wrong_payload, format="json")
+
+        self.assertDictEqual(response.json(), {"detail": "missing phone_number or one_time_password in data."})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_validate_otp_without_right_validation_code(self):
+        """
+        Test  the post request to validate otp with wrong validation code.
+
+        Expected behavior:
+            - Check logging validation msg
+            - Status code 403.
+            - Cache related with the OTP is different from None
+        """
+        correct_otp = "correct17"
+        payload = {"phone_number": 3219990000, "one_time_password": "password"}
+        url_endpoint = reverse(self.reverse_viewname)
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
+        cache.set(user_otp_key, correct_otp, timeout=600)
+
+        with self.assertLogs(view_decorators.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertEqual(logs.output, [
+            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIsNotNone(cache.get(f"{self.user.username}-{payload['phone_number']}"))
+
+    def test_validate_right_otp_code(self):
+        """
+        Test the post request to validate otp with right data.
+
+        Expected behavior:
+            - Check loggin validation msg
+            - Check the response say success validate-otp.
+            - Status code 200.
+            - Cache related with the OTP has been deleted
+        """
+        correct_otp = "correct26"
+        payload = {"phone_number": 3219990000, "one_time_password": correct_otp}
+        url_endpoint = reverse(self.reverse_viewname)
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
+        cache.set(user_otp_key, correct_otp, timeout=600)
+
+        with self.assertLogs(view_decorators.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertEqual(logs.output, [
+            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****"
+        ])
+        self.assertDictEqual(response.json(), {"message": "Valid OTP code"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(cache.get(f"{self.user.username}-{payload['phone_number']}"))

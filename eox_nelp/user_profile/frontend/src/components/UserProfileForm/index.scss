@@ -1,0 +1,22 @@
+@import "~@edx/brand/paragon/fonts";
+@import "~@edx/brand/paragon/variables";
+@import "~@edx/paragon/styles/scss/core/core";
+
+.pgn__modal-layer{
+  z-index: 9999 !important;
+
+  .user-profile-modal {
+    .btn {
+      background-image: none;
+    }
+
+    .btn-icon {
+      box-shadow: none;
+      background-image: none;
+
+      &:hover {
+        background-color: var(--btn-icon-hover-bg-color, inherit);
+      }
+    }
+  }
+}

@@ -1,22 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { APP_INIT_ERROR, APP_READY, subscribe, initialize } from '@edx/frontend-platform';
-import { PhoneValidatorModal, messages as essentialsMessages } from '@edunext/frontend-essentials';
+import { ProfileDataModal, messages as essentialsMessages } from '@edunext/frontend-essentials';
 import { AppProvider } from '@edx/frontend-platform/react';
 
 import './index.scss';
 
-function LaunchPhoneValidator() {
+function LaunchUserProfileForm() {
 
   return (
     <AppProvider>
-      <PhoneValidatorModal />
+      <ProfileDataModal fields={fields}/>
     </AppProvider>
   );
 }
 
 subscribe(APP_READY, () => {
-  ReactDOM.render(<LaunchPhoneValidator />, document.getElementById('phone-validation'));
+  ReactDOM.render(<LaunchUserProfileForm />, document.getElementById('user-profile-data-form'));
 });
 
 initialize({ messages: [essentialsMessages] });

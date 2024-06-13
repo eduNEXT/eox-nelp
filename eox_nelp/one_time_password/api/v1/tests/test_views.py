@@ -13,6 +13,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from eox_nelp.edxapp_wrapper.custom_reg_form import ExtraInfo
 from eox_nelp.one_time_password import view_decorators
 from eox_nelp.one_time_password.api.v1 import views
 from eox_nelp.tests.mixins import POSTAuthenticatedTestMixin
@@ -114,6 +115,13 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
     """Test case for validate OTP view."""
     reverse_viewname = "one-time-password-api:v1:validate-otp"
 
+    def tearDown(self):  # pylint: disable=invalid-name
+        """Clear cache after or mocks each test case"""
+        cache.clear()
+        ExtraInfo.reset_mock()
+        if hasattr(self.user, "extrainfo"):
+            delattr(self.user, "extrainfo")
+
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):
         """
@@ -173,8 +181,37 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             response = self.client.post(url_endpoint, payload, format="json")
 
         self.assertEqual(logs.output, [
-            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****"
+            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****",
+            f"INFO:{view_decorators.__name__}:Saved sucessfull validated otp for {user_otp_key[:-5]}*****",
         ])
         self.assertDictEqual(response.json(), {"message": "Valid OTP code"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNone(cache.get(f"{self.user.username}-{payload['phone_number']}"))
+
+    def test_validate_right_otp_code_with_extra_info(self):
+        """
+        Test the post request to validate otp with right data with a user with extrainfo foreign model.
+
+        Expected behavior:
+            - Check everything from test `test_validate_right_otp_code`
+            - extrainfo attr of user in is_phone_validated is True.
+            - ExtraInfo save method was called once.
+        """
+        setattr(self.user, "extrainfo", ExtraInfo)
+
+        self.test_validate_right_otp_code()
+
+        self.assertTrue(self.user.extrainfo.is_phone_validated)
+        ExtraInfo.save.assert_called_once()
+
+    def test_validate_right_otp_code_without_extra_info(self):
+        """
+        Test the post request to validate otp with right data with a user with extrainfo foreign model.
+
+        Expected behavior:
+            - Check everything from test `test_validate_right_otp_code`
+            - ExtraInfo ojectes create method was called once and with desired params.
+        """
+        self.test_validate_right_otp_code()
+
+        ExtraInfo.objects.create.assert_called_once_with(user=self.user, is_phone_validated=True)

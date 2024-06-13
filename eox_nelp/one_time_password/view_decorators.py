@@ -12,8 +12,7 @@ from django.core.cache import cache
 from django.http import HttpResponseForbidden, JsonResponse
 from rest_framework import status
 
-from custom_reg_form.models import ExtraInfo
-
+from eox_nelp.edxapp_wrapper.custom_reg_form import ExtraInfo
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +66,6 @@ def validate_otp(func):
     return wrapper
 
 
-
 def save_successfull_phone_validation(user):
     """Save in db the successfull phone_validation field with `True`
     in extrainfo model of the user.
@@ -75,7 +73,7 @@ def save_successfull_phone_validation(user):
     Args:
         user (User): User instance to check
     """
-    if extra_info:= getattr(user, "extrainfo", None):
+    if extra_info := getattr(user, "extrainfo", None):
         setattr(extra_info, "is_phone_validated", True)
         extra_info.save()
     else:

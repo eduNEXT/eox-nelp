@@ -23,6 +23,7 @@ from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
+from eox_nelp.pearson_vue.validators import validate_cdd_request, validate_ead_request
 from eox_nelp.signals.utils import get_completed_and_graded
 
 try:

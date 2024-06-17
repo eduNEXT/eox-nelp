@@ -4,6 +4,7 @@ Classes:
     GenerateOTPTestCase: Class to test GenerateOTP view
 """
 
+from custom_reg_form.models import ExtraInfo
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -13,7 +14,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from eox_nelp.edxapp_wrapper.custom_reg_form import ExtraInfo
 from eox_nelp.one_time_password import view_decorators
 from eox_nelp.one_time_password.api.v1 import views
 from eox_nelp.tests.mixins import POSTAuthenticatedTestMixin
@@ -116,11 +116,9 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
     reverse_viewname = "one-time-password-api:v1:validate-otp"
 
     def tearDown(self):  # pylint: disable=invalid-name
-        """Clear cache after or mocks each test case"""
+        """Clear cache after or mocks each test case. Clean extrainfo values."""
         cache.clear()
-        ExtraInfo.reset_mock()
-        if hasattr(self.user, "extrainfo"):
-            delattr(self.user, "extrainfo")
+        ExtraInfo.objects.all().delete()  # pylint: disable=no-member
 
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):
@@ -195,14 +193,11 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         Expected behavior:
             - Check everything from test `test_validate_right_otp_code`
             - extrainfo attr of user in is_phone_validated is True.
-            - ExtraInfo save method was called once.
         """
-        setattr(self.user, "extrainfo", ExtraInfo)
-
+        self.user.extrainfo = ExtraInfo(is_phone_validated=False, arabic_name="فيدر")
         self.test_validate_right_otp_code()
 
         self.assertTrue(self.user.extrainfo.is_phone_validated)
-        ExtraInfo.save.assert_called_once()
 
     def test_validate_right_otp_code_without_extra_info(self):
         """
@@ -210,8 +205,8 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
 
         Expected behavior:
             - Check everything from test `test_validate_right_otp_code`
-            - ExtraInfo ojectes create method was called once and with desired params.
+            - extrainfo attr of user in is_phone_validated is True.
         """
         self.test_validate_right_otp_code()
 
-        ExtraInfo.objects.create.assert_called_once_with(user=self.user, is_phone_validated=True)
+        self.assertTrue(self.user.extrainfo.is_phone_validated)

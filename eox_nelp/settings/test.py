@@ -38,7 +38,6 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_COURSE_BLOCKS_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.course_blocks_m_v1'
     settings.EOX_NELP_COURSEWARE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.courseware_m_v1"
     settings.EOX_NELP_INSTRUCTOR_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.instructor_m_v1"
-    settings.EOX_NELP_CUSTOM_REG_FORM_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.custom_reg_form_nelp'
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'
@@ -132,6 +131,11 @@ EOX_TENANT_USERS_BACKEND = 'eox_tenant.edxapp_wrapper.backends.users_test_v1'
 # ------------eox-audit external config for tests------------------------------
 if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in INSTALLED_APPS:  # noqa: F405
     INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)  # noqa: F405
+
+# ------------custom reg form config for tests------------------------------
+if 'custom_reg_form' not in INSTALLED_APPS:  # noqa: F405
+    INSTALLED_APPS.append('custom_reg_form')  # noqa: F405
+
 ALLOW_EOX_AUDIT_MODEL = False
 CELERY_TASK_ALWAYS_EAGER = True
 

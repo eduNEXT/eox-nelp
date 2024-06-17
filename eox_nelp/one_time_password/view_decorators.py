@@ -7,12 +7,11 @@ Decorators:
 import functools
 import logging
 
+from custom_reg_form.models import ExtraInfo
 from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponseForbidden, JsonResponse
 from rest_framework import status
-
-from eox_nelp.edxapp_wrapper.custom_reg_form import ExtraInfo
 
 logger = logging.getLogger(__name__)
 
@@ -77,4 +76,4 @@ def save_successfull_phone_validation(user):
         setattr(extra_info, "is_phone_validated", True)
         extra_info.save()
     else:
-        ExtraInfo.objects.create(user=user, is_phone_validated=True)
+        ExtraInfo.objects.create(user=user, is_phone_validated=True)  # pylint: disable=no-member

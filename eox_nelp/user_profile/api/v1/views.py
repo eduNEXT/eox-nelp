@@ -8,6 +8,7 @@ Function-views:
 """
 import logging
 
+from django.conf import settings
 from django.db import transaction
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import status
@@ -50,6 +51,19 @@ def update_user_data(request):
     try:
         with transaction.atomic():
             accounts.api.update_account_settings(request.user, request.data)
+
+            # This extra code block is required since the method update_account_settings just
+            # allows to update fields defined in the AccountUserSerializer and the AccountLegacyProfileSerializer
+            # so some fields like first_name and last_name are not editable in the standad implementation.
+            extra_account_user_fields = getattr(settings, "EXTRA_ACCOUNT_USER_FIELDS", [])
+
+            if extra_account_user_fields:
+                for field, value in request.data.items():
+                    if field in extra_account_user_fields and hasattr(request.user, field):
+                        setattr(request.user, field, value)
+
+                request.user.save()
+
     except errors.AccountValidationError as err:
         return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
     except errors.AccountUpdateError as err:

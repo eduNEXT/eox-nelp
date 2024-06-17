@@ -8,7 +8,7 @@ amqp==5.2.0
     # via kombu
 aniso8601==9.0.1
     # via tincan
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via pydantic
 appdirs==1.4.4
     # via fs
@@ -30,7 +30,7 @@ celery==5.4.0
     # via
     #   eox-core
     #   event-tracking
-certifi==2024.2.2
+certifi==2024.6.2
     # via requests
 cffi==1.16.0
     # via
@@ -55,7 +55,7 @@ click-repl==0.3.0
     # via celery
 code-annotations==1.8.0
     # via edx-toggles
-cryptography==42.0.7
+cryptography==42.0.8
     # via
     #   jwcrypto
     #   pyjwt
@@ -90,6 +90,7 @@ django==3.2.25
     #   eox-theming
     #   event-tracking
     #   jsonfield
+    #   nelp-custom-registration-fields
     #   openedx-events
     #   openedx-filters
     #   social-auth-app-django
@@ -117,7 +118,7 @@ django-password-validators==1.7.3
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-django-simple-history==3.5.0
+django-simple-history==3.6.0
     # via edx-proctoring
 django-waffle==4.1.0
     # via
@@ -170,7 +171,7 @@ edx-drf-extensions==8.0.0
     #   eox-core
 edx-i18n-tools==1.6.0
     # via -r requirements/base.in
-edx-opaque-keys[django]==2.9.0
+edx-opaque-keys[django]==2.10.0
     # via
     #   -r requirements/base.in
     #   edx-ccx-keys
@@ -179,7 +180,7 @@ edx-opaque-keys[django]==2.9.0
     #   edx-when
     #   eox-core
     #   openedx-events
-edx-proctoring==4.17.0
+edx-proctoring==4.18.1
     # via eox-core
 edx-rest-api-client==5.7.0
     # via edx-proctoring
@@ -187,7 +188,7 @@ edx-toggles==5.2.0
     # via event-tracking
 edx-when==2.5.0
     # via edx-proctoring
-eox-core==10.2.0
+eox-core==10.3.0
     # via -r requirements/base.in
 eox-tenant==11.2.0
     # via
@@ -235,7 +236,9 @@ markupsafe==2.1.5
     #   jinja2
     #   mako
     #   xblock
-newrelic==9.9.1
+nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
+    # via -r requirements/base.in
+newrelic==9.11.0
     # via edx-django-utils
 oauthlib==3.2.2
     # via
@@ -247,19 +250,19 @@ openedx-events==9.10.0
     #   -r requirements/base.in
     #   eox-core
     #   event-tracking
-openedx-filters==1.8.1
+openedx-filters==1.9.0
     # via -r requirements/base.in
-packaging==24.0
+packaging==24.1
     # via drf-yasg
 path==16.14.0
     # via edx-i18n-tools
 pbr==6.0.0
     # via stevedore
-phonenumbers==8.13.37
+phonenumbers==8.13.39
     # via -r requirements/base.in
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.43
+prompt-toolkit==3.0.47
     # via click-repl
 psutil==5.9.8
     # via edx-django-utils
@@ -269,9 +272,9 @@ pycryptodomex==3.20.0
     # via
     #   edx-proctoring
     #   pyjwkest
-pydantic==2.7.1
+pydantic==2.7.4
     # via -r requirements/base.in
-pydantic-core==2.18.2
+pydantic-core==2.18.4
     # via pydantic
 pyjwkest==1.4.2
     # via edx-drf-extensions
@@ -370,7 +373,7 @@ text-unidecode==1.3
     # via python-slugify
 tincan==1.0.0
     # via -r requirements/base.in
-typing-extensions==4.11.0
+typing-extensions==4.12.2
     # via
     #   asgiref
     #   edx-opaque-keys
@@ -381,7 +384,7 @@ tzdata==2024.1
     # via celery
 uritemplate==4.1.1
     # via drf-yasg
-urllib3==2.2.1
+urllib3==2.2.2
     # via requests
 vine==5.1.0
     # via

@@ -131,6 +131,11 @@ EOX_TENANT_USERS_BACKEND = 'eox_tenant.edxapp_wrapper.backends.users_test_v1'
 # ------------eox-audit external config for tests------------------------------
 if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in INSTALLED_APPS:  # noqa: F405
     INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)  # noqa: F405
+
+# ------------custom reg form config for tests------------------------------
+if 'custom_reg_form' not in INSTALLED_APPS:  # noqa: F405
+    INSTALLED_APPS.append('custom_reg_form')  # noqa: F405
+
 ALLOW_EOX_AUDIT_MODEL = False
 CELERY_TASK_ALWAYS_EAGER = True
 

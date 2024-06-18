@@ -4,6 +4,7 @@ Classes:
     GenerateOTPTestCase: Class to test GenerateOTP view
 """
 
+from custom_reg_form.models import ExtraInfo
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -114,6 +115,11 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
     """Test case for validate OTP view."""
     reverse_viewname = "one-time-password-api:v1:validate-otp"
 
+    def tearDown(self):  # pylint: disable=invalid-name
+        """Clear cache after or mocks each test case. Clean extrainfo values."""
+        cache.clear()
+        ExtraInfo.objects.all().delete()  # pylint: disable=no-member
+
     @data({}, {"not_phone_number": 3123123123}, {"not_one_time_password": 12345678, "phone_number": 3123123123})
     def test_validate_otp_without_right_payload(self, wrong_payload):
         """
@@ -173,8 +179,33 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             response = self.client.post(url_endpoint, payload, format="json")
 
         self.assertEqual(logs.output, [
-            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****"
+            f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****",
         ])
         self.assertDictEqual(response.json(), {"message": "Valid OTP code"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNone(cache.get(f"{self.user.username}-{payload['phone_number']}"))
+
+    def test_validate_right_otp_code_with_extra_info(self):
+        """
+        Test the post request to validate otp with right data with a user with extrainfo foreign model.
+
+        Expected behavior:
+            - Check everything from test `test_validate_right_otp_code`
+            - extrainfo attr of user in is_phone_validated is True.
+        """
+        self.user.extrainfo = ExtraInfo(is_phone_validated=False, arabic_name="فيدر")
+        self.test_validate_right_otp_code()
+
+        self.assertTrue(self.user.extrainfo.is_phone_validated)
+
+    def test_validate_right_otp_code_without_extra_info(self):
+        """
+        Test the post request to validate otp with right data with a user with extrainfo foreign model.
+
+        Expected behavior:
+            - Check everything from test `test_validate_right_otp_code`
+            - extrainfo attr of user in is_phone_validated is True.
+        """
+        self.test_validate_right_otp_code()
+
+        self.assertTrue(self.user.extrainfo.is_phone_validated)

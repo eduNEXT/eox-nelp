@@ -6,6 +6,8 @@ Classes:
     RealTimeImport: Class for managing RTI operations and executing the pipeline.
 """
 from eox_nelp.pearson_vue.pipeline import (
+    build_cdd_request,
+    build_ead_request,
     check_service_availability,
     get_exam_data,
     get_user_data,
@@ -60,6 +62,8 @@ class RealTimeImport:
             handle_course_completion_status,
             get_user_data,
             get_exam_data,
+            build_cdd_request,
+            build_ead_request,
             check_service_availability,
             import_candidate_demographics,
             import_exam_authorization,
@@ -75,6 +79,7 @@ class ExamAuthorizationDataImport(RealTimeImport):
         return [
             get_user_data,
             get_exam_data,
+            build_ead_request,
             check_service_availability,
             import_exam_authorization,
         ]
@@ -88,6 +93,7 @@ class CandidateDemographicsDataImport(RealTimeImport):
         """
         return [
             get_user_data,
+            build_cdd_request,
             check_service_availability,
             import_candidate_demographics,
         ]

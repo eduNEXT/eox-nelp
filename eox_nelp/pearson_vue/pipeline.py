@@ -163,7 +163,7 @@ def check_service_availability(**kwargs):  # pylint: disable=unused-argument
         raise Exception("The pearson vue service is not available")  # pylint: disable=broad-exception-raised
 
 
-def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disable=unused-argument
+def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unused-argument
     """
     Imports candidate demographics data into the Pearson VUE RTI system.
 
@@ -173,7 +173,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
     If the import request is not accepted, the function raises an exception.
 
     Args:
-        profile_metadata (dict): Basic user data.
+        cdd_request(dict): cdd_request to be sent.
         **kwargs: Additional keyword arguments.
 
     Raises:
@@ -193,39 +193,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
                 },
             },
             "soapenv:Body": {
-                "sch:cddRequest": {
-                    "@clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
-                    "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
-                    "candidateName": {
-                        "firstName": profile_metadata["first_name"],
-                        "lastName": profile_metadata["last_name"],
-                    },
-                    "webAccountInfo": {
-                        "email": profile_metadata["email"],
-                    },
-                    "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                    "primaryAddress": {
-                        "address1": profile_metadata["address"],
-                        "city": profile_metadata["city"],
-                        "country": profile_metadata["country"],
-                        "phone": {
-                            "phoneNumber": profile_metadata["phone_number"],
-                            "phoneCountryCode": profile_metadata["phone_country_code"],
-                        },
-                        "mobile": {
-                            "mobileNumber": profile_metadata["mobile_number"],
-                            "mobileCountryCode": profile_metadata["mobile_country_code"],
-                        },
-                        "nativeAddress": {
-                            "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
-                            "potentialMismatch": "false",
-                            "firstName": profile_metadata["arabic_name"],
-                            "lastName": profile_metadata["arabic_name"],
-                            "address1": profile_metadata["address"],
-                            "city": profile_metadata["city"],
-                        },
-                    }
-                },
+                "sch:cddRequest": cdd_request
             },
         },
     }
@@ -237,12 +205,7 @@ def import_candidate_demographics(profile_metadata, **kwargs):  # pylint: disabl
         raise Exception("Error trying to process import candidate demographics request.")
 
 
-def import_exam_authorization(
-    profile_metadata,
-    exam_metadata,
-    transaction_type="Add",
-    **kwargs
-):  # pylint: disable=unused-argument
+def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-argument
     """
     Imports exam authorization data into the Pearson VUE RTI system.
 
@@ -253,9 +216,8 @@ def import_exam_authorization(
     an exception.
 
     Args:
-        profile_metadata (dict): Basic user data.
-        exam_metadata (dict): Exam information.
-        transaction_type (str): The type of transaction for the authorization (default is "Add").
+        ead_request(dict): ead_request to be sent.
+
         **kwargs: A dictionary containing the following key-value pairs:
             - anonymous_user_id (str): An anonymized identifier for the user.
 
@@ -276,17 +238,7 @@ def import_exam_authorization(
                 },
             },
             "soapenv:Body": {
-                "sch:eadRequest": {
-                    "@clientAuthorizationID": exam_metadata["client_authorization_id"],
-                    "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
-                    "@authorizationTransactionType": transaction_type,
-                    "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
-                    "examAuthorizationCount": exam_metadata["exam_authorization_count"],
-                    "examSeriesCode": exam_metadata["exam_series_code"],
-                    "eligibilityApptDateFirst": exam_metadata["eligibility_appt_date_first"],
-                    "eligibilityApptDateLast": exam_metadata["eligibility_appt_date_last"],
-                    "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                },
+                "sch:eadRequest": ead_request
             },
         },
     }
@@ -345,3 +297,85 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
             f"{course_id}. Please check PEARSON_RTI_COURSES_DATA setting."
         ),
     )
+
+
+def build_cdd_request(profile_metadata, **kwargs):  # pylint: disable=unused-argument
+    """Build the cdd_request dict.
+
+    Args:
+        profile_metadata (dict): Basic user data.
+        **kwargs: A dictionary containing the following key-value pairs:
+
+    Returns:
+       dict: dict with ead_request dict.
+    """
+    cdd_request = {
+        "@clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
+        "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
+        "candidateName": {
+            "firstName": profile_metadata["first_name"],
+            "lastName": profile_metadata["last_name"],
+        },
+        "webAccountInfo": {
+            "email": profile_metadata["email"],
+        },
+        "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
+        "primaryAddress": {
+            "address1": profile_metadata["address"],
+            "city": profile_metadata["city"],
+            "country": profile_metadata["country"],
+            "phone": {
+                "phoneNumber": profile_metadata["phone_number"],
+                "phoneCountryCode": profile_metadata["phone_country_code"],
+            },
+            "mobile": {
+                "mobileNumber": profile_metadata["mobile_number"],
+                "mobileCountryCode": profile_metadata["mobile_country_code"],
+            },
+            "nativeAddress": {
+                "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
+                "potentialMismatch": "false",
+                "firstName": profile_metadata["arabic_name"],
+                "lastName": profile_metadata["arabic_name"],
+                "address1": profile_metadata["address"],
+                "city": profile_metadata["city"],
+            },
+        }
+    }
+    return {
+        "cdd_request": cdd_request
+    }
+
+
+def build_ead_request(
+    profile_metadata,
+    exam_metadata,
+    transaction_type="Add",
+    **kwargs
+):  # pylint: disable=unused-argument
+    """Build the ead_request dict.
+
+    Args:
+        profile_metadata (dict): Basic user data.
+        exam_metadata (dict): Exam information.
+        transaction_type (str): The type of transaction for the authorization (default is "Add").
+        **kwargs: A dictionary containing the following key-value pairs:
+
+    Returns:
+        dict: dict with ead_request dict
+    """
+    ead_request = {
+        "@clientAuthorizationID": exam_metadata["client_authorization_id"],
+        "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
+        "@authorizationTransactionType": transaction_type,
+        "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
+        "examAuthorizationCount": exam_metadata["exam_authorization_count"],
+        "examSeriesCode": exam_metadata["exam_series_code"],
+        "eligibilityApptDateFirst": exam_metadata["eligibility_appt_date_first"],
+        "eligibilityApptDateLast": exam_metadata["eligibility_appt_date_last"],
+        "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
+    }
+
+    return {
+        "ead_request": ead_request
+    }

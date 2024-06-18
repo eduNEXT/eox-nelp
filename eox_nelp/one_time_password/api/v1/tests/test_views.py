@@ -180,7 +180,6 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
 
         self.assertEqual(logs.output, [
             f"INFO:{view_decorators.__name__}:validating otp for {user_otp_key[:-5]}*****",
-            f"INFO:{view_decorators.__name__}:Saved sucessfull validated otp for {user_otp_key[:-5]}*****",
         ])
         self.assertDictEqual(response.json(), {"message": "Valid OTP code"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)

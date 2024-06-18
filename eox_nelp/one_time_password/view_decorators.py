@@ -57,7 +57,6 @@ def validate_otp(func):
                 return HttpResponseForbidden(reason="Forbidden - wrong code")
 
             save_successfull_phone_validation(request.user)
-            logger.info("Saved sucessfull validated otp for %s*****", user_otp_key[:-5])
             cache.delete(user_otp_key)
 
         return func(request)

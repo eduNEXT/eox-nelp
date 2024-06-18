@@ -93,3 +93,30 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+
+    @override_settings(ENABLE_OTP_VALIDATION=False, EXTRA_ACCOUNT_USER_FIELDS=["first_name", "last_name"])
+    def test_account_update_extra_fields(self):
+        """
+        Test that extra account user fields has been set.
+
+        Expected behavior:
+            - Check the response says that the field has been updated.
+            - Status code 200.
+            - Check that update_account_settings method has called once.
+            - Check that user first_name has been updated.
+            - Check that user last_name has been updated.
+        """
+        payload = {
+            "first_name": "Anakin",
+            "last_name": "Skywalker",
+            "one_time_password": "correct26",
+        }
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+        self.assertEqual(self.user.first_name, payload["first_name"])
+        self.assertEqual(self.user.last_name, payload["last_name"])

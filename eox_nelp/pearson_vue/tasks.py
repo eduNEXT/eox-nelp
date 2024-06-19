@@ -78,7 +78,7 @@ def cdd_task(self, pipeline_index=0, **kwargs):
 @shared_task(bind=True)
 def error_validation_task(self, pipeline_index=0, **kwargs):
     """
-    Performs an asynchronous call to Pearson VUE's CDD task (Candidate Demographics Data) service.
+    Performs an asynchronous call to manage Pearson validation error task.
 
     This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
 

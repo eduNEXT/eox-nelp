@@ -428,12 +428,12 @@ def audit_error_validation(*args, **kwargs):
     Returns:
         None
     """
-    @audit_method(action="Error Pearson Vue save audit data")
-    def audit_exception(*args, **kwargs):
+    @audit_method(action="Pearson Vue Error validation data")
+    def raise_audit_validation_exception(*args, **kwargs):
         raise ValueError(*args, kwargs)
 
     try:
-        audit_exception(*args, **kwargs)
+        raise_audit_validation_exception(*args, **kwargs)
     except ValueError:
         pass
     logger.error("Validation Error args:%s-kwargs:%s", args, kwargs)

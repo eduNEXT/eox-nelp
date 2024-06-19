@@ -9,7 +9,13 @@ from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from eox_nelp.utils import camel_to_snake, extract_course_id_from_string, get_course_from_id, get_item_label
+from eox_nelp.utils import (
+    camel_to_snake,
+    extract_course_id_from_string,
+    get_course_from_id,
+    get_item_label,
+    remove_keys_from_dict,
+)
 
 
 @ddt
@@ -222,3 +228,44 @@ class CamelToSnakeTestCase(TestCase):
             - TypeError is raised
         """
         self.assertRaises(TypeError, camel_to_snake, input_value)
+
+
+@ddt
+class RemoveKeysFromDict(TestCase):
+    """Test class for the remove_keys_from_dict method."""
+
+    def setUp(self):
+        """
+        Set up test environment.
+        """
+        self.student_info = {
+            "name": "Alice Smith",
+            "id": 12345,
+            "grade": 10,
+            "math_grade": 85,
+            "science_grade": 92,
+            "history_grade": 78,
+            "english_grade": 90,
+            "has_library_fines": False,
+            "favorite_subject": "science",
+            "number_of_siblings": 2,
+            "email": "alice.smith@school.com"
+        }
+
+    @data(
+        ["name", "id"],
+        ["science_grade", "english_grade"],
+        ["favorite_subject", "email"],
+        ["favorite_subject", "math_grade"],
+        ["history_grade"],
+    )
+    def test_remove_keys_from_dict(self, removed_keys):
+        """ Test right functionality.
+
+        Expected behavior:
+            - Returned value is the expected value.
+        """
+        expected_result = remove_keys_from_dict(self.student_info, removed_keys)
+
+        for key in removed_keys:
+            self.assertNotIn(key, expected_result)

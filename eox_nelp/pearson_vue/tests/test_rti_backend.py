@@ -10,6 +10,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
+from eox_nelp.utils import remove_keys_from_dict
 
 
 class TestRealTimeImport(unittest.TestCase):
@@ -153,7 +154,7 @@ class TestRealTimeImport(unittest.TestCase):
             - Pipeline method 4 is not called.
             - backend_data attribute is the expected value.
                 Without func3,func4 data and pipeline index in the last.
-            - error_validation_task is called with updated backend_data kwargs.
+            - error_validation_task is called with error_validation_kwargs.
         """
         # Mock pipeline functions
         func1 = MagicMock(return_value={"updated_key": "value1"})
@@ -166,7 +167,6 @@ class TestRealTimeImport(unittest.TestCase):
         func4 = MagicMock(return_value={"additional_key": "value4"})
 
         self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func2])
-
         self.rti.run_pipeline()
 
         func1.assert_called_once_with(**self.backend_data)
@@ -178,10 +178,15 @@ class TestRealTimeImport(unittest.TestCase):
             {
                 "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
                 **func1(),  # Include data from func1 ()
-                **func2(),  # Include data from func2  (with safely_pipeline_termination)
+                **func2(),  # Include data from func2  (with launch_validation_error_pipeline)
             },
         )
-        error_validation_task_mock.delay.assert_called_with(**self.rti.backend_data)
+
+        error_validation_kwargs = remove_keys_from_dict(
+            self.rti.backend_data,
+            ["pipeline_index", "launch_validation_error_pipeline"]
+        )
+        error_validation_task_mock.delay.assert_called_with(**error_validation_kwargs)
 
     def test_get_pipeline(self):
         """

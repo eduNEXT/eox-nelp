@@ -154,3 +154,20 @@ def camel_to_snake(string):
         String in snake case.
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
+
+
+def remove_keys_from_dict(source_dict: dict, removed_keys: list):
+    """Remove specific keys from a dict
+
+    Args:
+        source_dict (dict): dict to process
+        removed_keys (list[str,int]): keys to remove
+
+    Returns:
+        dict: with the keys removed
+    """
+    return {
+        key: value
+        for key, value in source_dict.items()
+        if key not in removed_keys
+    }

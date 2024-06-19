@@ -20,6 +20,7 @@ from eox_nelp.pearson_vue.pipeline import (
     validate_cdd_request,
     validate_ead_request,
 )
+from eox_nelp.utils import remove_keys_from_dict
 
 
 class RealTimeImport:
@@ -60,8 +61,14 @@ class RealTimeImport:
                 break
             if result.get("launch_validation_error_pipeline"):
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
+                # clean kwargs to dont finish next pipeline.
+                error_validation_kwargs = remove_keys_from_dict(
+                    self.backend_data,
+                    ["pipeline_index", "launch_validation_error_pipeline"]
+                )
+
                 tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
-                tasks.error_validation_task.delay(**self.backend_data)
+                tasks.error_validation_task.delay(**error_validation_kwargs)
                 break
 
     def get_pipeline(self):

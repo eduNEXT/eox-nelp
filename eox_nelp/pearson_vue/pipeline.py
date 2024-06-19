@@ -18,21 +18,21 @@ import phonenumbers
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from pydantic import ValidationError
 
 from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
+from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
+
 try:
     from eox_audit_model.decorators import audit_method
 except ImportError:
     def audit_method(action):  # pylint: disable=unused-argument
         """Identity audit_method"""
         return lambda x: x
-from pydantic import ValidationError
-
-from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -418,7 +418,7 @@ def build_ead_request(
     }
 
 
-def audit_pipe_error(*args, **kwargs):
+def audit_error_validation(*args, **kwargs):
     """
     Method to save an error with eox-audit.
     Args:
@@ -438,11 +438,10 @@ def audit_pipe_error(*args, **kwargs):
         pass
     logger.error("Validation Error args:%s-kwargs:%s", args, kwargs)
 
-    return None
 
 def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):
     """
-    Validates an CDD request dictionary using a Pydantic model.
+    Validates a CDD request dictionary using a Pydantic model.
 
     This function attempts to create a Pydantic model instance (likely named `class CddRequest`:
 `)
@@ -463,6 +462,7 @@ def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argum
         }
 
     return None
+
 
 def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argument
     """

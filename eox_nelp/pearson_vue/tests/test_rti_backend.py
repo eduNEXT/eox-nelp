@@ -2,7 +2,7 @@
 This module contains unit tests for the RealTimeImport class and its methods in rti_backend.py.
 """
 import unittest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
@@ -140,6 +140,49 @@ class TestRealTimeImport(unittest.TestCase):
             },
         )
 
+    @patch("eox_nelp.pearson_vue.tasks.error_validation_task")
+    def test_launch_validation_error_pipeline(self, error_validation_task_mock):
+        """
+        Test the execution of the RTI finished after the second function call due
+        `launch_validation_error_pipeline` kwarg.
+
+        Expected behavior:
+            - Pipeline method 1 is called with the original data.
+            - Pipeline method 2 is called with updated data.
+            - Pipeline method 3 is not called.
+            - Pipeline method 4 is not called.
+            - backend_data attribute is the expected value.
+                Without func3,func4 data and pipeline index in the last.
+            - error_validation_task is called with updated backend_data kwargs.
+        """
+        # Mock pipeline functions
+        func1 = MagicMock(return_value={"updated_key": "value1"})
+        func2 = MagicMock(return_value={"launch_validation_error_pipeline": {
+            "validation_exception": {
+                "error": ["String to short."]
+            }
+        }})
+        func3 = MagicMock(return_value={"additional_key": "value3"})
+        func4 = MagicMock(return_value={"additional_key": "value4"})
+
+        self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func2])
+
+        self.rti.run_pipeline()
+
+        func1.assert_called_once_with(**self.backend_data)
+        func2.assert_called_once_with(**{"updated_key": "value1", "pipeline_index": 1})
+        func3.assert_not_called()
+        func4.assert_not_called()
+        self.assertDictEqual(
+            self.rti.backend_data,
+            {
+                "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
+                **func1(),  # Include data from func1 ()
+                **func2(),  # Include data from func2  (with safely_pipeline_termination)
+            },
+        )
+        error_validation_task_mock.delay.assert_called_with(**self.rti.backend_data)
+
     def test_get_pipeline(self):
         """
         Test the retrieval of the RTI pipeline.
@@ -166,6 +209,7 @@ class TestCandidateDemographicsDataImport(TestRealTimeImport):
     Unit tests for the rti_backend class.
     """
     rti_backend_class = CandidateDemographicsDataImport
+
 
 class TestErrorValidationDataImport(TestRealTimeImport):
     """

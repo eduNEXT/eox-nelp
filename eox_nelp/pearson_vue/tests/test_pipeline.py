@@ -11,13 +11,12 @@ from django.test import override_settings
 from django.utils import timezone
 from django_countries.fields import Country
 from pydantic.v1.utils import deep_update
-from eox_nelp.pearson_vue.pipeline import validate_cdd_request, validate_ead_request
 
 from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
-    audit_pipe_error,
+    audit_error_validation,
     build_cdd_request,
     build_ead_request,
     check_service_availability,
@@ -26,6 +25,8 @@ from eox_nelp.pearson_vue.pipeline import (
     handle_course_completion_status,
     import_candidate_demographics,
     import_exam_authorization,
+    validate_cdd_request,
+    validate_ead_request,
 )
 
 User = get_user_model()
@@ -834,20 +835,27 @@ class TestValidateEadRequest(unittest.TestCase):
 
 class TestAuditPipeError(unittest.TestCase):
     """
-    Unit tests for the audit_pipe_error method.
+    Unit tests for the audit_error_validation method.
     """
 
-    def test_audit_pipe_error(self):
+    def test_audit_error_validation(self):
+        """Test correct behaviour calling  audit_error_validation.
+
+        Expected behavior:
+            - The result is the expected value(None).
+            - Expected log error.
+        """
         kwargs = {
             "validation_exception": {
                 "error": ["String to short."]
             }
         }
         args = ("vaderio", 3244)
-        with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
-            result = audit_pipe_error(*args, **kwargs)
-        self.assertIsNone(result)
         log_error = [
             f"ERROR:{pipeline.__name__}:Validation Error args:{args}-kwargs:{kwargs}"
         ]
+
+        with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
+            self.assertIsNone(audit_error_validation(*args, **kwargs))
+
         self.assertListEqual(log_error, logs.output)

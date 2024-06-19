@@ -8,7 +8,7 @@ Classes:
 import importlib
 
 from eox_nelp.pearson_vue.pipeline import (
-    audit_pipe_error,
+    audit_error_validation,
     build_cdd_request,
     build_ead_request,
     check_service_availability,
@@ -56,10 +56,10 @@ class RealTimeImport:
             if result.get("safely_pipeline_termination"):
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
                 break
-            if error_kwargs := result.get("launch_validation_error_pipeline"):
+            if result.get("launch_validation_error_pipeline"):
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
-                error_validation_task = importlib.import_module("eox_nelp.pearson_vue.tasks.error_validation_task")
-                error_validation_task.delay(**error_kwargs, **self.backend_data)
+                tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
+                tasks.error_validation_task.delay(**self.backend_data)
                 break
 
     def get_pipeline(self):
@@ -106,12 +106,13 @@ class CandidateDemographicsDataImport(RealTimeImport):
             import_candidate_demographics,
         ]
 
+
 class ErrorValidationDataImport(RealTimeImport):
     """Class for managing validation error pipe  executing the pipeline for data validation."""
     def get_pipeline(self):
         """
-        Returns the CDD pipeline, which is a list of functions to be executed.
+        Returns the error validation pipeline, which is a list of functions to be executed.
         """
         return [
-            audit_pipe_error,
+            audit_error_validation,
         ]

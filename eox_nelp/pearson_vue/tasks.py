@@ -9,8 +9,8 @@ from celery import shared_task
 
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
-    ExamAuthorizationDataImport,
     ErrorValidationDataImport,
+    ExamAuthorizationDataImport,
     RealTimeImport,
 )
 

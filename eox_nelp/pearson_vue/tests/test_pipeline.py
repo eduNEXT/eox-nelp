@@ -15,6 +15,8 @@ from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_u
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.pipeline import (
+    build_cdd_request,
+    build_ead_request,
     check_service_availability,
     get_exam_data,
     get_user_data,
@@ -24,6 +26,41 @@ from eox_nelp.pearson_vue.pipeline import (
 )
 
 User = get_user_model()
+
+CDD_REQUEST_SAMPLE = {
+    "@clientCandidateID": "NELC12345",
+    "@clientID": "12345678",
+    "candidateName": {"firstName": "John", "lastName": "Doe"},
+    "lastUpdate": "2023/05/20 12:00:00 GMT",
+    "primaryAddress": {
+        "address1": "123 Main St",
+        "city": "Anytown",
+        "country": "US",
+        "mobile": {"mobileCountryCode": "1", "mobileNumber": "5551234567"},
+        "nativeAddress": {
+            "address1": "123 Main St",
+            "city": "Anytown",
+            "firstName": "فلان الفلاني",
+            "language": "UKN",
+            "lastName": "فلان الفلاني",
+            "potentialMismatch": "false",
+        },
+        "phone": {"phoneCountryCode": "1", "phoneNumber": "5551234567"},
+    },
+    "webAccountInfo": {"email": "john.doe@example.com"},
+}
+
+EAD_REQUEST_SAMPLE = {
+    '@authorizationTransactionType': 'Add',
+    '@clientAuthorizationID': '12345678954',
+    '@clientID': '12345678',
+    'clientCandidateID': 'NELC12345',
+    'eligibilityApptDateFirst': '2024/07/15 11:59:59',
+    'eligibilityApptDateLast': '2025/07/15 11:59:59',
+    'examAuthorizationCount': 3,
+    'examSeriesCode': 'ABC',
+    'lastUpdate': '2023/05/20 12:00:00 GMT',
+}
 
 
 class TestTerminateNotFullCompletionCases(unittest.TestCase):
@@ -322,11 +359,15 @@ class TestImportCandidateDemographics(unittest.TestCase):
     """
     Unit tests for the import_candidate_demographics function.
     """
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.cdd_request = CDD_REQUEST_SAMPLE
 
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
-    @patch("eox_nelp.pearson_vue.pipeline.timezone")
-    def test_import_candidate_demographics_success(self, mock_timezone, mock_update_xml_with_dict, mock_api_client):
+    def test_import_candidate_demographics_success(self, mock_update_xml_with_dict, mock_api_client):
         """
         Test that the import_candidate_demographics function succeeds when the import request is accepted.
 
@@ -334,24 +375,10 @@ class TestImportCandidateDemographics(unittest.TestCase):
             - update_xml_with_dict was called with the right parameters.
             - import_candidate_demographics method was called with the result of update_xml_with_dict.
         """
-        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_candidate_demographics.return_value = {"status": "accepted"}
         input_data = {
-            "profile_metadata": {
-                "anonymous_user_id": "12345",
-                "first_name": "John",
-                "last_name": "Doe",
-                "email": "john.doe@example.com",
-                "address": "123 Main St",
-                "city": "Anytown",
-                "country": "US",
-                "phone_number": "5551234567",
-                "phone_country_code": "1",
-                "mobile_number": "5551234567",
-                "mobile_country_code": "1",
-                "arabic_name": "فلان الفلاني",
-            },
+            "cdd_request": self.cdd_request
         }
         expected_payload = {
             "soapenv:Envelope": {
@@ -366,39 +393,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                     },
                 },
                 "soapenv:Body": {
-                    "sch:cddRequest": {
-                        "@clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
-                        "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
-                        "candidateName": {
-                            "firstName": input_data["profile_metadata"]["first_name"],
-                            "lastName": input_data["profile_metadata"]["last_name"],
-                        },
-                        "webAccountInfo": {
-                            "email": input_data["profile_metadata"]["email"],
-                        },
-                        "lastUpdate": mock_timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                        "primaryAddress": {
-                            "address1": input_data["profile_metadata"]["address"],
-                            "city": input_data["profile_metadata"]["city"],
-                            "country": input_data["profile_metadata"]["country"],
-                            "phone": {
-                                "phoneNumber": input_data["profile_metadata"]["phone_number"],
-                                "phoneCountryCode": input_data["profile_metadata"]["phone_country_code"],
-                            },
-                            "mobile": {
-                                "mobileNumber": input_data["profile_metadata"]["mobile_number"],
-                                "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
-                            },
-                            "nativeAddress": {
-                                "language": "UKN",
-                                "potentialMismatch": "false",
-                                "firstName": input_data["profile_metadata"]["arabic_name"],
-                                "lastName": input_data["profile_metadata"]["arabic_name"],
-                                "address1": input_data["profile_metadata"]["address"],
-                                "city": input_data["profile_metadata"]["city"],
-                            },
-                        }
-                    },
+                    "sch:cddRequest": self.cdd_request
                 },
             },
         }
@@ -410,8 +405,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
 
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
-    @patch("eox_nelp.pearson_vue.pipeline.timezone")
-    def test_import_candidate_demographics_failure(self, mock_timezone, mock_update_xml_with_dict, mock_api_client):
+    def test_import_candidate_demographics_failure(self, mock_update_xml_with_dict, mock_api_client):
         """
         Test that the import_candidate_demographics function raises an exception
         when the import request is not accepted.
@@ -422,25 +416,10 @@ class TestImportCandidateDemographics(unittest.TestCase):
             - update_xml_with_dict was called with the right parameters.
             - import_candidate_demographics method was called with the result of update_xml_with_dict.
         """
-        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_candidate_demographics.return_value = {"status": "error"}
         input_data = {
-            "profile_metadata": {
-                "anonymous_user_id": "12345",
-                "first_name": "John",
-                "last_name": "Doe",
-                "email": "john.doe@example.com",
-                "address": "123 Main St",
-                "city": "Anytown",
-                "country": "US",
-                "phone_number": "5551234567",
-                "phone_country_code": "1",
-                "mobile_number": "5551234567",
-                "mobile_country_code": "1",
-                "arabic_name": "فلان الفلاني",
-
-            },
+            "cdd_request": self.cdd_request
         }
         expected_payload = {
             "soapenv:Envelope": {
@@ -455,39 +434,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
                     },
                 },
                 "soapenv:Body": {
-                    "sch:cddRequest": {
-                        "@clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
-                        "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
-                        "candidateName": {
-                            "firstName": input_data["profile_metadata"]["first_name"],
-                            "lastName": input_data["profile_metadata"]["last_name"],
-                        },
-                        "webAccountInfo": {
-                            "email": input_data["profile_metadata"]["email"],
-                        },
-                        "lastUpdate": mock_timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                        "primaryAddress": {
-                            "address1": input_data["profile_metadata"]["address"],
-                            "city": input_data["profile_metadata"]["city"],
-                            "country": input_data["profile_metadata"]["country"],
-                            "phone": {
-                                "phoneNumber": input_data["profile_metadata"]["phone_number"],
-                                "phoneCountryCode": input_data["profile_metadata"]["phone_country_code"],
-                            },
-                            "mobile": {
-                                "mobileNumber": input_data["profile_metadata"]["mobile_number"],
-                                "mobileCountryCode": input_data["profile_metadata"]["mobile_country_code"],
-                            },
-                            "nativeAddress": {
-                                "language": "UKN",
-                                "potentialMismatch": "false",
-                                "firstName": input_data["profile_metadata"]["arabic_name"],
-                                "lastName": input_data["profile_metadata"]["arabic_name"],
-                                "address1": input_data["profile_metadata"]["address"],
-                                "city": input_data["profile_metadata"]["city"],
-                            },
-                        }
-                    },
+                    "sch:cddRequest": self.cdd_request
                 },
             },
         }
@@ -504,11 +451,15 @@ class TestImportExamAuthorization(unittest.TestCase):
     """
     Unit tests for the import_exam_authorization function.
     """
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.ead_request = EAD_REQUEST_SAMPLE
 
-    @patch.object(timezone, "now")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
-    def test_import_exam_authorization_success(self, mock_update_xml_with_dict, mock_api_client, mock_now):
+    def test_import_exam_authorization_success(self, mock_update_xml_with_dict, mock_api_client):
         """
         Test that the import_exam_authorization function succeeds when the import request is accepted.
 
@@ -516,20 +467,10 @@ class TestImportExamAuthorization(unittest.TestCase):
             - update_xml_with_dict was called with the right parameters.
             - import_exam_authorization method was called with the result of update_xml_with_dict.
         """
-        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_exam_authorization.return_value = {"status": "accepted"}
         input_data = {
-            "profile_metadata": {
-                "anonymous_user_id": "12345",
-            },
-            "exam_metadata": {
-                "eligibility_appt_date_first": "2024/07/15 11:59:59",
-                "eligibility_appt_date_last": "2025/07/15 11:59:59",
-                "exam_authorization_count": 3,
-                "exam_series_code": "ABC",
-                "client_authorization_id": "12345678954",
-            },
+            "ead_request": self.ead_request
         }
         expected_payload = {
             "soapenv:Envelope": {
@@ -544,17 +485,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                     },
                 },
                 "soapenv:Body": {
-                    "sch:eadRequest": {
-                        "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
-                        "@clientAuthorizationID": input_data["exam_metadata"]["client_authorization_id"],
-                        "@authorizationTransactionType": "Add",
-                        "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
-                        "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
-                        "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
-                        "eligibilityApptDateFirst": input_data["exam_metadata"]["eligibility_appt_date_first"],
-                        "eligibilityApptDateLast": input_data["exam_metadata"]["eligibility_appt_date_last"],
-                        "lastUpdate": mock_now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                    },
+                    "sch:eadRequest": self.ead_request
                 },
             },
         }
@@ -564,10 +495,9 @@ class TestImportExamAuthorization(unittest.TestCase):
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_EAD, expected_payload)
         mock_api_client.return_value.import_exam_authorization.assert_called_once_with(mock_update_xml_with_dict())
 
-    @patch.object(timezone, "now")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
-    def test_import_exam_authorization_failure(self, mock_update_xml_with_dict, mock_api_client, mock_now):
+    def test_import_exam_authorization_failure(self, mock_update_xml_with_dict, mock_api_client):
         """
         Test that the import_exam_authorization function raises an exception when the import request is not accepted.
 
@@ -577,20 +507,10 @@ class TestImportExamAuthorization(unittest.TestCase):
             - update_xml_with_dict was called with the right parameters.
             - import_exam_authorization method was called with the result of update_xml_with_dict.
         """
-        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
         mock_update_xml_with_dict.return_value = 'updated_payload'
         mock_api_client.return_value.import_exam_authorization.return_value = {"status": "error"}
         input_data = {
-            "profile_metadata": {
-                "anonymous_user_id": "12345",
-            },
-            "exam_metadata": {
-                "eligibility_appt_date_first": "2024/07/15 11:59:59",
-                "eligibility_appt_date_last": "2025/07/15 11:59:59",
-                "exam_authorization_count": 3,
-                "exam_series_code": "ABC",
-                "client_authorization_id": "12345678954",
-            },
+            "ead_request": self.ead_request
         }
         expected_payload = {
             "soapenv:Envelope": {
@@ -605,17 +525,7 @@ class TestImportExamAuthorization(unittest.TestCase):
                     },
                 },
                 "soapenv:Body": {
-                    "sch:eadRequest": {
-                        "@clientID": settings.PEARSON_RTI_WSDL_CLIENT_ID,
-                        "@clientAuthorizationID": input_data["exam_metadata"]["client_authorization_id"],
-                        "@authorizationTransactionType": "Add",
-                        "clientCandidateID": f'NELC{input_data["profile_metadata"]["anonymous_user_id"]}',
-                        "examAuthorizationCount": input_data["exam_metadata"]["exam_authorization_count"],
-                        "examSeriesCode": input_data["exam_metadata"]["exam_series_code"],
-                        "eligibilityApptDateFirst": input_data["exam_metadata"]["eligibility_appt_date_first"],
-                        "eligibilityApptDateLast": input_data["exam_metadata"]["eligibility_appt_date_last"],
-                        "lastUpdate": mock_now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-                    },
+                    "sch:eadRequest": self.ead_request
                 },
             },
         }
@@ -708,3 +618,73 @@ class TestGetExamData(unittest.TestCase):
                 f"{course_id}. Please check PEARSON_RTI_COURSES_DATA setting."
             ),
         )
+
+
+class TestBuildCddRequest(unittest.TestCase):
+    """
+    Unit tests for the build_cdd_request function.
+    """
+    @patch("eox_nelp.pearson_vue.pipeline.timezone")
+    def test_cdd_request(self, mock_timezone):
+        """ Test cdd_request is built with profile_metadata.
+            Expected behavior:
+            - The result is the expected value.
+        """
+        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+        input_data = {
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john.doe@example.com",
+                "address": "123 Main St",
+                "city": "Anytown",
+                "country": "US",
+                "phone_number": "5551234567",
+                "phone_country_code": "1",
+                "mobile_number": "5551234567",
+                "mobile_country_code": "1",
+                "arabic_name": "فلان الفلاني",
+            }
+        }
+
+        expected_output = {
+            "cdd_request": CDD_REQUEST_SAMPLE
+        }
+
+        result = build_cdd_request(**input_data)
+
+        self.assertDictEqual(expected_output, result)
+
+
+class TestBuildEadRequest(unittest.TestCase):
+    """
+    Unit tests for the build_cdd_request function.
+    """
+    @patch.object(timezone, "now")
+    def test_build_ead_request(self, mock_now):
+        """ Test ead_request is built with profile_metadata and exam_metadata.
+            Expected behavior:
+            - The result is the expected value.
+        """
+        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+
+        input_data = {
+            "profile_metadata": {
+                "anonymous_user_id": "12345",
+            },
+            "exam_metadata": {
+                "eligibility_appt_date_first": "2024/07/15 11:59:59",
+                "eligibility_appt_date_last": "2025/07/15 11:59:59",
+                "exam_authorization_count": 3,
+                "exam_series_code": "ABC",
+                "client_authorization_id": "12345678954",
+            },
+        }
+        expected_output = {
+            "ead_request": EAD_REQUEST_SAMPLE
+        }
+
+        result = build_ead_request(**input_data)
+
+        self.assertDictEqual(expected_output, result)

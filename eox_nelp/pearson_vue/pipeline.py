@@ -456,9 +456,8 @@ def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argum
         CddRequest(**cdd_request)
     except ValidationError as validation_exception:
         return {
-            "launch_validation_error_pipeline": {
-                "validation_exception": validation_exception.json()
-            }
+            "launch_validation_error_pipeline": True,
+            "validation_exception": validation_exception.json()
         }
 
     return None
@@ -480,9 +479,8 @@ def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argum
         EadRequest(**ead_request)
     except ValidationError as validation_exception:
         return {
-            "launch_validation_error_pipeline": {
-                "validation_exception": validation_exception.json()
-            }
+            "launch_validation_error_pipeline": True,
+            "validation_exception": validation_exception.json()
         }
 
     return None

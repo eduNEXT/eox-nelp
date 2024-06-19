@@ -24,6 +24,15 @@ from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
+try:
+    from eox_audit_model.decorators import audit_method
+except ImportError:
+    def audit_method(action):  # pylint: disable=unused-argument
+        """Identity audit_method"""
+        return lambda x: x
+from pydantic import ValidationError
+
+from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -407,3 +416,73 @@ def build_ead_request(
     return {
         "ead_request": ead_request
     }
+
+
+def audit_pipe_error(*args, **kwargs):
+    """
+    Method to save an error with eox-audit.
+    Args:
+        *args, **kwargs
+    Logs:
+        LogError: Log everything with name error.
+    Returns:
+        None
+    """
+    @audit_method(action="Error Pearson Vue save audit data")
+    def audit_exception(*args, **kwargs):
+        raise ValueError(*args, kwargs)
+
+    try:
+        audit_exception(*args, **kwargs)
+    except ValueError:
+        pass
+    logger.error("Validation Error args:%s-kwargs:%s", args, kwargs)
+
+    return None
+
+def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):
+    """
+    Validates an CDD request dictionary using a Pydantic model.
+
+    This function attempts to create a Pydantic model instance (likely named `class CddRequest`:
+`)
+    from the provided `cdd_request` dictionary. It performs data validation based on the
+    model's data type definitions.
+    Then if there is an error then that error is raised using audit. audit_validation_error
+
+    Args:
+        cdd_request (dict): The dictionary containing the EAD request data.
+    """
+    try:
+        CddRequest(**cdd_request)
+    except ValidationError as validation_exception:
+        return {
+            "launch_validation_error_pipeline": {
+                "validation_exception": validation_exception.json()
+            }
+        }
+
+    return None
+
+def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argument
+    """
+    Validates an EAD request dictionary using a Pydantic model.
+
+    This function attempts to create a Pydantic model instance (likely named `EadRequest`)
+    from the provided `ead_request` dictionary. It performs data validation based on the
+    model's data type definitions.
+    Then if there is an error then that error is raised using audit. audit_validation_error
+
+    Args:
+        ead_request (dict): The dictionary containing the EAD request data.
+    """
+    try:
+        EadRequest(**ead_request)
+    except ValidationError as validation_exception:
+        return {
+            "launch_validation_error_pipeline": {
+                "validation_exception": validation_exception.json()
+            }
+        }
+
+    return None

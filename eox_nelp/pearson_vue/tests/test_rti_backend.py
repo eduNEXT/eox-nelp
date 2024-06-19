@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, call
 
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
+    ErrorValidationDataImport,
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
@@ -165,3 +166,9 @@ class TestCandidateDemographicsDataImport(TestRealTimeImport):
     Unit tests for the rti_backend class.
     """
     rti_backend_class = CandidateDemographicsDataImport
+
+class TestErrorValidationDataImport(TestRealTimeImport):
+    """
+    Unit tests for the rti_backend class.
+    """
+    rti_backend_class = ErrorValidationDataImport

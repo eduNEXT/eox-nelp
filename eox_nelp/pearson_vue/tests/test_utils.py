@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from eox_nelp.edxapp_wrapper.student import CourseEnrollment
+from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
 from eox_nelp.pearson_vue.constants import CLIENT_AUTHORIZATION_ID_OFFSET, PAYLOAD_CDD, PAYLOAD_EAD
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 
@@ -395,18 +395,25 @@ class GenerateClientAuthorizationIDTestCase(TestCase):
             course_id=self.course_id,
             id=1,
         )
+        AnonymousUserId.objects.get.return_value = MagicMock(
+            user=self.user,
+            course_id=self.course_id,
+            id=28475,
+        )
 
     def tearDown(self):
         """Restore mocks' state"""
         CourseEnrollment.reset_mock()
+        AnonymousUserId.reset_mock()
 
     def test_generate_client_authorization_id(self):
         """
         Test generate_client_authorization_id function return the set values.
-            Expected behavior:
-            - The result is the expected value.(300001)
+
+        Expected behavior:
+            - The result is the expected value.(300001-28475)
         """
-        expected_result = str(1 + CLIENT_AUTHORIZATION_ID_OFFSET)
+        expected_result = f"{1 + CLIENT_AUTHORIZATION_ID_OFFSET}-28475"
 
         result = generate_client_authorization_id(self.user.id, self.course_id)
 

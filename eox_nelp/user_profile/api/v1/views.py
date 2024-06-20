@@ -75,7 +75,10 @@ def update_user_data(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    cdd_task.delay(user_id=request.user.id)  # Send cdd request with user updated.
+    if (
+        getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False) or
+        getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False)
+    ):
+        cdd_task.delay(user_id=request.user.id)  # Send cdd request with user updated.
 
     return Response({"message": "User's fields has been updated successfully"}, status=status.HTTP_200_OK)

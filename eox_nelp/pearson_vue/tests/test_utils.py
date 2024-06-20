@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
-from eox_nelp.pearson_vue.constants import CLIENT_AUTHORIZATION_ID_OFFSET, PAYLOAD_CDD, PAYLOAD_EAD
+from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 
 User = get_user_model()
@@ -413,7 +413,7 @@ class GenerateClientAuthorizationIDTestCase(TestCase):
         Expected behavior:
             - The result is the expected value.(300001-28475)
         """
-        expected_result = f"{1 + CLIENT_AUTHORIZATION_ID_OFFSET}-28475"
+        expected_result = "1-28475"
 
         result = generate_client_authorization_id(self.user.id, self.course_id)
 

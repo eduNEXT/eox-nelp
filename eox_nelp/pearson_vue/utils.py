@@ -6,7 +6,6 @@ import xmltodict
 from pydantic.v1.utils import deep_update
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
-from eox_nelp.pearson_vue.constants import CLIENT_AUTHORIZATION_ID_OFFSET
 
 
 def update_xml_with_dict(xml: str, update_dict: dict) -> str:
@@ -43,4 +42,4 @@ def generate_client_authorization_id(user_id: int, course_id: str) -> str:
     anonymous_user_id = anonymous_id_for_user(course_enrollment.user, course_id)
     anonymous_user_id_instance = AnonymousUserId.objects.get(anonymous_user_id=anonymous_user_id)
 
-    return f"{course_enrollment.id + CLIENT_AUTHORIZATION_ID_OFFSET}-{anonymous_user_id_instance.id}"
+    return f"{course_enrollment.id}-{anonymous_user_id_instance.id}"

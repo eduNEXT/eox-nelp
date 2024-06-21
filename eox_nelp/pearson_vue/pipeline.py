@@ -209,13 +209,18 @@ def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unu
         }
         payload = update_xml_with_dict(PAYLOAD_CDD, payload)
 
-        return api_client.import_candidate_demographics(payload)
+        response = api_client.import_candidate_demographics(payload)
 
-    response = import_candidate_demographics_request(cdd_request)
+        if response.get("status", "error") == "accepted":
+            return response
 
-    if response.get("status", "error") != "accepted":
+        logger.info("Import candidate demographics pipeline has failed with the following response: %s", response)
         # pylint: disable=broad-exception-raised
-        raise Exception("Error trying to process import candidate demographics request.")
+        raise Exception(
+            response.get("message", "Error trying to process import candidate demographics request.")
+        )
+
+    import_candidate_demographics_request(cdd_request)
 
 
 def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-argument
@@ -259,13 +264,18 @@ def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-
             },
         }
         payload = update_xml_with_dict(PAYLOAD_EAD, payload)
-        return api_client.import_exam_authorization(payload)
+        response = api_client.import_exam_authorization(payload)
 
-    response = import_exam_authorization_request(ead_request)
+        if response.get("status", "error") == "accepted":
+            return response
 
-    if response.get("status", "error") != "accepted":
+        logger.info("Import exam authorization pipeline has failed with the following response: %s", response)
         # pylint: disable=broad-exception-raised
-        raise Exception("Error trying to process import exam authorization request.")
+        raise Exception(
+            response.get("message", "Error trying to process import exam authorization request.")
+        )
+
+    import_exam_authorization_request(ead_request)
 
 
 def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argument

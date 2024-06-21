@@ -70,17 +70,6 @@ class RealTimeImport:
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
                 break
 
-            if result.get("launch_validation_error_pipeline"):
-                self.backend_data["pipeline_index"] = len(pipeline) - 1
-                # clean kwargs to dont finish next pipeline launch.
-                error_validation_kwargs = remove_keys_from_dict(
-                    self.backend_data,
-                    ["pipeline_index", "launch_validation_error_pipeline"]
-                )
-                tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
-                tasks.rti_error_handler_task.delay(**error_validation_kwargs)
-                break
-
     def get_pipeline(self):
         """
         Returns the RTI pipeline, which is a list of functions to be executed.

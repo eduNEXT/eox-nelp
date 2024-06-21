@@ -15,8 +15,9 @@ from pydantic.v1.utils import deep_update
 from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
+from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
 from eox_nelp.pearson_vue.pipeline import (
-    audit_error_validation,
+    audit_pearson_error,
     build_cdd_request,
     build_ead_request,
     check_service_availability,
@@ -623,19 +624,37 @@ class TestGetExamData(unittest.TestCase):
             ),
         )
 
+    @override_settings()
+    def test_wrong_exam_metadata_key_error(self):
+        """ Test that the get_exam_data function raises an exception when the required settings are not found.
+            Expected behavior:
+            - Raise Pearson Vue key error.
+        """
+        setattr(settings, "PEARSON_RTI_COURSES_DATA", {})
+
+        self.assertRaises(PearsonKeyError, get_exam_data, self.user.id, self.course_id)
+
+    @override_settings()
+    def test_wrong_exam_metadata_attr_error(self):
+        """ Test that the get_exam_data function raises an exception when the required settings are not found.
+            Expected behavior:
+            - Raise Pearson Vue attribute error.
+        """
+        if hasattr(settings, "PEARSON_RTI_COURSES_DATA"):
+            delattr(settings, "PEARSON_RTI_COURSES_DATA")
+
+        self.assertRaises(PearsonAttributeError, get_exam_data, self.user.id, self.course_id)
+
 
 class TestBuildCddRequest(unittest.TestCase):
     """
     Unit tests for the build_cdd_request function.
     """
-    @patch("eox_nelp.pearson_vue.pipeline.timezone")
-    def test_cdd_request(self, mock_timezone):
-        """ Test cdd_request is built with profile_metadata.
-            Expected behavior:
-            - The result is the expected value.
+    def setUp(self):
         """
-        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
-        input_data = {
+        Set up test environment.
+        """
+        self.input_data = {
             "profile_metadata": {
                 "anonymous_user_id": "12345",
                 "first_name": "John",
@@ -652,28 +671,56 @@ class TestBuildCddRequest(unittest.TestCase):
             }
         }
 
+    @patch("eox_nelp.pearson_vue.pipeline.timezone")
+    def test_cdd_request(self, mock_timezone):
+        """ Test cdd_request is built with profile_metadata.
+            Expected behavior:
+            - The result is the expected value.
+        """
+        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+
         expected_output = {
             "cdd_request": CDD_REQUEST_SAMPLE
         }
 
-        result = build_cdd_request(**input_data)
+        result = build_cdd_request(**self.input_data)
 
         self.assertDictEqual(expected_output, result)
+
+    @patch("eox_nelp.pearson_vue.pipeline.timezone")
+    def test_wrong_cdd_request_key_error(self, mock_timezone):
+        """ Test cdd_request is not built with profile_metadata.
+            Expected behavior:
+            - Raise Pearson Vue key error.
+        """
+        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+        self.input_data["profile_metadata"] = {}
+
+        self.assertRaises(PearsonKeyError, build_cdd_request, **self.input_data)
+
+    @override_settings()
+    @patch("eox_nelp.pearson_vue.pipeline.timezone")
+    def test_wrong_cdd_request_attr_error(self, mock_timezone):
+        """ Test cdd_request is not built with profile_metadata.
+            Expected behavior:
+            - Raise Pearson Vue Attribute error.
+        """
+        mock_timezone.now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+        if hasattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"):
+            delattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID")
+
+        self.assertRaises(PearsonAttributeError, build_cdd_request, **self.input_data)
 
 
 class TestBuildEadRequest(unittest.TestCase):
     """
     Unit tests for the build_cdd_request function.
     """
-    @patch.object(timezone, "now")
-    def test_build_ead_request(self, mock_now):
-        """ Test ead_request is built with profile_metadata and exam_metadata.
-            Expected behavior:
-            - The result is the expected value.
+    def setUp(self):
         """
-        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
-
-        input_data = {
+        Set up test environment.
+        """
+        self.input_data = {
             "profile_metadata": {
                 "anonymous_user_id": "12345",
             },
@@ -685,13 +732,47 @@ class TestBuildEadRequest(unittest.TestCase):
                 "client_authorization_id": "12345678954",
             },
         }
+
+    @patch.object(timezone, "now")
+    def test_build_ead_request(self, mock_now):
+        """ Test ead_request is built with profile_metadata and exam_metadata.
+            Expected behavior:
+            - The result is the expected value.
+        """
+        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+
         expected_output = {
             "ead_request": EAD_REQUEST_SAMPLE
         }
 
-        result = build_ead_request(**input_data)
+        result = build_ead_request(**self.input_data)
 
         self.assertDictEqual(expected_output, result)
+
+    @patch.object(timezone, "now")
+    def test_wrong_build_ead_request_key(self, mock_now):
+        """ Test ead_request is not built with profile_metadata and exam_metadata.
+            Expected behavior:
+            - Raise Pearson Vue key error.
+        """
+        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+
+        self.input_data["profile_metadata"] = {}
+
+        self.assertRaises(PearsonKeyError, build_ead_request, **self.input_data)
+
+    @override_settings()
+    @patch.object(timezone, "now")
+    def test_wrong_build_ead_request_attr_error(self, mock_now):
+        """ Test ead_request is not built with profile_metadata and exam_metadata.
+            Expected behavior:
+            - Raise Pearson Vue attribute error.
+        """
+        mock_now.return_value = timezone.datetime(2023, 5, 20, 12, 0, 0)
+        if hasattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"):
+            delattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID")
+
+        self.assertRaises(PearsonAttributeError, build_ead_request, **self.input_data)
 
 
 @ddt
@@ -753,15 +834,11 @@ class TestValidateCddRequest(unittest.TestCase):
         different keys.
 
         Expected behavior:
-            - The result is the expected value.(with key launch_validation_error_pipeline)
-            - launch_validation_error_pipeline key is truthy
+            - raise PearsonValidationError
         """
         wrong_cdd_request = deep_update(self.cdd_request, wrong_update)
 
-        result = validate_cdd_request(wrong_cdd_request)
-
-        self.assertIn("launch_validation_error_pipeline", result)
-        self.assertTrue(bool(result["launch_validation_error_pipeline"]))
+        self.assertRaises(PearsonValidationError, validate_ead_request, wrong_cdd_request)
 
     def test_correct_cdd_request(self):
         """Test validator with correct cdd_request.
@@ -769,9 +846,7 @@ class TestValidateCddRequest(unittest.TestCase):
         Expected behavior:
             - The result is the expected value.
         """
-        result = validate_cdd_request(self.cdd_request)
-
-        self.assertIsNone(result)
+        self.assertIsNone(validate_cdd_request(self.cdd_request))
 
 
 @ddt
@@ -812,15 +887,11 @@ class TestValidateEadRequest(unittest.TestCase):
         different keys.
 
         Expected behavior:
-            - The result is the expected value.(with key launch_validation_error_pipeline)
-            - launch_validation_error_pipeline key is truthy
+            - raise PearsonValidationError
         """
         wrong_ead_request = deep_update(self.ead_request, wrong_update)
 
-        result = validate_ead_request(wrong_ead_request)
-
-        self.assertIn("launch_validation_error_pipeline", result)
-        self.assertTrue(bool(result["launch_validation_error_pipeline"]))
+        self.assertRaises(PearsonValidationError, validate_ead_request, wrong_ead_request)
 
     def test_correct_ead_request(self):
         """Test validator with correct ead_request.
@@ -828,18 +899,16 @@ class TestValidateEadRequest(unittest.TestCase):
         Expected behavior:
             - The result is the expected value.
         """
-        result = validate_ead_request(self.ead_request)
-
-        self.assertIsNone(result)
+        self.assertIsNone(validate_ead_request(self.ead_request))
 
 
 class TestAuditPipeError(unittest.TestCase):
     """
-    Unit tests for the audit_error_validation method.
+    Unit tests for the audit_pearson_error method.
     """
 
-    def test_audit_error_validation(self):
-        """Test correct behaviour calling  audit_error_validation.
+    def test_audit_pearson_error(self):
+        """Test correct behaviour calling  audit_pearson_error.
 
         Expected behavior:
             - The result is the expected value(None).
@@ -852,10 +921,10 @@ class TestAuditPipeError(unittest.TestCase):
         }
         args = ("vaderio", 3244)
         log_error = [
-            f"ERROR:{pipeline.__name__}:Validation Error args:{args}-kwargs:{kwargs}"
+            f"ERROR:{pipeline.__name__}:Handling Error args:{args}-kwargs:{kwargs}"
         ]
 
         with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
-            self.assertIsNone(audit_error_validation(*args, **kwargs))
+            self.assertIsNone(audit_pearson_error(*args, **kwargs))
 
         self.assertListEqual(log_error, logs.output)

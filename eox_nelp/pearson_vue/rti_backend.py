@@ -7,8 +7,9 @@ Classes:
 """
 import importlib
 
+from eox_nelp.pearson_vue.exceptions import PearsonBaseError
 from eox_nelp.pearson_vue.pipeline import (
-    audit_error_validation,
+    audit_pearson_error,
     build_cdd_request,
     build_ead_request,
     check_service_availability,
@@ -53,9 +54,18 @@ class RealTimeImport:
 
         for idx, func in enumerate(pipeline[pipeline_index:]):
             self.backend_data["pipeline_index"] = pipeline_index + idx
-            result = func(**self.backend_data) or {}
-            self.backend_data.update(result)
+            try:
+                result = func(**self.backend_data) or {}
+            except PearsonBaseError as pearson_error:
+                self.backend_data["pipeline_index"] = len(pipeline) - 1
+                # clean kwargs to dont finish next pipeline launch.
+                executed__pipeline_kwargs = remove_keys_from_dict(self.backend_data, ["pipeline_index"])
+                executed__pipeline_kwargs["failed_step_pipeline"] = func.__name__
+                tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
+                tasks.rti_error_handler_task.delay(**executed__pipeline_kwargs, **pearson_error.__dict__)
+                break
 
+            self.backend_data.update(result)
             if result.get("safely_pipeline_termination"):
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
                 break
@@ -68,7 +78,7 @@ class RealTimeImport:
                     ["pipeline_index", "launch_validation_error_pipeline"]
                 )
                 tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
-                tasks.error_validation_task.delay(**error_validation_kwargs)
+                tasks.rti_error_handler_task.delay(**error_validation_kwargs)
                 break
 
     def get_pipeline(self):
@@ -120,12 +130,12 @@ class CandidateDemographicsDataImport(RealTimeImport):
         ]
 
 
-class ErrorValidationDataImport(RealTimeImport):
+class ErrorRealTimeImportHandler(RealTimeImport):
     """Class for managing validation error pipe  executing the pipeline for data validation."""
     def get_pipeline(self):
         """
         Returns the error validation pipeline, which is a list of functions to be executed.
         """
         return [
-            audit_error_validation,
+            audit_pearson_error,
         ]

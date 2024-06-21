@@ -4,15 +4,18 @@ This module contains unit tests for the RealTimeImport class and its methods in 
 import unittest
 from unittest.mock import MagicMock, call, patch
 
+from ddt import data, ddt
+
+from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
-    ErrorValidationDataImport,
+    ErrorRealTimeImportHandler,
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
-from eox_nelp.utils import remove_keys_from_dict
 
 
+@ddt
 class TestRealTimeImport(unittest.TestCase):
     """
     Unit tests for the RealTimeImport class.
@@ -141,8 +144,13 @@ class TestRealTimeImport(unittest.TestCase):
             },
         )
 
-    @patch("eox_nelp.pearson_vue.tasks.error_validation_task")
-    def test_launch_validation_error_pipeline(self, error_validation_task_mock):
+    @data(
+        PearsonValidationError("CDD", {"error": ["String to short."]}),
+        PearsonKeyError("EAD", "eligibility_appt_date_first"),
+        PearsonAttributeError("CDD", "Settings' object has no attribute PERITA")
+    )
+    @patch("eox_nelp.pearson_vue.tasks.rti_error_handler_task")
+    def test_launch_validation_error_pipeline(self, pearson_error, rti_error_handler_task_mock):
         """
         Test the execution of the RTI finished after the second function call due
         `launch_validation_error_pipeline` kwarg.
@@ -154,17 +162,20 @@ class TestRealTimeImport(unittest.TestCase):
             - Pipeline method 4 is not called.
             - backend_data attribute is the expected value.
                 Without func3,func4 data and pipeline index in the last.
-            - error_validation_task is called with error_validation_kwargs.
+            - rti_error_handler_task is called with executed__pipeline_kwargs and error_validation_kwargs.
         """
         # Mock pipeline functions
         func1 = MagicMock(return_value={"updated_key": "value1"})
-        func2 = MagicMock(return_value={"launch_validation_error_pipeline": {
-            "validation_exception": {
-                "error": ["String to short."]
-            }
-        }})
+        func1.__name__ = "first_function"
+        func2 = MagicMock()
+        func2.side_effect = pearson_error
+        func2.__name__ = "failed_function"
         func3 = MagicMock(return_value={"additional_key": "value3"})
         func4 = MagicMock(return_value={"additional_key": "value4"})
+        executed__pipeline_kwargs = {
+            "updated_key": "value1",
+            "failed_step_pipeline": func2.__name__
+        }
 
         self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func2])
         self.rti.run_pipeline()
@@ -178,15 +189,10 @@ class TestRealTimeImport(unittest.TestCase):
             {
                 "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
                 **func1(),  # Include data from func1 ()
-                **func2(),  # Include data from func2  (with launch_validation_error_pipeline)
             },
         )
 
-        error_validation_kwargs = remove_keys_from_dict(
-            self.rti.backend_data,
-            ["pipeline_index", "launch_validation_error_pipeline"]
-        )
-        error_validation_task_mock.delay.assert_called_with(**error_validation_kwargs)
+        rti_error_handler_task_mock.delay.assert_called_with(**executed__pipeline_kwargs, **pearson_error.__dict__)
 
     def test_get_pipeline(self):
         """
@@ -216,8 +222,8 @@ class TestCandidateDemographicsDataImport(TestRealTimeImport):
     rti_backend_class = CandidateDemographicsDataImport
 
 
-class TestErrorValidationDataImport(TestRealTimeImport):
+class TestErrorRealTimeImportHandler(TestRealTimeImport):
     """
     Unit tests for the rti_backend class.
     """
-    rti_backend_class = ErrorValidationDataImport
+    rti_backend_class = ErrorRealTimeImportHandler

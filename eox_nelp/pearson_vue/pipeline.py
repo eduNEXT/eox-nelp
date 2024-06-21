@@ -24,6 +24,7 @@ from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
+from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
 
@@ -309,8 +310,13 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
-    courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
-    exam_metadata = courses_data[course_id]
+    try:
+        courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
+        exam_metadata = courses_data[course_id]
+    except KeyError as exc:
+        raise PearsonKeyError("EAD", str(exc)) from exc
+    except AttributeError as a_exc:
+        raise PearsonAttributeError("EAD", str(a_exc)) from a_exc
 
     # This generates the clientAuthorizationID based on the user_id and course_id
     exam_metadata["client_authorization_id"] = generate_client_authorization_id(
@@ -346,39 +352,45 @@ def build_cdd_request(profile_metadata, **kwargs):  # pylint: disable=unused-arg
     Returns:
        dict: dict with ead_request dict.
     """
-    cdd_request = {
-        "@clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
-        "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
-        "candidateName": {
-            "firstName": profile_metadata["first_name"],
-            "lastName": profile_metadata["last_name"],
-        },
-        "webAccountInfo": {
-            "email": profile_metadata["email"],
-        },
-        "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-        "primaryAddress": {
-            "address1": profile_metadata["address"],
-            "city": profile_metadata["city"],
-            "country": profile_metadata["country"],
-            "phone": {
-                "phoneNumber": profile_metadata["phone_number"],
-                "phoneCountryCode": profile_metadata["phone_country_code"],
+    try:
+        cdd_request = {
+            "@clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
+            "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
+            "candidateName": {
+                "firstName": profile_metadata["first_name"],
+                "lastName": profile_metadata["last_name"],
             },
-            "mobile": {
-                "mobileNumber": profile_metadata["mobile_number"],
-                "mobileCountryCode": profile_metadata["mobile_country_code"],
+            "webAccountInfo": {
+                "email": profile_metadata["email"],
             },
-            "nativeAddress": {
-                "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
-                "potentialMismatch": "false",
-                "firstName": profile_metadata["arabic_name"],
-                "lastName": profile_metadata["arabic_name"],
+            "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
+            "primaryAddress": {
                 "address1": profile_metadata["address"],
                 "city": profile_metadata["city"],
-            },
+                "country": profile_metadata["country"],
+                "phone": {
+                    "phoneNumber": profile_metadata["phone_number"],
+                    "phoneCountryCode": profile_metadata["phone_country_code"],
+                },
+                "mobile": {
+                    "mobileNumber": profile_metadata["mobile_number"],
+                    "mobileCountryCode": profile_metadata["mobile_country_code"],
+                },
+                "nativeAddress": {
+                    "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
+                    "potentialMismatch": "false",
+                    "firstName": profile_metadata["arabic_name"],
+                    "lastName": profile_metadata["arabic_name"],
+                    "address1": profile_metadata["address"],
+                    "city": profile_metadata["city"],
+                },
+            }
         }
-    }
+    except KeyError as exc:
+        raise PearsonKeyError("CDD", str(exc)) from exc
+    except AttributeError as a_exc:
+        raise PearsonAttributeError("CDD", str(a_exc)) from a_exc
+
     return {
         "cdd_request": cdd_request
     }
@@ -401,24 +413,29 @@ def build_ead_request(
     Returns:
         dict: dict with ead_request dict
     """
-    ead_request = {
-        "@clientAuthorizationID": exam_metadata["client_authorization_id"],
-        "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
-        "@authorizationTransactionType": transaction_type,
-        "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
-        "examAuthorizationCount": exam_metadata["exam_authorization_count"],
-        "examSeriesCode": exam_metadata["exam_series_code"],
-        "eligibilityApptDateFirst": exam_metadata["eligibility_appt_date_first"],
-        "eligibilityApptDateLast": exam_metadata["eligibility_appt_date_last"],
-        "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
-    }
+    try:
+        ead_request = {
+            "@clientAuthorizationID": exam_metadata["client_authorization_id"],
+            "@clientID": getattr(settings, "PEARSON_RTI_WSDL_CLIENT_ID"),
+            "@authorizationTransactionType": transaction_type,
+            "clientCandidateID": f'NELC{profile_metadata["anonymous_user_id"]}',
+            "examAuthorizationCount": exam_metadata["exam_authorization_count"],
+            "examSeriesCode": exam_metadata["exam_series_code"],
+            "eligibilityApptDateFirst": exam_metadata["eligibility_appt_date_first"],
+            "eligibilityApptDateLast": exam_metadata["eligibility_appt_date_last"],
+            "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
+        }
+    except KeyError as exc:
+        raise PearsonKeyError("EAD", str(exc)) from exc
+    except AttributeError as a_exc:
+        raise PearsonAttributeError("EAD", str(a_exc)) from a_exc
 
     return {
         "ead_request": ead_request
     }
 
 
-def audit_error_validation(*args, **kwargs):
+def audit_pearson_error(*args, **kwargs):
     """
     Method to save an error with eox-audit.
     Args:
@@ -428,15 +445,15 @@ def audit_error_validation(*args, **kwargs):
     Returns:
         None
     """
-    @audit_method(action="Pearson Vue Error validation data")
-    def raise_audit_validation_exception(*args, **kwargs):
+    @audit_method(action="Pearson Vue Error data")
+    def raise_audit_pearson_exception(*args, **kwargs):
         raise ValueError(*args, kwargs)
 
     try:
-        raise_audit_validation_exception(*args, **kwargs)
+        raise_audit_pearson_exception(*args, **kwargs)
     except ValueError:
         pass
-    logger.error("Validation Error args:%s-kwargs:%s", args, kwargs)
+    logger.error("Handling Error args:%s-kwargs:%s", args, kwargs)
 
 
 def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):
@@ -447,20 +464,15 @@ def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argum
 `)
     from the provided `cdd_request` dictionary. It performs data validation based on the
     model's data type definitions.
-    Then if there is an error then that error is raised using audit. audit_validation_error
+    Then if there is an error then that error is raised using audit. PearsonValidationError
 
     Args:
-        cdd_request (dict): The dictionary containing the EAD request data.
+        cdd_request (dict): The dictionary containing the CDD request data.
     """
     try:
         CddRequest(**cdd_request)
     except ValidationError as validation_exception:
-        return {
-            "launch_validation_error_pipeline": True,
-            "validation_exception": validation_exception.json()
-        }
-
-    return None
+        raise PearsonValidationError("CDD", validation_exception.json()) from validation_exception
 
 
 def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argument
@@ -470,7 +482,7 @@ def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argum
     This function attempts to create a Pydantic model instance (likely named `EadRequest`)
     from the provided `ead_request` dictionary. It performs data validation based on the
     model's data type definitions.
-    Then if there is an error then that error is raised using audit. audit_validation_error
+    Then if there is an error then that error is raised using PearsonValidationError
 
     Args:
         ead_request (dict): The dictionary containing the EAD request data.
@@ -478,9 +490,4 @@ def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argum
     try:
         EadRequest(**ead_request)
     except ValidationError as validation_exception:
-        return {
-            "launch_validation_error_pipeline": True,
-            "validation_exception": validation_exception.json()
-        }
-
-    return None
+        raise PearsonValidationError("EAD", validation_exception.json()) from validation_exception

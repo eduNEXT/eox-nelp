@@ -5,6 +5,7 @@ https://github.com/eduNEXT/edunext-platform/tree/ednx-release/mango.master/commo
 from common.djangoapps.student import roles
 from common.djangoapps.student.admin import CourseEnrollmentAdmin
 from common.djangoapps.student.models import (  # pylint: disable=import-error
+    AnonymousUserId,
     CourseAccessRole,
     CourseEnrollment,
     UserProfile,
@@ -56,6 +57,16 @@ def get_anonymous_id_for_user():
         anonymous_id_for_user function.
     """
     return anonymous_id_for_user
+
+
+def get_anonymous_user_id_model():
+    """Allow to get AnonymousUserId model from
+    https://github.com/nelc/edx-platform/blob/open-release/palm.nelp/common/djangoapps/student/models/user.py#L73
+
+    Returns:
+        AnonymousUserId model.
+    """
+    return AnonymousUserId
 
 
 def get_course_enrollment_admin():

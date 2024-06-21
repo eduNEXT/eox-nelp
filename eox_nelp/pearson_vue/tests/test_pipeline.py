@@ -838,7 +838,7 @@ class TestValidateCddRequest(unittest.TestCase):
         """
         wrong_cdd_request = deep_update(self.cdd_request, wrong_update)
 
-        self.assertRaises(PearsonValidationError, validate_ead_request, wrong_cdd_request)
+        self.assertRaises(PearsonValidationError, validate_cdd_request, wrong_cdd_request)
 
     def test_correct_cdd_request(self):
         """Test validator with correct cdd_request.
@@ -916,7 +916,8 @@ class TestAuditPipeError(unittest.TestCase):
         """
         kwargs = {
             "exception_data": {
-                "error": ["String to short."]
+                "error": ["String to short."],
+                "exception_type": "attribute-error"
             }
         }
         args = ("vaderio", 3244)

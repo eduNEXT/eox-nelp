@@ -450,7 +450,11 @@ def audit_pearson_error(*args, **kwargs):
     Returns:
         None
     """
-    @audit_method(action="Pearson Vue Error data")
+    audit_action = "Pearson Vue Exception"
+    if exception_data := kwargs.get("exception_data", None):
+        audit_action = f"{audit_action}~{exception_data['exception_type']}"
+
+    @audit_method(action=audit_action)
     def raise_audit_pearson_exception(*args, **kwargs):
         raise PearsonBaseError(*args, kwargs)
 

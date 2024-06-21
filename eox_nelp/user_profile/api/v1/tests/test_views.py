@@ -4,6 +4,8 @@ Classes:
     UpdateUserDataTestCase: Class to test update_user_data view
 """
 
+from unittest.mock import patch
+
 from ddt import ddt
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -27,8 +29,12 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         accounts.reset_mock()
         accounts.api.update_account_settings.side_effect = None
 
-    @override_settings(ENABLE_OTP_VALIDATION=False)
-    def test_update_fields_successfully(self):
+    @override_settings(
+        ENABLE_OTP_VALIDATION=False,
+        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
+    )
+    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    def test_update_fields_successfully(self, cdd_task_mock):
         """
         Test that the request completes its execution successfully.
 
@@ -36,6 +42,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check the response says that the field has been updated.
             - Status code 200.
             - Check that update_account_settings method has called once.
+            - Check cdd_task async task is called user.id
         """
         payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
@@ -45,9 +52,11 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+        cdd_task_mock.delay.assert_called_with(user_id=self.user.id)
 
     @override_settings(ENABLE_OTP_VALIDATION=False)
-    def test_account_validation_error(self):
+    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    def test_account_validation_error(self, cdd_task_mock):
         """
         Test that a bad request is returned when an AccountValidationError is raised.
 
@@ -55,6 +64,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check the response contains fields_errors.
             - Status code 400.
             - Check that update_account_settings method has called once.
+            - Check cdd_task async is not called.
         """
         payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
@@ -67,9 +77,11 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), {"field_errors": "Invalid phone number"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+        cdd_task_mock.delay.assert_not_called()
 
     @override_settings(ENABLE_OTP_VALIDATION=False)
-    def test_account_update_error(self):
+    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    def test_account_update_error(self, cdd_task_mock):
         """
         Test that a bad request is returned when an AccountUpdateError is raised.
 
@@ -77,6 +89,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check the response contains developer and user message.
             - Status code 400.
             - Check that update_account_settings method has called once.
+            - Check cdd_task async is not called.
         """
         payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
@@ -93,9 +106,15 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), expected_response)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
+        cdd_task_mock.delay.assert_not_called()
 
-    @override_settings(ENABLE_OTP_VALIDATION=False, EXTRA_ACCOUNT_USER_FIELDS=["first_name", "last_name"])
-    def test_account_update_extra_fields(self):
+    @override_settings(
+        ENABLE_OTP_VALIDATION=False,
+        EXTRA_ACCOUNT_USER_FIELDS=["first_name", "last_name"],
+        PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
+    )
+    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    def test_account_update_extra_fields(self, cdd_task_mock):
         """
         Test that extra account user fields has been set.
 
@@ -105,6 +124,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that update_account_settings method has called once.
             - Check that user first_name has been updated.
             - Check that user last_name has been updated.
+            - Check cdd_task async task is called with user.id
         """
         payload = {
             "first_name": "Anakin",
@@ -120,3 +140,4 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
         self.assertEqual(self.user.first_name, payload["first_name"])
         self.assertEqual(self.user.last_name, payload["last_name"])
+        cdd_task_mock.delay.assert_called_with(user_id=self.user.id)

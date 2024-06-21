@@ -930,7 +930,8 @@ class TestAuditPipeError(unittest.TestCase):
 
         self.assertListEqual(log_error, logs.output)
 
-    def test_not_audit_pearson_error(self):
+    @patch("eox_nelp.pearson_vue.pipeline.logger")
+    def test_not_audit_pearson_error(self, logger_mock):
         """Test not  behaviour calling  audit_pearson_error.
         If kwargs doesnt have `exception_data`.
 
@@ -941,5 +942,5 @@ class TestAuditPipeError(unittest.TestCase):
         kwargs = {}
         args = ("vaderio", 3244)
 
-        with self.assertNoLogs(pipeline.__name__, level="ERROR"):
-            self.assertIsNone(audit_pearson_error(*args, **kwargs))
+        self.assertIsNone(audit_pearson_error(*args, **kwargs))
+        logger_mock.error.assert_not_called()

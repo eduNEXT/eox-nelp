@@ -25,6 +25,13 @@ from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PIN
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
 
+try:
+    from eox_audit_model.decorators import audit_method
+except ImportError:
+    def audit_method(action):  # pylint: disable=unused-argument
+        """Identity audit_method"""
+        return lambda x: x
+
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
@@ -179,30 +186,41 @@ def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unu
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
-    api_client = PearsonRTIApiClient()
-    payload = {
-        "soapenv:Envelope": {
-            "soapenv:Header": {
-                "wsse:Security": {
-                    "wsse:UsernameToken": {
-                        "wsse:Username": getattr(settings, "PEARSON_RTI_WSDL_USERNAME"),
-                        "wsse:Password": {
-                            "#text": getattr(settings, "PEARSON_RTI_WSDL_PASSWORD")
+    @audit_method(action="Import Candidate Demographics")
+    def import_candidate_demographics_request(cdd_request):
+        """This is a wrapper that allows to make audit-able the import_candidate_demographics method."""
+        api_client = PearsonRTIApiClient()
+        payload = {
+            "soapenv:Envelope": {
+                "soapenv:Header": {
+                    "wsse:Security": {
+                        "wsse:UsernameToken": {
+                            "wsse:Username": getattr(settings, "PEARSON_RTI_WSDL_USERNAME"),
+                            "wsse:Password": {
+                                "#text": getattr(settings, "PEARSON_RTI_WSDL_PASSWORD")
+                            },
                         },
                     },
                 },
+                "soapenv:Body": {
+                    "sch:cddRequest": cdd_request
+                },
             },
-            "soapenv:Body": {
-                "sch:cddRequest": cdd_request
-            },
-        },
-    }
-    payload = update_xml_with_dict(PAYLOAD_CDD, payload)
-    response = api_client.import_candidate_demographics(payload)
+        }
+        payload = update_xml_with_dict(PAYLOAD_CDD, payload)
 
-    if response.get("status", "error") != "accepted":
+        response = api_client.import_candidate_demographics(payload)
+
+        if response.get("status", "error") == "accepted":
+            return response
+
+        logger.info("Import candidate demographics pipeline has failed with the following response: %s", response)
         # pylint: disable=broad-exception-raised
-        raise Exception("Error trying to process import candidate demographics request.")
+        raise Exception(
+            response.get("message", "Error trying to process import candidate demographics request.")
+        )
+
+    import_candidate_demographics_request(cdd_request)
 
 
 def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-argument
@@ -224,30 +242,40 @@ def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
-    api_client = PearsonRTIApiClient()
-    payload = {
-        "soapenv:Envelope": {
-            "soapenv:Header": {
-                "wsse:Security": {
-                    "wsse:UsernameToken": {
-                        "wsse:Username": getattr(settings, "PEARSON_RTI_WSDL_USERNAME"),
-                        "wsse:Password": {
-                            "#text": getattr(settings, "PEARSON_RTI_WSDL_PASSWORD")
+    @audit_method(action="Import Exam Authorization")
+    def import_exam_authorization_request(ead_request):
+        """This is a wrapper that allows to make audit-able the import_exam_authorization method."""
+        api_client = PearsonRTIApiClient()
+        payload = {
+            "soapenv:Envelope": {
+                "soapenv:Header": {
+                    "wsse:Security": {
+                        "wsse:UsernameToken": {
+                            "wsse:Username": getattr(settings, "PEARSON_RTI_WSDL_USERNAME"),
+                            "wsse:Password": {
+                                "#text": getattr(settings, "PEARSON_RTI_WSDL_PASSWORD")
+                            },
                         },
                     },
                 },
+                "soapenv:Body": {
+                    "sch:eadRequest": ead_request
+                },
             },
-            "soapenv:Body": {
-                "sch:eadRequest": ead_request
-            },
-        },
-    }
-    payload = update_xml_with_dict(PAYLOAD_EAD, payload)
-    response = api_client.import_exam_authorization(payload)
+        }
+        payload = update_xml_with_dict(PAYLOAD_EAD, payload)
+        response = api_client.import_exam_authorization(payload)
 
-    if response.get("status", "error") != "accepted":
+        if response.get("status", "error") == "accepted":
+            return response
+
+        logger.info("Import exam authorization pipeline has failed with the following response: %s", response)
         # pylint: disable=broad-exception-raised
-        raise Exception("Error trying to process import exam authorization request.")
+        raise Exception(
+            response.get("message", "Error trying to process import exam authorization request.")
+        )
+
+    import_exam_authorization_request(ead_request)
 
 
 def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argument

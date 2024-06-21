@@ -24,7 +24,12 @@ from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
-from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
+from eox_nelp.pearson_vue.exceptions import (
+    PearsonAttributeError,
+    PearsonBaseError,
+    PearsonKeyError,
+    PearsonValidationError,
+)
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
 
@@ -447,13 +452,13 @@ def audit_pearson_error(*args, **kwargs):
     """
     @audit_method(action="Pearson Vue Error data")
     def raise_audit_pearson_exception(*args, **kwargs):
-        raise ValueError(*args, kwargs)
+        raise PearsonBaseError(*args, kwargs)
 
     try:
         raise_audit_pearson_exception(*args, **kwargs)
-    except ValueError:
+    except PearsonBaseError:
         pass
-    logger.error("Handling Error args:%s-kwargs:%s", args, kwargs)
+    logger.error("Found Pearson Error with args:%s-kwargs:%s", args, kwargs)
 
 
 def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):

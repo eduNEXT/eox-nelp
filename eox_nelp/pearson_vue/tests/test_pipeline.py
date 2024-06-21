@@ -915,13 +915,13 @@ class TestAuditPipeError(unittest.TestCase):
             - Expected log error.
         """
         kwargs = {
-            "validation_exception": {
+            "exception_data": {
                 "error": ["String to short."]
             }
         }
         args = ("vaderio", 3244)
         log_error = [
-            f"ERROR:{pipeline.__name__}:Handling Error args:{args}-kwargs:{kwargs}"
+            f"ERROR:{pipeline.__name__}:Found Pearson Error with args:{args}-kwargs:{kwargs}"
         ]
 
         with self.assertLogs(pipeline.__name__, level="ERROR") as logs:

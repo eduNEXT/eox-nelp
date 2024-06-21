@@ -30,8 +30,8 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         accounts.api.update_account_settings.side_effect = None
 
     @override_settings(
-            ENABLE_OTP_VALIDATION=False,
-            PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
+        ENABLE_OTP_VALIDATION=False,
+        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
     )
     @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
     def test_update_fields_successfully(self, cdd_task_mock):

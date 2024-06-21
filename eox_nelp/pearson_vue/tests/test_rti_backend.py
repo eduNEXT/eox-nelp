@@ -172,27 +172,29 @@ class TestRealTimeImport(unittest.TestCase):
         func2.__name__ = "failed_function"
         func3 = MagicMock(return_value={"additional_key": "value3"})
         func4 = MagicMock(return_value={"additional_key": "value4"})
-        executed__pipeline_kwargs = {
+        executed_pipeline_kwargs = {
             "updated_key": "value1",
-            "failed_step_pipeline": func2.__name__
         }
 
-        self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func2])
+        self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func3, func4])
         self.rti.run_pipeline()
 
         func1.assert_called_once_with(**self.backend_data)
-        func2.assert_called_once_with(**{"updated_key": "value1", "pipeline_index": 1})
+        func2.assert_called_once_with(pipeline_index=1, **executed_pipeline_kwargs)
         func3.assert_not_called()
         func4.assert_not_called()
         self.assertDictEqual(
             self.rti.backend_data,
             {
-                "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
+                "pipeline_index": 1,  # includes the pipe executed until break due exception
                 **func1(),  # Include data from func1 ()
             },
         )
-
-        rti_error_handler_task_mock.delay.assert_called_with(**executed__pipeline_kwargs, **pearson_error.__dict__)
+        rti_error_handler_task_mock.delay.assert_called_with(
+            failed_step_pipeline=func2.__name__,
+            exception_data=pearson_error.__dict__,
+            **executed_pipeline_kwargs,
+        )
 
     def test_get_pipeline(self):
         """

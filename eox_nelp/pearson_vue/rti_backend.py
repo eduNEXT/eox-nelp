@@ -57,12 +57,14 @@ class RealTimeImport:
             try:
                 result = func(**self.backend_data) or {}
             except PearsonBaseError as pearson_error:
-                self.backend_data["pipeline_index"] = len(pipeline) - 1
                 # clean kwargs to dont finish next pipeline launch.
-                executed__pipeline_kwargs = remove_keys_from_dict(self.backend_data, ["pipeline_index"])
-                executed__pipeline_kwargs["failed_step_pipeline"] = func.__name__
+                executed_pipeline_kwargs = remove_keys_from_dict(self.backend_data, ["pipeline_index"])
                 tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
-                tasks.rti_error_handler_task.delay(**executed__pipeline_kwargs, **pearson_error.__dict__)
+                tasks.rti_error_handler_task.delay(
+                    failed_step_pipeline=func.__name__,
+                    exception_data=pearson_error.__dict__,
+                    **executed_pipeline_kwargs,
+                )
                 break
 
             self.backend_data.update(result)

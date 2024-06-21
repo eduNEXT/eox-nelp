@@ -929,3 +929,17 @@ class TestAuditPipeError(unittest.TestCase):
             self.assertIsNone(audit_pearson_error(*args, **kwargs))
 
         self.assertListEqual(log_error, logs.output)
+
+    def test_not_audit_pearson_error(self):
+        """Test not  behaviour calling  audit_pearson_error.
+        If kwargs doesnt have `exception_data`.
+
+        Expected behavior:
+            - The result is the expected value(None).
+            - Not expected log error.
+        """
+        kwargs = {}
+        args = ("vaderio", 3244)
+
+        with self.assertNoLogs(pipeline.__name__, level="ERROR"):
+            self.assertIsNone(audit_pearson_error(*args, **kwargs))

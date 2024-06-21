@@ -5,6 +5,7 @@ Module to add managed exceptions related Pearson Vue Integration
 
 class PearsonBaseError(Exception):
     """Pearson Base error class
+    Most classes that inherit from this class must have exception_type.
     """
     exception_type = "base-error"
 

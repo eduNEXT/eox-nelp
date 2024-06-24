@@ -1,4 +1,5 @@
 """Utils that can be used for the plugin project"""
+import inspect
 import re
 from copy import copy
 
@@ -171,3 +172,22 @@ def remove_keys_from_dict(source_dict: dict, removed_keys: list):
         for key, value in source_dict.items()
         if key not in removed_keys
     }
+
+
+def find_class_with_attribute_value(module, attribute_name, attribute_value):
+    """
+    Iterates through classes in a module and finds those with a specific attribute value.
+
+    Args:
+        module: The module to inspect.
+        attribute_name: The name of the attribute to search for.
+        attribute_value: The specific value of the attribute to match.
+
+    Returns:
+        Class that have the specified attribute with the matching value.
+    """
+    for _, member in inspect.getmembers(module):
+        if inspect.isclass(member) and hasattr(member, attribute_name):
+            if getattr(member, attribute_name) == attribute_value:
+                return member
+    return None

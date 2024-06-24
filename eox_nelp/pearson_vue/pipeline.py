@@ -22,6 +22,7 @@ from pydantic import ValidationError
 
 from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
+from eox_nelp.pearson_vue import exceptions
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 from eox_nelp.pearson_vue.exceptions import (
@@ -32,6 +33,7 @@ from eox_nelp.pearson_vue.exceptions import (
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
+from eox_nelp.utils import find_class_with_attribute_value
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -453,18 +455,22 @@ def audit_pearson_error(*args, **kwargs):
     audit_action = "Pearson Vue Exception"
     if exception_data := kwargs.get("exception_data"):
         audit_action = f"{audit_action}~{exception_data['exception_type']}"
+        pearson_exception = find_class_with_attribute_value(
+            exceptions,
+            "exception_type",
+            exception_data['exception_type'],
+        ) or PearsonBaseError
     else:
         return
 
     @audit_method(action=audit_action)
     def raise_audit_pearson_exception(*args, **kwargs):
-        raise PearsonBaseError(*args, kwargs)
+        raise pearson_exception(*args, kwargs)
 
     try:
         raise_audit_pearson_exception(*args, **kwargs)
-    except PearsonBaseError:
-        pass
-    logger.error("Found Pearson Error with args:%s-kwargs:%s", args, kwargs)
+    except PearsonBaseError as exc:
+        logger.error(exc)
 
 
 def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):

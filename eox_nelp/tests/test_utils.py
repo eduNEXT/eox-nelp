@@ -4,6 +4,9 @@ Classes:
     ExtractCourseIdFromStringTestCase: Tests cases for the extract_course_id_from_string method.
     GetCourseFromIdTestCase: Tests cases for the get_course_from_id method.
 """
+import unittest
+from unittest.mock import MagicMock
+
 from ddt import data, ddt
 from django.test import TestCase
 from mock import Mock, patch
@@ -12,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from eox_nelp.utils import (
     camel_to_snake,
     extract_course_id_from_string,
+    find_class_with_attribute_value,
     get_course_from_id,
     get_item_label,
     remove_keys_from_dict,
@@ -269,3 +273,52 @@ class RemoveKeysFromDict(TestCase):
 
         for key in removed_keys:
             self.assertNotIn(key, expected_result)
+
+
+class TestAttributeFinder(unittest.TestCase):
+    """Test class for the find_class_with_attribute_value method."""
+
+    def test_empty_module(self):
+        """Tests the function with an empty module.
+        Expected behavior:
+            - Returned value is the expected value.
+        """
+        empty_module = MagicMock()
+        attribute_name = "some_attribute"
+        attribute_value = "specific_value"
+        matching_class = find_class_with_attribute_value(empty_module, attribute_name, attribute_value)
+        self.assertIsNone(matching_class)
+
+    def test_no_matching_class(self):
+        """Tests the function with a module containing no matching class.
+        Expected behavior:
+            - Returned value is the expected value.
+        """
+        class DummyClass:
+            """Dummy class"""
+        dummy_module = MagicMock(**{"DummyClass": DummyClass})
+        attribute_name = "some_attribute"
+        attribute_value = "specific_value"
+
+        matching_class = find_class_with_attribute_value(dummy_module, attribute_name, attribute_value)
+
+        self.assertIsNone(matching_class)
+
+    def test_matching_class(self):
+        """Tests the function with a module containing a matching class.
+        Expected behavior:
+             - Returned value is the expected value.
+        """
+        class MatchingClass:
+            """Matching class"""
+            some_attribute = "specific_value"
+
+        class DummyClass:
+            """Dummy class"""
+        dummy_module = MagicMock(**{"MatchingClass": MatchingClass, "DummyClass": DummyClass})
+        attribute_name = "some_attribute"
+        attribute_value = "specific_value"
+
+        matching_class = find_class_with_attribute_value(dummy_module, attribute_name, attribute_value)
+
+        self.assertEqual(matching_class, MatchingClass)

@@ -922,7 +922,9 @@ class TestAuditPipeError(unittest.TestCase):
         }
         args = ("vaderio", 3244)
         log_error = [
-            f"ERROR:{pipeline.__name__}:Found Pearson Error with args:{args}-kwargs:{kwargs}"
+            f"ERROR:{pipeline.__name__}:('attribute-error', 'vaderio', 3244, "
+            "{'exception_data': {'error': ['String to short.'], 'exception_type': "
+            "'attribute-error'}})"
         ]
 
         with self.assertLogs(pipeline.__name__, level="ERROR") as logs:

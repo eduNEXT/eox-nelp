@@ -920,16 +920,42 @@ class TestAuditPipeError(unittest.TestCase):
                 "exception_type": "attribute-error"
             }
         }
-        args = ("vaderio", 3244)
         log_error = [
-            f"ERROR:{pipeline.__name__}:('attribute-error', 'vaderio', 3244, "
-            "{'exception_data': {'error': ['String to short.'], 'exception_type': "
-            "'attribute-error'}})"
+            f"ERROR:{pipeline.__name__}:('attribute-error', {kwargs['exception_data']}, {{}})"
+
         ]
 
         with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
-            self.assertIsNone(audit_pearson_error(*args, **kwargs))
+            self.assertIsNone(audit_pearson_error(**kwargs))
+        self.assertListEqual(log_error, logs.output)
 
+    def test_audit_pearson_error_removing_sensitive_kwargs(self):
+        """Test correct behaviour calling  audit_pearson_error.
+
+        Expected behavior:
+            - The result is the expected value(None).
+            - Expected log error. Not loggin passwords or api auth keys.
+        """
+        kwargs = {
+            "exception_data": {
+                "error": ["String to short."],
+                "exception_type": "attribute-error"
+            },
+            "passwords": {
+                "top_secret": "secret"
+            },
+            "api_auth": {
+                "api_secret": "1212323424"
+            },
+            "hidden_kwargs": ["passwords", "api_auth"],
+        }
+        log_error = [
+            f"ERROR:{pipeline.__name__}:('attribute-error', {kwargs['exception_data']}, {{}})"
+
+        ]
+
+        with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
+            self.assertIsNone(audit_pearson_error(**kwargs))
         self.assertListEqual(log_error, logs.output)
 
     @patch("eox_nelp.pearson_vue.pipeline.logger")
@@ -942,7 +968,6 @@ class TestAuditPipeError(unittest.TestCase):
             - Not expected log error.
         """
         kwargs = {}
-        args = ("vaderio", 3244)
 
-        self.assertIsNone(audit_pearson_error(*args, **kwargs))
+        self.assertIsNone(audit_pearson_error(**kwargs))
         logger_mock.error.assert_not_called()

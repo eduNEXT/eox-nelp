@@ -33,7 +33,7 @@ from eox_nelp.pearson_vue.exceptions import (
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
-from eox_nelp.utils import find_class_with_attribute_value
+from eox_nelp.utils import find_class_with_attribute_value, remove_keys_from_dict
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -42,12 +42,6 @@ except ImportError:
         """Identity audit_method"""
         return lambda x: x
 
-try:
-    from eox_audit_model.decorators import audit_method
-except ImportError:
-    def audit_method(action):  # pylint: disable=unused-argument
-        """Identity audit_method"""
-        return lambda x: x
 
 logger = logging.getLogger(__name__)
 
@@ -442,33 +436,40 @@ def build_ead_request(
     }
 
 
-def audit_pearson_error(*args, **kwargs):
+def audit_pearson_error(exception_data=None, hidden_kwargs=None, **kwargs):
     """
     Method to save an error with eox-audit.
     Args:
-        *args, **kwargs
+        exception_data(dict): dict with exception_type key.
+        hidden_kwargs(list: str): List with keys name that dont want to be added
+        the audit model and the logger error.
+        **kwargs
     Logs:
         LogError: Log everything with name error.
     Returns:
         None
     """
-    audit_action = "Pearson Vue Exception"
-    if exception_data := kwargs.get("exception_data"):
-        audit_action = f"{audit_action}~{exception_data['exception_type']}"
-        pearson_exception = find_class_with_attribute_value(
-            exceptions,
-            "exception_type",
-            exception_data['exception_type'],
-        ) or PearsonBaseError
-    else:
+    if not exception_data:
         return
+    if hidden_kwargs is None:
+        hidden_kwargs = []
+    hidden_kwargs.append("hidden_kwargs")  # Clean also the same hidden.
+    audit_kwargs = remove_keys_from_dict(kwargs, hidden_kwargs)
+
+    audit_action = "Pearson Vue Exception"
+    audit_action = f"{audit_action}~{exception_data['exception_type']}"
+    pearson_exception = find_class_with_attribute_value(
+        exceptions,
+        "exception_type",
+        exception_data['exception_type'],
+    ) or PearsonBaseError
 
     @audit_method(action=audit_action)
-    def raise_audit_pearson_exception(*args, **kwargs):
-        raise pearson_exception(*args, kwargs)
+    def raise_audit_pearson_exception(exception_data, **audit_kwargs):
+        raise pearson_exception(exception_data, audit_kwargs)
 
     try:
-        raise_audit_pearson_exception(*args, **kwargs)
+        raise_audit_pearson_exception(exception_data, **audit_kwargs)
     except PearsonBaseError as exc:
         logger.error(exc)
 

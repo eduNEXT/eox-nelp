@@ -485,8 +485,11 @@ def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):
     Returns:
         None
     """
-    if not exception_dict or not failed_step_pipeline:
+    if not exception_dict:
         return
+        
+    if not failed_step_pipeline:
+        failed_step_pipeline = exception_dict.get("pipe_function")
 
     audit_action = f"Pearson Vue Exception~{exception_dict['exception_type']}"
 

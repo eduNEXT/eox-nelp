@@ -7,6 +7,15 @@ import inspect
 class PearsonBaseError(Exception):
     """Pearson Base error class
     Most classes that inherit from this class must have exception_type.
+    This class could have a dict representation with the following shape:
+    exception_dict  = {
+        'exception_type': 'validation-error',
+        'pipe_args_dict': {
+            "cdd_request": {}
+        },
+        'pipe_function': 'validate_cdd_request',
+        'exception_reason': "error: ['String to short.']"
+    }
     """
     exception_type = "base-error"
 
@@ -20,17 +29,9 @@ class PearsonBaseError(Exception):
         **kwargs
     ):  # pylint: disable=unused-argument
         """Init pearson exception.Is mandatory the exception_reasons.
-        You could init using pipe_frame
-        Or init using exception_dict representation with **kwargs.
-        That representation should have the following shape:
-         exception_dict  = {
-                'exception_type': 'validation-error',
-                'pipe_args_dict': {
-                    "cdd_request": {}
-                },
-                'pipe_function': 'validate_cdd_request',
-                'exception_reason': "error: ['String to short.']"
-            }
+        You could init using pipe_frame.
+        Or init using exception_dict representation,
+        so you could init the class with PearsonBaseError(**exception_dict)
         """
 
         self.exception_type = self.exception_type

@@ -364,6 +364,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
     """
     Unit tests for the import_candidate_demographics function.
     """
+
     def setUp(self):
         """
         Set up the test environment.
@@ -456,6 +457,7 @@ class TestImportExamAuthorization(unittest.TestCase):
     """
     Unit tests for the import_exam_authorization function.
     """
+
     def setUp(self):
         """
         Set up the test environment.
@@ -650,6 +652,7 @@ class TestBuildCddRequest(unittest.TestCase):
     """
     Unit tests for the build_cdd_request function.
     """
+
     def setUp(self):
         """
         Set up test environment.
@@ -716,6 +719,7 @@ class TestBuildEadRequest(unittest.TestCase):
     """
     Unit tests for the build_cdd_request function.
     """
+
     def setUp(self):
         """
         Set up test environment.

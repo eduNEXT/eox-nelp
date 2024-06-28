@@ -1,16 +1,22 @@
 """
 This module contains unit tests for the RealTimeImport class and its methods in rti_backend.py.
 """
+import inspect
 import unittest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
+from ddt import data, ddt
+
+from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
+    ErrorRealTimeImportHandler,
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
 
 
+@ddt
 class TestRealTimeImport(unittest.TestCase):
     """
     Unit tests for the RealTimeImport class.
@@ -139,6 +145,59 @@ class TestRealTimeImport(unittest.TestCase):
             },
         )
 
+    @data(
+        PearsonValidationError(inspect.currentframe(), "error: ['String to short.']"),
+        PearsonKeyError(inspect.currentframe(), "eligibility_appt_date_first"),
+        PearsonAttributeError(inspect.currentframe(), "Settings' object has no attribute PERITA")
+    )
+    @patch("eox_nelp.pearson_vue.tasks.rti_error_handler_task")
+    def test_launch_validation_error_pipeline(self, pearson_error, rti_error_handler_task_mock):
+        """
+        Test the execution of the RTI finished after the second function call due
+        `launch_validation_error_pipeline` kwarg.
+
+        Expected behavior:
+            - Pipeline method 1 is called with the original data.
+            - Pipeline method 2 is called with updated data.
+            - Pipeline method 3 is not called.
+            - Pipeline method 4 is not called.
+            - backend_data attribute is the expected value.
+                Without func3,func4 data and pipeline index in the last.
+            - rti_error_handler_task is called with executed__pipeline_kwargs and error_validation_kwargs.
+        """
+        # Mock pipeline functions
+        func1 = MagicMock(return_value={"updated_key": "value1"})
+        func1.__name__ = "first_function"
+        func2 = MagicMock()
+        func2.side_effect = pearson_error
+        func2.__name__ = "failed_function"
+        func3 = MagicMock(return_value={"additional_key": "value3"})
+        func4 = MagicMock(return_value={"additional_key": "value4"})
+        executed_pipeline_kwargs = {
+            "updated_key": "value1",
+        }
+
+        self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func3, func4])
+        self.rti.run_pipeline()
+
+        func1.assert_called_once_with(**self.backend_data)
+        func2.assert_called_once_with(pipeline_index=1, **executed_pipeline_kwargs)
+        func3.assert_not_called()
+        func4.assert_not_called()
+        self.assertDictEqual(
+            self.rti.backend_data,
+            {
+                "pipeline_index": 1,  # includes the pipe executed until break due exception
+                **func1(),  # Include data from func1 ()
+            },
+        )
+        rti_error_handler_task_mock.delay.assert_called_with(
+            failed_step_pipeline=func2.__name__,
+            exception_dict=pearson_error.to_dict(),
+            user_id=None,
+            course_id=None,
+        )
+
     def test_get_pipeline(self):
         """
         Test the retrieval of the RTI pipeline.
@@ -165,3 +224,10 @@ class TestCandidateDemographicsDataImport(TestRealTimeImport):
     Unit tests for the rti_backend class.
     """
     rti_backend_class = CandidateDemographicsDataImport
+
+
+class TestErrorRealTimeImportHandler(TestRealTimeImport):
+    """
+    Unit tests for the rti_backend class.
+    """
+    rti_backend_class = ErrorRealTimeImportHandler

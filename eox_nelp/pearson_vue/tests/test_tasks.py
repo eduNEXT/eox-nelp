@@ -4,7 +4,7 @@ This module contains unit tests for the tasks.py module and its functions.
 import unittest
 from unittest.mock import MagicMock, call
 
-from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task
+from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task, rti_error_handler_task
 
 
 class TestRealTimeImportTask(unittest.TestCase):
@@ -86,3 +86,11 @@ class TestCddTask(TestRealTimeImportTask):
     """
     import_class_patch = "eox_nelp.pearson_vue.tasks.CandidateDemographicsDataImport"
     import_task_function = cdd_task
+
+
+class TestErrorValidationTask(TestRealTimeImportTask):
+    """
+    Unit tests for the cdd_task function.
+    """
+    import_class_patch = "eox_nelp.pearson_vue.tasks.ErrorRealTimeImportHandler"
+    import_task_function = rti_error_handler_task

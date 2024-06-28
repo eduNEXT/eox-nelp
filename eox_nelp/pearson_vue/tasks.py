@@ -9,6 +9,7 @@ from celery import shared_task
 
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
+    ErrorRealTimeImportHandler,
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
@@ -72,3 +73,23 @@ def cdd_task(self, pipeline_index=0, **kwargs):
         cdd.run_pipeline()
     except Exception as exc:  # pylint: disable=broad-exception-caught
         self.retry(exc=exc, kwargs=cdd.backend_data)
+
+
+@shared_task(bind=True)
+def rti_error_handler_task(self, pipeline_index=0, **kwargs):
+    """
+    Performs an asynchronous call to manage Pearson validation error task.
+
+    This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
+
+    Args:
+        self: The Celery task instance.
+        pipeline_index (int): The index of the pipeline to be executed (default is 0).
+        **kwargs: Additional keyword arguments to configure the RTI service.
+    """
+    error_rti = ErrorRealTimeImportHandler(pipeline_index=pipeline_index, **kwargs.copy())
+
+    try:
+        error_rti.run_pipeline()
+    except Exception as exc:  # pylint: disable=broad-exception-caught
+        self.retry(exc=exc, kwargs=error_rti.backend_data)

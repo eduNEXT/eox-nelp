@@ -5,7 +5,11 @@ and executing various processes related to rti.
 Classes:
     RealTimeImport: Class for managing RTI operations and executing the pipeline.
 """
+import importlib
+
+from eox_nelp.pearson_vue.exceptions import PearsonBaseError
 from eox_nelp.pearson_vue.pipeline import (
+    audit_pearson_error,
     build_cdd_request,
     build_ead_request,
     check_service_availability,
@@ -14,6 +18,8 @@ from eox_nelp.pearson_vue.pipeline import (
     handle_course_completion_status,
     import_candidate_demographics,
     import_exam_authorization,
+    validate_cdd_request,
+    validate_ead_request,
 )
 
 
@@ -47,9 +53,19 @@ class RealTimeImport:
 
         for idx, func in enumerate(pipeline[pipeline_index:]):
             self.backend_data["pipeline_index"] = pipeline_index + idx
-            result = func(**self.backend_data) or {}
-            self.backend_data.update(result)
+            try:
+                result = func(**self.backend_data) or {}
+            except PearsonBaseError as pearson_error:
+                tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
+                tasks.rti_error_handler_task.delay(
+                    failed_step_pipeline=func.__name__,
+                    exception_dict=pearson_error.to_dict(),
+                    course_id=self.backend_data.get("course_id"),
+                    user_id=self.backend_data.get("user_id"),
+                )
+                break
 
+            self.backend_data.update(result)
             if result.get("safely_pipeline_termination"):
                 self.backend_data["pipeline_index"] = len(pipeline) - 1
                 break
@@ -63,7 +79,9 @@ class RealTimeImport:
             get_user_data,
             get_exam_data,
             build_cdd_request,
+            validate_cdd_request,
             build_ead_request,
+            validate_ead_request,
             check_service_availability,
             import_candidate_demographics,
             import_exam_authorization,
@@ -80,6 +98,7 @@ class ExamAuthorizationDataImport(RealTimeImport):
             get_user_data,
             get_exam_data,
             build_ead_request,
+            validate_ead_request,
             check_service_availability,
             import_exam_authorization,
         ]
@@ -94,6 +113,18 @@ class CandidateDemographicsDataImport(RealTimeImport):
         return [
             get_user_data,
             build_cdd_request,
+            validate_cdd_request,
             check_service_availability,
             import_candidate_demographics,
+        ]
+
+
+class ErrorRealTimeImportHandler(RealTimeImport):
+    """Class for managing validation error pipe  executing the pipeline for data validation."""
+    def get_pipeline(self):
+        """
+        Returns the error validation pipeline, which is a list of functions to be executed.
+        """
+        return [
+            audit_pearson_error,
         ]

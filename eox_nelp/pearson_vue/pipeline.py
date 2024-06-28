@@ -12,6 +12,7 @@ Functions:
     import_exam_authorization: Imports exam authorization data.
     get_exam_data: Retrieves exam data.
 """
+import inspect
 import logging
 
 import phonenumbers
@@ -22,7 +23,6 @@ from pydantic import ValidationError
 
 from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
 from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
-from eox_nelp.pearson_vue import exceptions
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 from eox_nelp.pearson_vue.exceptions import (
@@ -33,7 +33,6 @@ from eox_nelp.pearson_vue.exceptions import (
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
 from eox_nelp.signals.utils import get_completed_and_graded
-from eox_nelp.utils import find_class_with_attribute_value, remove_keys_from_dict
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -315,9 +314,9 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
         courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
         exam_metadata = courses_data[course_id]
     except KeyError as exc:
-        raise PearsonKeyError("EAD", str(exc)) from exc
+        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError("EAD", str(a_exc)) from a_exc
+        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
 
     # This generates the clientAuthorizationID based on the user_id and course_id
     exam_metadata["client_authorization_id"] = generate_client_authorization_id(
@@ -388,9 +387,9 @@ def build_cdd_request(profile_metadata, **kwargs):  # pylint: disable=unused-arg
             }
         }
     except KeyError as exc:
-        raise PearsonKeyError("CDD", str(exc)) from exc
+        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError("CDD", str(a_exc)) from a_exc
+        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
 
     return {
         "cdd_request": cdd_request
@@ -427,51 +426,13 @@ def build_ead_request(
             "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
         }
     except KeyError as exc:
-        raise PearsonKeyError("EAD", str(exc)) from exc
+        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError("EAD", str(a_exc)) from a_exc
+        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
 
     return {
         "ead_request": ead_request
     }
-
-
-def audit_pearson_error(exception_data=None, hidden_kwargs=None, **kwargs):
-    """
-    Method to save an error with eox-audit.
-    Args:
-        exception_data(dict): dict with exception_type key.
-        hidden_kwargs(list: str): List with keys name that dont want to be added
-        the audit model and the logger error.
-        **kwargs
-    Logs:
-        LogError: Log everything with name error.
-    Returns:
-        None
-    """
-    if not exception_data:
-        return
-    if hidden_kwargs is None:
-        hidden_kwargs = []
-    hidden_kwargs.append("hidden_kwargs")  # Clean also the same hidden.
-    audit_kwargs = remove_keys_from_dict(kwargs, hidden_kwargs)
-
-    audit_action = "Pearson Vue Exception"
-    audit_action = f"{audit_action}~{exception_data['exception_type']}"
-    pearson_exception = find_class_with_attribute_value(
-        exceptions,
-        "exception_type",
-        exception_data['exception_type'],
-    ) or PearsonBaseError
-
-    @audit_method(action=audit_action)
-    def raise_audit_pearson_exception(exception_data, **audit_kwargs):
-        raise pearson_exception(exception_data, audit_kwargs)
-
-    try:
-        raise_audit_pearson_exception(exception_data, **audit_kwargs)
-    except PearsonBaseError as exc:
-        logger.error(exc)
 
 
 def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argument):
@@ -489,8 +450,8 @@ def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argum
     """
     try:
         CddRequest(**cdd_request)
-    except ValidationError as validation_exception:
-        raise PearsonValidationError("CDD", validation_exception.json()) from validation_exception
+    except ValidationError as exc:
+        raise PearsonValidationError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
 
 
 def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argument
@@ -507,5 +468,33 @@ def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argum
     """
     try:
         EadRequest(**ead_request)
-    except ValidationError as validation_exception:
-        raise PearsonValidationError("EAD", validation_exception.json()) from validation_exception
+    except ValidationError as exc:
+        raise PearsonValidationError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+
+
+def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):  # pylint: disable=unused-argument
+    """
+    Method to save an error with eox-audit.
+    Args:
+        exception_dict(dict): dict presentation of the dict.
+        failed_step_pipeline(str): Name of function of step failed.
+        the audit model and the logger error.
+        **kwargs
+    Logs:
+        LogError: log pearsonsubclass error subclass matched.
+    Returns:
+        None
+    """
+    if not exception_dict or not failed_step_pipeline:
+        return
+
+    audit_action = f"Pearson Vue Exception~{exception_dict['exception_type']}"
+
+    @audit_method(action=audit_action)
+    def raise_audit_pearson_exception(exception_dict, *args, **kwargs):
+        raise PearsonBaseError.from_dict(exception_dict)
+
+    try:
+        raise_audit_pearson_exception(failed_step_pipeline=failed_step_pipeline, exception_dict=exception_dict)
+    except PearsonBaseError as exc:
+        logger.error(exc)

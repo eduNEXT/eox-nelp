@@ -21,7 +21,6 @@ from eox_nelp.pearson_vue.pipeline import (
     validate_cdd_request,
     validate_ead_request,
 )
-from eox_nelp.utils import remove_keys_from_dict
 
 
 class RealTimeImport:
@@ -57,13 +56,12 @@ class RealTimeImport:
             try:
                 result = func(**self.backend_data) or {}
             except PearsonBaseError as pearson_error:
-                # clean kwargs to dont finish next pipeline launch.
-                executed_pipeline_kwargs = remove_keys_from_dict(self.backend_data, ["pipeline_index"])
                 tasks = importlib.import_module("eox_nelp.pearson_vue.tasks")
                 tasks.rti_error_handler_task.delay(
                     failed_step_pipeline=func.__name__,
-                    exception_data=pearson_error.__dict__,
-                    **executed_pipeline_kwargs,
+                    exception_dict=pearson_error.to_dict(),
+                    course_id=self.backend_data.get("course_id"),
+                    user_id=self.backend_data.get("user_id"),
                 )
                 break
 

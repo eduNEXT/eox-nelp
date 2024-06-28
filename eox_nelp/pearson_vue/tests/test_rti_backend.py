@@ -1,6 +1,7 @@
 """
 This module contains unit tests for the RealTimeImport class and its methods in rti_backend.py.
 """
+import inspect
 import unittest
 from unittest.mock import MagicMock, call, patch
 
@@ -145,9 +146,9 @@ class TestRealTimeImport(unittest.TestCase):
         )
 
     @data(
-        PearsonValidationError("CDD", {"error": ["String to short."]}),
-        PearsonKeyError("EAD", "eligibility_appt_date_first"),
-        PearsonAttributeError("CDD", "Settings' object has no attribute PERITA")
+        PearsonValidationError(inspect.currentframe(), "error: ['String to short.']"),
+        PearsonKeyError(inspect.currentframe(), "eligibility_appt_date_first"),
+        PearsonAttributeError(inspect.currentframe(), "Settings' object has no attribute PERITA")
     )
     @patch("eox_nelp.pearson_vue.tasks.rti_error_handler_task")
     def test_launch_validation_error_pipeline(self, pearson_error, rti_error_handler_task_mock):
@@ -192,8 +193,9 @@ class TestRealTimeImport(unittest.TestCase):
         )
         rti_error_handler_task_mock.delay.assert_called_with(
             failed_step_pipeline=func2.__name__,
-            exception_data=pearson_error.__dict__,
-            **executed_pipeline_kwargs,
+            exception_dict=pearson_error.to_dict(),
+            user_id=None,
+            course_id=None,
         )
 
     def test_get_pipeline(self):

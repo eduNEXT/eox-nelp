@@ -915,42 +915,19 @@ class TestAuditPipeError(unittest.TestCase):
             - Expected log error.
         """
         kwargs = {
-            "exception_data": {
-                "error": ["String to short."],
-                "exception_type": "attribute-error"
-            }
+            'exception_dict': {
+                'exception_type': 'validation-error',
+                'pipe_args_dict': {
+                    "cdd_request": {}
+                },
+                'pipe_function': 'validate_cdd_request',
+                'exception_reason': "error: ['String to short.']"
+            },
+            "failed_step_pipeline": 'validate_cdd_request',
         }
+
         log_error = [
-            f"ERROR:{pipeline.__name__}:('attribute-error', {kwargs['exception_data']}, {{}})"
-
-        ]
-
-        with self.assertLogs(pipeline.__name__, level="ERROR") as logs:
-            self.assertIsNone(audit_pearson_error(**kwargs))
-        self.assertListEqual(log_error, logs.output)
-
-    def test_audit_pearson_error_removing_sensitive_kwargs(self):
-        """Test correct behaviour calling  audit_pearson_error.
-
-        Expected behavior:
-            - The result is the expected value(None).
-            - Expected log error. Not loggin passwords or api auth keys.
-        """
-        kwargs = {
-            "exception_data": {
-                "error": ["String to short."],
-                "exception_type": "attribute-error"
-            },
-            "passwords": {
-                "top_secret": "secret"
-            },
-            "api_auth": {
-                "api_secret": "1212323424"
-            },
-            "hidden_kwargs": ["passwords", "api_auth"],
-        }
-        log_error = [
-            f"ERROR:{pipeline.__name__}:('attribute-error', {kwargs['exception_data']}, {{}})"
+            f"ERROR:{pipeline.__name__}:{str(kwargs['exception_dict'])}"
 
         ]
 
@@ -967,7 +944,10 @@ class TestAuditPipeError(unittest.TestCase):
             - The result is the expected value(None).
             - Not expected log error.
         """
-        kwargs = {}
+        kwargs = {
+            'exception_dict': {},
+            "failed_step_pipeline": None,
+        }
 
         self.assertIsNone(audit_pearson_error(**kwargs))
         logger_mock.error.assert_not_called()

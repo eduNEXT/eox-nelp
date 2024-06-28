@@ -10,9 +10,18 @@ class PearsonBaseError(Exception):
     """
     exception_type = "base-error"
 
-    def __init__(self, *args, pipe_frame=inspect.currentframe(), exception_reason="", exception_dict=None):
-        """Init pearson exception using frame and exception_reason(str)
-        Or init using exception_dict representation.
+    def __init__(
+        self,
+        exception_reason,
+        *args,
+        pipe_frame=None,
+        pipe_args_dict=None,
+        pipe_function=None,
+        **kwargs
+    ):  # pylint: disable=unused-argument
+        """Init pearson exception.Is mandatory the exception_reasons.
+        You could init using pipe_frame
+        Or init using exception_dict representation with **kwargs.
         That representation should have the following shape:
          exception_dict  = {
                 'exception_type': 'validation-error',
@@ -24,16 +33,18 @@ class PearsonBaseError(Exception):
             }
         """
 
-        if exception_dict:
-            _ = [setattr(self, key, value) for key, value in exception_dict.items()]
-            super().__init__(exception_dict, *args)
-        else:
-            self.exception_type = self.exception_type
+        self.exception_type = self.exception_type
+        self.exception_reason = exception_reason
+
+        if pipe_frame:
             arg_info = inspect.getargvalues(pipe_frame)
             self.pipe_args_dict = {arg: arg_info.locals[arg] for arg in arg_info.args}
             self.pipe_function = pipe_frame.f_code.co_name
-            self.exception_reason = exception_reason
-            super().__init__(self.to_dict(), *args)
+        else:
+            self.pipe_args_dict = pipe_args_dict
+            self.pipe_function = pipe_function
+
+        super().__init__(self.to_dict(), *args)
 
     def to_dict(self):
         """
@@ -55,10 +66,10 @@ class PearsonBaseError(Exception):
         exception_type = exception_dict.get('exception_type')
         for subclass in cls.__subclasses__():
             if subclass.exception_type == exception_type:
-                return subclass(exception_dict=exception_dict)
+                return subclass(**exception_dict)
 
         # Default to Person if no matching subclass is found
-        return cls()
+        return cls(**exception_dict)
 
 
 class PearsonKeyError(PearsonBaseError):

@@ -314,9 +314,9 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
         courses_data = getattr(settings, "PEARSON_RTI_COURSES_DATA")
         exam_metadata = courses_data[course_id]
     except KeyError as exc:
-        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+        raise PearsonKeyError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
+        raise PearsonAttributeError(exception_reason=str(a_exc), pipe_frame=inspect.currentframe()) from a_exc
 
     # This generates the clientAuthorizationID based on the user_id and course_id
     exam_metadata["client_authorization_id"] = generate_client_authorization_id(
@@ -387,9 +387,9 @@ def build_cdd_request(profile_metadata, **kwargs):  # pylint: disable=unused-arg
             }
         }
     except KeyError as exc:
-        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+        raise PearsonKeyError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
+        raise PearsonAttributeError(exception_reason=str(a_exc), pipe_frame=inspect.currentframe()) from a_exc
 
     return {
         "cdd_request": cdd_request
@@ -426,9 +426,9 @@ def build_ead_request(
             "lastUpdate": timezone.now().strftime("%Y/%m/%d %H:%M:%S GMT"),
         }
     except KeyError as exc:
-        raise PearsonKeyError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+        raise PearsonKeyError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
     except AttributeError as a_exc:
-        raise PearsonAttributeError(pipe_frame=inspect.currentframe(), exception_reason=str(a_exc)) from a_exc
+        raise PearsonAttributeError(exception_reason=str(a_exc), pipe_frame=inspect.currentframe()) from a_exc
 
     return {
         "ead_request": ead_request
@@ -451,7 +451,7 @@ def validate_cdd_request(cdd_request, **kwargs):  # pylint: disable=unused-argum
     try:
         CddRequest(**cdd_request)
     except ValidationError as exc:
-        raise PearsonValidationError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+        raise PearsonValidationError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
 
 
 def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argument
@@ -469,7 +469,7 @@ def validate_ead_request(ead_request, **kwargs):  # pylint: disable=unused-argum
     try:
         EadRequest(**ead_request)
     except ValidationError as exc:
-        raise PearsonValidationError(pipe_frame=inspect.currentframe(), exception_reason=str(exc)) from exc
+        raise PearsonValidationError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
 
 
 def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):  # pylint: disable=unused-argument
@@ -487,14 +487,14 @@ def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):
     """
     if not exception_dict:
         return
-        
+
     if not failed_step_pipeline:
         failed_step_pipeline = exception_dict.get("pipe_function")
 
     audit_action = f"Pearson Vue Exception~{exception_dict['exception_type']}"
 
     @audit_method(action=audit_action)
-    def raise_audit_pearson_exception(exception_dict, *args, **kwargs):
+    def raise_audit_pearson_exception(exception_dict, failed_step_pipeline):
         raise PearsonBaseError.from_dict(exception_dict)
 
     try:

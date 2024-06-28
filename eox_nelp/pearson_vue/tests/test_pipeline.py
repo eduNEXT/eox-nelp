@@ -917,11 +917,11 @@ class TestAuditPipeError(unittest.TestCase):
         kwargs = {
             'exception_dict': {
                 'exception_type': 'validation-error',
+                'exception_reason': "error: ['String to short.']",
                 'pipe_args_dict': {
                     "cdd_request": {}
                 },
                 'pipe_function': 'validate_cdd_request',
-                'exception_reason': "error: ['String to short.']"
             },
             "failed_step_pipeline": 'validate_cdd_request',
         }

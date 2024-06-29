@@ -498,8 +498,8 @@ def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):
     exception_title = ' '.join(word.capitalize() for word in exception_dict['exception_type'].split('-'))
     audit_action = f"Pearson Vue Exception: {exception_title}"
 
-    @rename_function(name=failed_step_pipeline)
     @audit_method(action=audit_action)
+    @rename_function(name=failed_step_pipeline)
     def raise_audit_pearson_exception(exception_dict, failed_step_pipeline):
         raise PearsonBaseError.from_dict(exception_dict)
 

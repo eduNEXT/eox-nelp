@@ -89,3 +89,10 @@ class PearsonValidationError(PearsonBaseError):
     """Pearson Validation error class
     """
     exception_type = "validation-error"
+
+
+class PearsonImportError(PearsonBaseError):
+    """Pearson Import error class.
+    Error related with a failure response from Pearson Vue site.
+    """
+    exception_type = "import-error"

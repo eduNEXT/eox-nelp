@@ -35,10 +35,14 @@ from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_
 from eox_nelp.signals.utils import get_completed_and_graded
 
 try:
-    from eox_audit_model.decorators import audit_method
+    from eox_audit_model.decorators import audit_method, rename_function
 except ImportError:
     def audit_method(action):  # pylint: disable=unused-argument
         """Identity audit_method"""
+        return lambda x: x
+
+    def rename_function(name):  # pylint: disable=unused-argument
+        """Identity rename_function"""
         return lambda x: x
 
 
@@ -491,9 +495,11 @@ def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):
     if not failed_step_pipeline:
         failed_step_pipeline = exception_dict.get("pipe_function")
 
-    audit_action = f"Pearson Vue Exception~{exception_dict['exception_type']}"
+    exception_title = ' '.join(word.capitalize() for word in exception_dict['exception_type'].split('-'))
+    audit_action = f"Pearson Vue Exception: {exception_title}"
 
     @audit_method(action=audit_action)
+    @rename_function(name=failed_step_pipeline)
     def raise_audit_pearson_exception(exception_dict, failed_step_pipeline):
         raise PearsonBaseError.from_dict(exception_dict)
 

@@ -15,7 +15,12 @@ from pydantic.v1.utils import deep_update
 from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
-from eox_nelp.pearson_vue.exceptions import PearsonAttributeError, PearsonKeyError, PearsonValidationError
+from eox_nelp.pearson_vue.exceptions import (
+    PearsonAttributeError,
+    PearsonImportError,
+    PearsonKeyError,
+    PearsonValidationError,
+)
 from eox_nelp.pearson_vue.pipeline import (
     audit_pearson_error,
     build_cdd_request,
@@ -417,13 +422,14 @@ class TestImportCandidateDemographics(unittest.TestCase):
         when the import request is not accepted.
 
             Expected behavior:
-            - Function raises an exception.
+            - Function raises a PearsonImportError exception.
             - Exception message is the expected.
             - update_xml_with_dict was called with the right parameters.
             - import_candidate_demographics method was called with the result of update_xml_with_dict.
         """
         mock_update_xml_with_dict.return_value = 'updated_payload'
-        mock_api_client.return_value.import_candidate_demographics.return_value = {"status": "error"}
+        response_return = {"status": "error"}
+        mock_api_client.return_value.import_candidate_demographics.return_value = response_return
         input_data = {
             "cdd_request": self.cdd_request
         }
@@ -445,10 +451,13 @@ class TestImportCandidateDemographics(unittest.TestCase):
             },
         }
 
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(PearsonImportError) as context:
             import_candidate_demographics(**input_data)
 
-        self.assertEqual(str(context.exception), "Error trying to process import candidate demographics request.")
+        self.assertEqual(
+            context.exception.exception_reason,
+            f"Import candidate demographics pipeline has failed with the following response: {response_return}"
+        )
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_CDD, expected_payload)
         mock_api_client.return_value.import_candidate_demographics.assert_called_once_with(mock_update_xml_with_dict())
 
@@ -509,13 +518,14 @@ class TestImportExamAuthorization(unittest.TestCase):
         Test that the import_exam_authorization function raises an exception when the import request is not accepted.
 
             Expected behavior:
-            - Function raises an exception.
+            - Function raises a PearsonImportError exception.
             - Exception message is the expected.
             - update_xml_with_dict was called with the right parameters.
             - import_exam_authorization method was called with the result of update_xml_with_dict.
         """
         mock_update_xml_with_dict.return_value = 'updated_payload'
-        mock_api_client.return_value.import_exam_authorization.return_value = {"status": "error"}
+        response_return = {"status": "error"}
+        mock_api_client.return_value.import_exam_authorization.return_value = response_return
         input_data = {
             "ead_request": self.ead_request
         }
@@ -537,10 +547,13 @@ class TestImportExamAuthorization(unittest.TestCase):
             },
         }
 
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(PearsonImportError) as context:
             import_exam_authorization(**input_data)
 
-        self.assertEqual(str(context.exception), "Error trying to process import exam authorization request.")
+        self.assertEqual(
+            context.exception.exception_reason,
+            f"Import exam authorization pipeline has failed with the following response: {response_return}",
+        )
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_EAD, expected_payload)
         mock_api_client.return_value.import_exam_authorization.assert_called_once_with(mock_update_xml_with_dict())
 

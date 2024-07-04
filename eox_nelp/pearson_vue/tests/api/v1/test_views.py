@@ -11,6 +11,7 @@ Classes:
     TestUnrevokeResultView: Unit tests for the UnrevokeResultView.
 """
 import unittest
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import override_settings
@@ -47,12 +48,13 @@ class RTENMixin:
         self.user, _ = User.objects.get_or_create(username='testuser', password='12345')
         self.client.force_authenticate(user=self.user)
 
+    @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
     def test_create_result_notification_event(self):
         """
         Test creating an event.
 
         Expected behavior:
-            - The number of recors has incrsed in 1.
+            - The number of records has increased in 1.
             - Response returns a 200 status code.
             - Response data is empty.
 
@@ -130,6 +132,42 @@ class TestResultNotificationView(RTENMixin, unittest.TestCase):
     Unit tests for ResultNotificationView.
     """
     event_type = RESULT_NOTIFICATION
+
+    @patch("eox_nelp.pearson_vue.api.v1.views.ResultNotificationBackend")
+    def test_pipeline_execution(self, result_notification_mock):
+        """
+        Test that a new event is created and the result notification pipeline is run
+        when ENABLE_CERTIFICATE_PUBLISHER is True.
+
+        Expected behavior:
+            - The number of records has increased in 1.
+            - Response returns a 200 status code.
+            - Response data is empty.
+            - ResultNotificationBackend was initialized with the right data
+            - run_pipeline method was called once.
+
+        """
+        # pylint: disable=no-member
+        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
+        payload = {
+            "eventType": "RESULT_AVAILABLE",
+            "candidate": {
+                "candidateName": {
+                    "firstName": "Alastor",
+                    "lastName": "Moody",
+                }
+            }
+        }
+
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), payload, format="json")
+
+        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
+
+        self.assertEqual(final_count, initial_count + 1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {})
+        result_notification_mock.assert_called_once_with(request_data=payload)
+        result_notification_mock.return_value.run_pipeline.assert_called_once()
 
 
 class TestPlaceHoldView(RTENMixin, unittest.TestCase):

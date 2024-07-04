@@ -16,14 +16,12 @@ from eox_nelp.pearson_vue.rti_backend import (
 )
 
 
-@ddt
-class TestRealTimeImport(unittest.TestCase):
+class TestAbstractBackendMixin:
     """
-    Unit tests for the RealTimeImport class.
+    Unit tests for the AbstracBackend subclasses.
     """
-    rti_backend_class = RealTimeImport
 
-    def setUp(self):
+    def setUp(self):  # pylint: disable=invalid-name
         """
         Set up the test environment.
         """
@@ -145,6 +143,27 @@ class TestRealTimeImport(unittest.TestCase):
             },
         )
 
+    def test_get_pipeline(self):
+        """
+        Test the retrieval of the RTI pipeline.
+
+        Expected behavior:
+            - Method return a list instance
+            - All the pipeline items are callable.
+        """
+        pipeline = self.rti.get_pipeline()
+
+        self.assertIsInstance(pipeline, list)
+        self.assertTrue(all(callable(func) for func in pipeline))
+
+
+@ddt
+class TestRealTimeImport(TestAbstractBackendMixin, unittest.TestCase):
+    """
+    Unit tests for the RealTimeImport class.
+    """
+    rti_backend_class = RealTimeImport
+
     @data(
         PearsonValidationError(inspect.currentframe(), "error: ['String to short.']"),
         PearsonKeyError(inspect.currentframe(), "eligibility_appt_date_first"),
@@ -198,19 +217,6 @@ class TestRealTimeImport(unittest.TestCase):
             course_id=None,
         )
 
-    def test_get_pipeline(self):
-        """
-        Test the retrieval of the RTI pipeline.
-
-        Expected behavior:
-            - Method return a list instance
-            - All the pipeline items are callable.
-        """
-        pipeline = self.rti.get_pipeline()
-
-        self.assertIsInstance(pipeline, list)
-        self.assertTrue(all(callable(func) for func in pipeline))
-
 
 class TestExamAuthorizationDataImport(TestRealTimeImport):
     """
@@ -226,7 +232,7 @@ class TestCandidateDemographicsDataImport(TestRealTimeImport):
     rti_backend_class = CandidateDemographicsDataImport
 
 
-class TestErrorRealTimeImportHandler(TestRealTimeImport):
+class TestErrorRealTimeImportHandler(TestAbstractBackendMixin, unittest.TestCase):
     """
     Unit tests for the rti_backend class.
     """

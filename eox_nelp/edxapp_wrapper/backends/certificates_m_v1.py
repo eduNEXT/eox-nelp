@@ -18,3 +18,13 @@ def get_generated_certificates_admin():
         return certificates.admin.GeneratedCertificateAdmin
 
     return admin.ModelAdmin
+
+
+def get_generate_course_certificate_method():
+    """Allow to get the generate_course_certificate method.
+    https://github.com/nelc/edx-platform/blob/open-release/palm.nelp/lms/djangoapps/certificates/generation.py#L20
+
+    Returns:
+        generate_course_certificate method.
+    """
+    return certificates.generation.generate_course_certificate

@@ -1,9 +1,17 @@
 """
-This module provides the RealTimeImport class, which is responsible for orchestrating the RTI pipeline
-and executing various processes related to rti.
+This module provides classes for managing various backend operations and executing their corresponding pipelines.
 
 Classes:
-    RealTimeImport: Class for managing RTI operations and executing the pipeline.
+    AbstractBackend: Base class for managing backend operations and executing pipelines.
+    ErrorRealTimeImportHandler: Class for managing validation error pipelines and executing
+         the pipeline for data validation.
+    RealTimeImport: Class for managing RTI (Real Time Import) operations and executing the pipeline.
+    ExamAuthorizationDataImport: Class for managing EAD requests (Exam Authorization Data operations)
+        and executing the pipeline.
+    CandidateDemographicsDataImport: Class for managing CDD requests (Candidate Demographics Data operations)
+        and executing the pipeline.
+    ResultNotificationBackend: Class for managing Result Notification operations and executing the
+         corresponding pipeline.
 """
 import importlib
 from abc import ABC, abstractmethod
@@ -14,6 +22,10 @@ from eox_nelp.pearson_vue.pipeline import (
     build_cdd_request,
     build_ead_request,
     check_service_availability,
+    extract_result_notification_data,
+    generate_external_certificate,
+    get_enrollment_from_anonymous_user_id,
+    get_enrollment_from_id,
     get_exam_data,
     get_user_data,
     handle_course_completion_status,
@@ -193,4 +205,34 @@ class CandidateDemographicsDataImport(RealTimeImport):
             validate_cdd_request,
             check_service_availability,
             import_candidate_demographics,
+        ]
+
+
+class ResultNotificationBackend(RealTimeImport):
+    """
+    Class for managing the Result Notification operations and executing the corresponding pipeline.
+
+    This class inherits from RealTimeImport and is responsible for orchestrating the pipeline
+    for handling result notifications, including extracting result notification data,
+    retrieving enrollment information, and generating external certificates.
+    """
+
+    def get_pipeline(self):
+        """
+        Returns the Result Notification pipeline, which is a list of functions to be executed.
+
+        The pipeline includes the following steps:
+        1. `extract_result_notification_data`: Extracts the result notification data.
+        2. `get_enrollment_from_id`: Retrieves the enrollment information based on the given ID.
+        3. `get_enrollment_from_anonymous_user_id`: Retrieves the enrollment information for an anonymous user.
+        4. `generate_external_certificate`: Generates an external certificate based on the enrollment data.
+
+        Returns:
+            list: A list of functions representing the pipeline steps.
+        """
+        return [
+            extract_result_notification_data,
+            get_enrollment_from_id,
+            get_enrollment_from_anonymous_user_id,
+            generate_external_certificate,
         ]

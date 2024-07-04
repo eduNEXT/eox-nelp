@@ -13,7 +13,7 @@ from django.test import TestCase
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
-from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
+from eox_nelp.pearson_vue.utils import generate_client_authorization_id, is_cp1252, update_xml_with_dict
 
 User = get_user_model()
 
@@ -418,3 +418,36 @@ class GenerateClientAuthorizationIDTestCase(TestCase):
         result = generate_client_authorization_id(self.user.id, self.course_id)
 
         self.assertEqual(expected_result, result)
+
+
+class TestIsCp1252(TestCase):
+    """Class to test is_cp1252 function"""
+    def test_english_true(self):
+        """Tests if a string with English characters is CP1252 encoded."""
+        text = "This is a test string"
+
+        self.assertTrue(is_cp1252(text))
+
+    def test_arabic_false(self):
+        """Tests if a string with Arabic characters is not CP1252 encoded."""
+        text = "هذا هو اختبار باللغة العربية"  # Arabic text
+
+        self.assertFalse(is_cp1252(text))
+
+    def test_mixed_chars(self):
+        """Tests if a string with mixed characters (English and Arabic) is not CP1252 encoded."""
+        text = "This is a test with عربية characters"
+
+        self.assertFalse(is_cp1252(text))
+
+    def test_empty_string(self):
+        """Tests if an empty string is considered CP1252 encoded."""
+        text = ""
+
+        self.assertTrue(is_cp1252(text))
+
+    def test_special_chars_false(self):
+        """Tests if a string with special characters is not CP1252 encoded."""
+        text = "This string has ©®€ symbols"
+
+        self.assertFalse(is_cp1252(text))

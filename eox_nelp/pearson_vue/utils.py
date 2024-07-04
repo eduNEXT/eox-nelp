@@ -2,6 +2,7 @@
 This includes xml helpers:
     - update_xml_with_dict
 """
+import re
 import xmltodict
 from pydantic.v1.utils import deep_update
 
@@ -43,3 +44,10 @@ def generate_client_authorization_id(user_id: int, course_id: str) -> str:
     anonymous_user_id_instance = AnonymousUserId.objects.get(anonymous_user_id=anonymous_user_id)
 
     return f"{course_enrollment.id}-{anonymous_user_id_instance.id}"
+
+
+def is_cp1252(text):
+    """Checks if the given text matchs the format CP1252"""
+    cp1252_regex = r'^[\x00-\x7F\x80-\x9F\xA0-\xFF]*$'
+
+    return re.match(cp1252_regex, text) is not None

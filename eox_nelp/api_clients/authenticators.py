@@ -127,3 +127,33 @@ class PKCS12Authenticator(AbstractAuthenticator):
         )
 
         return session
+
+
+class SMSVendoAuthenticator(BasicAuthAuthenticator):
+    """Authenticator for custom use of the SMS vendor particular API."""
+
+    def authenticate(self, api_client):
+        """Authenticate the session with basic auth in order to get Bearer token.
+        Then the Bearer token is added to a new session Headers.
+        SMS vendor configuration.
+        """
+        auth_session = super().authenticate(api_client)
+        key = f"smsvendor-{api_client.user}-{api_client.password}"
+        headers = cache.get(key)
+
+        if not headers:
+            authenticate_url = f"{api_client.base_url}/oauth2/v1/token"
+            response = auth_session.post(
+                url=authenticate_url,
+                data={"grant_type": "client_credentials", "scope": "notification"}
+            ).json()
+            headers = {
+                "Authorization": f"{response.get('token_type')} {response.get('access_token')}"
+            }
+
+            cache.set(key, headers, int(response.get("expires_in", 300)))
+
+        session = requests.Session()
+        session.headers.update(headers)
+
+        return session

@@ -5,7 +5,7 @@ This module contains unit tests for the functions in pipeline.py.
 import unittest
 from unittest.mock import MagicMock, Mock, patch
 
-from ddt import data, ddt, unpack
+from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -22,6 +22,7 @@ from eox_nelp.pearson_vue.exceptions import (
     PearsonAttributeError,
     PearsonImportError,
     PearsonKeyError,
+    PearsonTypeError,
     PearsonValidationError,
 )
 from eox_nelp.pearson_vue.pipeline import (
@@ -1006,21 +1007,17 @@ class TestExtractResultNotificationData(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     @data(
-        ({"clientCandidateID": "NELC9012", "exams": {"exam": [{"examResult": "Pass"}]}}, KeyError),
-        ({"authorization": {"clientAuthorizationID": "12-58"}, "exams": {"exam": [{"examResult": "Pass"}]}}, KeyError),
-        (
-            {"authorization": {"clientAuthorizationID": "12-5"}, "clientCandidateID": "NELC2", "exams": {"exam": []}},
-            IndexError,
-        ),
+        ({"clientCandidateID": "NELC9012", "exams": {"exam": [{"examResult": "Pass"}]}}),
+        ({"authorization": {"clientAuthorizationID": "12-58"}, "exams": {"exam": [{"examResult": "Pass"}]}}),
+        ({"authorization": {"clientAuthorizationID": "12-5"}, "clientCandidateID": "NELC2", "exams": {"exam": []}}),
     )
-    @unpack
-    def test_extract_result_notification_data_missing_data(self, request_data, expected_exception):
+    def test_extract_result_notification_data_missing_data(self, request_data):
         """Test extraction with missing required data fields.
 
         Expected behavior:
             - The specified exception is raised due to missing data.
         """
-        with self.assertRaises(expected_exception):
+        with self.assertRaises(PearsonKeyError):
             extract_result_notification_data(request_data)
 
 
@@ -1067,6 +1064,15 @@ class TestGenerateExternalCertificate(unittest.TestCase):
         generate_external_certificate(enrollment, exam_result)
 
         generate_course_certificate.assert_not_called()
+
+    def test_generate_external_certificate_invalid_arguments(self):
+        """Test generating an external certificate with invalid arguments.
+
+        Expected behavior:
+            - The specified exception is raised due to invalid data.
+        """
+        with self.assertRaises(PearsonTypeError):
+            generate_external_certificate(enrollment=None, exam_result=None)
 
 
 class TestGetEnrollmentFromAnonymousUserId(unittest.TestCase):
@@ -1128,7 +1134,7 @@ class TestGetEnrollmentFromAnonymousUserId(unittest.TestCase):
         Test behavior when an enrollment object is provided as an argument.
 
         Expected behavior:
-            - The function returns a dictionary containing the provided enrollment object.
+            - The function returns a dictionary containing an empty object.
             - Verify that no calls are made to retrieve objects from the database.
         """
         # Call the function under test with an enrollment object
@@ -1186,3 +1192,20 @@ class TestGetEnrollmentFromId(unittest.TestCase):
 
         self.assertEqual(result, {})
         CourseEnrollment.objects.get.assert_called_once_with(id=enrollment_id)
+
+    def test_get_enrollment_with_provided_enrollment(self):
+        """
+        Test behavior when an enrollment object is provided as an argument.
+
+        Expected behavior:
+            - The function returns a dictionary containing an empty object.
+            - Verify that no calls are made to retrieve objects from the database.
+        """
+        # Call the function under test with an enrollment object
+        result = get_enrollment_from_id("valid_id", enrollment=Mock())
+
+        # Assert the result
+        self.assertEqual(result, {})
+
+        # Verify mock calls
+        CourseEnrollment.objects.get.assert_not_called()

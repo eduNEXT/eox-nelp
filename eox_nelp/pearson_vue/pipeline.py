@@ -32,6 +32,7 @@ from eox_nelp.pearson_vue.exceptions import (
     PearsonBaseError,
     PearsonImportError,
     PearsonKeyError,
+    PearsonTypeError,
     PearsonValidationError,
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
@@ -512,22 +513,26 @@ def extract_result_notification_data(request_data, **kwargs):  # pylint: disable
         dict: A dictionary containing extracted data including exam result, client authorization ID,
               enrollment ID, anonymous user model ID, and anonymous user ID.
     """
-    client_authorization_id = request_data["authorization"]["clientAuthorizationID"]
-    client_authorization_elements = client_authorization_id.split("-")
-    enrollment_id = client_authorization_elements[0]
-    anonymous_user_model_id = client_authorization_elements[1]
-    anonymous_user_id = request_data["clientCandidateID"].replace("NELC", "")
 
-    return {
-        "exam_result": request_data["exams"]["exam"][0]["examResult"],
-        "client_authorization_id": client_authorization_id,
-        "enrollment_id": enrollment_id,
-        "anonymous_user_model_id": anonymous_user_model_id,
-        "anonymous_user_id": anonymous_user_id,
-    }
+    try:
+        client_authorization_id = request_data["authorization"]["clientAuthorizationID"]
+        client_authorization_elements = client_authorization_id.split("-")
+        enrollment_id = client_authorization_elements[0]
+        anonymous_user_model_id = client_authorization_elements[1]
+        anonymous_user_id = request_data["clientCandidateID"].replace("NELC", "")
+
+        return {
+            "exam_result": request_data["exams"]["exam"][0]["examResult"],
+            "client_authorization_id": client_authorization_id,
+            "enrollment_id": enrollment_id,
+            "anonymous_user_model_id": anonymous_user_model_id,
+            "anonymous_user_id": anonymous_user_id,
+        }
+    except (KeyError, IndexError) as exc:
+        raise PearsonKeyError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
 
 
-def generate_external_certificate(enrollment, exam_result, **kwargs):  # pylint: disable=unused-argument
+def generate_external_certificate(enrollment=None, exam_result=None, **kwargs):  # pylint: disable=unused-argument
     """
     Generates an external certificate if the exam result meets the passing criteria.
 
@@ -536,6 +541,12 @@ def generate_external_certificate(enrollment, exam_result, **kwargs):  # pylint:
         exam_result (dict): The dictionary containing the exam result data.
         **kwargs: Additional keyword arguments.
     """
+    if not enrollment or not exam_result:
+        raise PearsonTypeError(
+            exception_reason="Method generate_external_certificate has failed due to a missing variable",
+            pipe_frame=inspect.currentframe()
+        )
+
     passing_score = float(exam_result.get("passingScore", 1))
     score = float(exam_result.get("score", 0))
 
@@ -582,7 +593,7 @@ def get_enrollment_from_anonymous_user_id(
     return {}
 
 
-def get_enrollment_from_id(enrollment_id, **kwargs):  # pylint: disable=unused-argument
+def get_enrollment_from_id(enrollment_id, enrollment=None, **kwargs):  # pylint: disable=unused-argument
     """
     Retrieves enrollment information based on the enrollment ID.
 
@@ -593,9 +604,12 @@ def get_enrollment_from_id(enrollment_id, **kwargs):  # pylint: disable=unused-a
     Returns:
         dict: A dictionary containing the enrollment object if found, otherwise an empty dictionary.
     """
-    try:
-        return {
-            "enrollment": CourseEnrollment.objects.get(id=enrollment_id)
-        }
-    except ObjectDoesNotExist:
-        return {}
+    if not enrollment:
+        try:
+            return {
+                "enrollment": CourseEnrollment.objects.get(id=enrollment_id)
+            }
+        except ObjectDoesNotExist:
+            pass
+
+    return {}

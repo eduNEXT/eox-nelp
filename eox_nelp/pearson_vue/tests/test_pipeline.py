@@ -1,24 +1,28 @@
 """
 This module contains unit tests for the functions in pipeline.py.
 """
+# pylint: disable=too-many-lines
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from django.utils import timezone
 from django_countries.fields import Country
 from pydantic.v1.utils import deep_update
 
-from eox_nelp.edxapp_wrapper.student import CourseEnrollment, anonymous_id_for_user
+from eox_nelp.edxapp_wrapper.certificates import generate_course_certificate
+from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue import pipeline
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.exceptions import (
     PearsonAttributeError,
     PearsonImportError,
     PearsonKeyError,
+    PearsonTypeError,
     PearsonValidationError,
 )
 from eox_nelp.pearson_vue.pipeline import (
@@ -26,6 +30,10 @@ from eox_nelp.pearson_vue.pipeline import (
     build_cdd_request,
     build_ead_request,
     check_service_availability,
+    extract_result_notification_data,
+    generate_external_certificate,
+    get_enrollment_from_anonymous_user_id,
+    get_enrollment_from_id,
     get_exam_data,
     get_user_data,
     handle_course_completion_status,
@@ -990,3 +998,236 @@ class TestAuditPipeError(unittest.TestCase):
 
         self.assertIsNone(audit_pearson_error(**kwargs))
         logger_mock.error.assert_not_called()
+
+
+@ddt
+class TestExtractResultNotificationData(unittest.TestCase):
+    """
+    Unit tests for the extract_result_notification_data function.
+    """
+
+    def test_extract_result_notification_data_success(self):
+        """Test correct extraction of result notification data.
+
+        Expected behavior:
+            - The returned dictionary contains the correct extracted data.
+        """
+        request_data = {
+            "authorization": {"clientAuthorizationID": "1234-5678"},
+            "clientCandidateID": "NELC9012",
+            "exams": {"exam": [{"examResult": "Pass"}]}
+        }
+        expected_result = {
+            "exam_result": "Pass",
+            "client_authorization_id": "1234-5678",
+            "enrollment_id": "1234",
+            "anonymous_user_model_id": "5678",
+            "anonymous_user_id": "9012",
+        }
+
+        result = extract_result_notification_data(request_data)
+        self.assertEqual(result, expected_result)
+
+    @data(
+        ({"clientCandidateID": "NELC9012", "exams": {"exam": [{"examResult": "Pass"}]}}),
+        ({"authorization": {"clientAuthorizationID": "12-58"}, "exams": {"exam": [{"examResult": "Pass"}]}}),
+        ({"authorization": {"clientAuthorizationID": "12-5"}, "clientCandidateID": "NELC2", "exams": {"exam": []}}),
+    )
+    def test_extract_result_notification_data_missing_data(self, request_data):
+        """Test extraction with missing required data fields.
+
+        Expected behavior:
+            - The specified exception is raised due to missing data.
+        """
+        with self.assertRaises(PearsonKeyError):
+            extract_result_notification_data(request_data)
+
+
+@ddt
+class TestGenerateExternalCertificate(unittest.TestCase):
+    """
+    Unit tests for the generate_external_certificate function.
+    """
+
+    def tearDown(self):
+        """Reset the mock after each test."""
+        generate_course_certificate.reset_mock()
+
+    @data(
+        ({'passingScore': '50', 'score': '75'}),
+        ({'passingScore': '0', 'score': '0'}),
+    )
+    def test_generate_external_certificate_success(self, exam_result):
+        """Test generating an external certificate when the score meets the passing criteria.
+
+        Expected behavior:
+            - The generate_course_certificate function is called with the correct arguments.
+        """
+        enrollment = Mock(user='test_user', course_id='test_course', mode='test_mode')
+
+        generate_external_certificate(enrollment, exam_result)
+
+        generate_course_certificate.assert_called_once_with(
+            'test_user', 'test_course', 'downloadable', 'test_mode', float(exam_result["score"]), 'batch'
+        )
+
+    @data(
+        ({'passingScore': '50', 'score': '25'}),
+        ({'passingScore': '100', 'score': '99'}),
+    )
+    def test_generate_external_certificate_various_scores(self, exam_result):
+        """Test generating an external certificate with various scores.
+
+        Expected behavior:
+            - The generate_course_certificate function is not called.
+        """
+        enrollment = Mock(user='test_user', course_id='test_course', mode='test_mode')
+
+        generate_external_certificate(enrollment, exam_result)
+
+        generate_course_certificate.assert_not_called()
+
+    def test_generate_external_certificate_invalid_arguments(self):
+        """Test generating an external certificate with invalid arguments.
+
+        Expected behavior:
+            - The specified exception is raised due to invalid data.
+        """
+        with self.assertRaises(PearsonTypeError):
+            generate_external_certificate(enrollment=None, exam_result=None)
+
+
+class TestGetEnrollmentFromAnonymousUserId(unittest.TestCase):
+    """
+    Unit tests for the get_enrollment_from_anonymous_user_id function.
+    """
+
+    def tearDown(self):
+        """
+        Reset the mocked objects after each test.
+        """
+        CourseEnrollment.reset_mock()
+        AnonymousUserId.reset_mock()
+        AnonymousUserId.objects.get.side_effect = None
+
+    def test_get_enrollment_found(self):
+        """
+        Test retrieval of enrollment information when the anonymous user ID is found.
+
+        Expected behavior:
+            - The function returns a dictionary containing the enrollment object.
+            - Verify that the correct calls are made to retrieve the anonymous user and enrollment objects.
+        """
+        anonymous_user_model_id = "valid_id"
+        anonymous_user_id = Mock(user='test_user', course_id='test_course')
+        course_enrollment_obj = Mock()
+        AnonymousUserId.objects.get.return_value = anonymous_user_id
+        CourseEnrollment.objects.get.return_value = course_enrollment_obj
+
+        result = get_enrollment_from_anonymous_user_id(anonymous_user_model_id)
+
+        self.assertEqual(result, {"enrollment": course_enrollment_obj})
+        AnonymousUserId.objects.get.assert_called_once_with(id=anonymous_user_model_id)
+        CourseEnrollment.objects.get.assert_called_once_with(
+            user=anonymous_user_id.user,
+            course=anonymous_user_id.course_id,
+        )
+
+    def test_get_enrollment_not_found(self):
+        """
+        Test behavior when the anonymous user ID is not found.
+
+        Expected behavior:
+            - The function returns an empty dictionary.
+            - Verify that the call to retrieve the anonymous user object raises ObjectDoesNotExist.
+            - Ensure that no attempt is made to retrieve the enrollment object.
+        """
+        anonymous_user_model_id = "invalid_id"
+        AnonymousUserId.objects.get.side_effect = ObjectDoesNotExist
+
+        result = get_enrollment_from_anonymous_user_id(anonymous_user_model_id)
+
+        self.assertEqual(result, {})
+        AnonymousUserId.objects.get.assert_called_once_with(id=anonymous_user_model_id)
+        CourseEnrollment.objects.get.assert_not_called()
+
+    def test_get_enrollment_with_provided_enrollment(self):
+        """
+        Test behavior when an enrollment object is provided as an argument.
+
+        Expected behavior:
+            - The function returns a dictionary containing an empty object.
+            - Verify that no calls are made to retrieve objects from the database.
+        """
+        # Call the function under test with an enrollment object
+        result = get_enrollment_from_anonymous_user_id("valid_id", enrollment=Mock())
+
+        # Assert the result
+        self.assertEqual(result, {})
+
+        # Verify mock calls
+        AnonymousUserId.objects.get.assert_not_called()
+        CourseEnrollment.objects.get.assert_not_called()
+
+
+class TestGetEnrollmentFromId(unittest.TestCase):
+    """
+    Unit tests for the get_enrollment_from_id function.
+    """
+
+    def tearDown(self):
+        """
+        Reset the mocked objects after each test.
+        """
+        CourseEnrollment.reset_mock()
+        CourseEnrollment.objects.get.side_effect = None
+
+    def test_get_enrollment_found(self):
+        """
+        Test retrieval of enrollment information when the enrollment ID is found.
+
+        Expected behavior:
+            - The function returns a dictionary containing the enrollment object.
+            - Verify that the correct call is made to retrieve the enrollment object.
+        """
+        enrollment_id = "valid_id"
+        enrollment_obj = Mock()
+        CourseEnrollment.objects.get.return_value = enrollment_obj
+
+        result = get_enrollment_from_id(enrollment_id)
+
+        self.assertEqual(result, {"enrollment": enrollment_obj})
+        CourseEnrollment.objects.get.assert_called_once_with(id=enrollment_id)
+
+    def test_get_enrollment_not_found(self):
+        """
+        Test behavior when the enrollment ID is not found.
+
+        Expected behavior:
+            - The function returns an empty dictionary.
+            - Verify that the call to retrieve the enrollment object raises ObjectDoesNotExist.
+        """
+        enrollment_id = "invalid_id"
+        CourseEnrollment.objects.get.side_effect = ObjectDoesNotExist
+
+        result = get_enrollment_from_id(enrollment_id)
+
+        self.assertEqual(result, {})
+        CourseEnrollment.objects.get.assert_called_once_with(id=enrollment_id)
+
+    def test_get_enrollment_with_provided_enrollment(self):
+        """
+        Test behavior when an enrollment object is provided as an argument.
+
+        Expected behavior:
+            - The function returns a dictionary containing an empty object.
+            - Verify that no calls are made to retrieve objects from the database.
+        """
+        # Call the function under test with an enrollment object
+        result = get_enrollment_from_id("valid_id", enrollment=Mock())
+
+        # Assert the result
+        self.assertEqual(result, {})
+
+        # Verify mock calls
+        CourseEnrollment.objects.get.assert_not_called()

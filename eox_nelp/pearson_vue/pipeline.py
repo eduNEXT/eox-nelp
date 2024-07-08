@@ -18,11 +18,13 @@ import logging
 import phonenumbers
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from pydantic import ValidationError
 
 from eox_nelp.api_clients.pearson_rti import PearsonRTIApiClient
-from eox_nelp.edxapp_wrapper.student import anonymous_id_for_user
+from eox_nelp.edxapp_wrapper.certificates import generate_course_certificate
+from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD, PAYLOAD_PING_DATABASE
 from eox_nelp.pearson_vue.data_classes import CddRequest, EadRequest
 from eox_nelp.pearson_vue.exceptions import (
@@ -30,6 +32,7 @@ from eox_nelp.pearson_vue.exceptions import (
     PearsonBaseError,
     PearsonImportError,
     PearsonKeyError,
+    PearsonTypeError,
     PearsonValidationError,
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
@@ -496,3 +499,117 @@ def audit_pearson_error(failed_step_pipeline="", exception_dict=None, **kwargs):
         raise_audit_pearson_exception(failed_step_pipeline=failed_step_pipeline, exception_dict=exception_dict)
     except PearsonBaseError as exc:
         logger.error(exc)
+
+
+def extract_result_notification_data(request_data, **kwargs):  # pylint: disable=unused-argument
+    """
+    Extracts result notification data from the request.
+
+    Args:
+        request_data (dict): The dictionary containing the Result Notification request data.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        dict: A dictionary containing extracted data including exam result, client authorization ID,
+              enrollment ID, anonymous user model ID, and anonymous user ID.
+    """
+
+    try:
+        client_authorization_id = request_data["authorization"]["clientAuthorizationID"]
+        client_authorization_elements = client_authorization_id.split("-")
+        enrollment_id = client_authorization_elements[0]
+        anonymous_user_model_id = client_authorization_elements[1]
+        anonymous_user_id = request_data["clientCandidateID"].replace("NELC", "")
+
+        return {
+            "exam_result": request_data["exams"]["exam"][0]["examResult"],
+            "client_authorization_id": client_authorization_id,
+            "enrollment_id": enrollment_id,
+            "anonymous_user_model_id": anonymous_user_model_id,
+            "anonymous_user_id": anonymous_user_id,
+        }
+    except (KeyError, IndexError) as exc:
+        raise PearsonKeyError(exception_reason=str(exc), pipe_frame=inspect.currentframe()) from exc
+
+
+def generate_external_certificate(enrollment=None, exam_result=None, **kwargs):  # pylint: disable=unused-argument
+    """
+    Generates an external certificate if the exam result meets the passing criteria.
+
+    Args:
+        enrollment (object): The enrollment object associated with the user and course.
+        exam_result (dict): The dictionary containing the exam result data.
+        **kwargs: Additional keyword arguments.
+    """
+    if not enrollment or not exam_result:
+        raise PearsonTypeError(
+            exception_reason="Method generate_external_certificate has failed due to a missing variable",
+            pipe_frame=inspect.currentframe()
+        )
+
+    passing_score = float(exam_result.get("passingScore", 1))
+    score = float(exam_result.get("score", 0))
+
+    if score >= passing_score:
+        generate_course_certificate(
+            enrollment.user,
+            enrollment.course_id,
+            "downloadable",
+            enrollment.mode,
+            score,
+            "batch"
+        )
+
+
+def get_enrollment_from_anonymous_user_id(
+    anonymous_user_model_id,
+    enrollment=None,
+    **kwargs
+):  # pylint: disable=unused-argument
+    """
+    Retrieves enrollment information based on the anonymous user model ID.
+
+    Args:
+        anonymous_user_model_id (str): The ID of the anonymous user model.
+        enrollment (object, optional): An optional enrollment object.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        dict: A dictionary containing the enrollment object if found, otherwise an empty dictionary.
+    """
+    if not enrollment:
+        try:
+            anonymous_user_id = AnonymousUserId.objects.get(id=anonymous_user_model_id)
+
+            return {
+                "enrollment": CourseEnrollment.objects.get(
+                    user=anonymous_user_id.user,
+                    course=anonymous_user_id.course_id,
+                )
+            }
+        except ObjectDoesNotExist:
+            pass
+
+    return {}
+
+
+def get_enrollment_from_id(enrollment_id, enrollment=None, **kwargs):  # pylint: disable=unused-argument
+    """
+    Retrieves enrollment information based on the enrollment ID.
+
+    Args:
+        enrollment_id (str): The ID of the enrollment.
+        **kwargs: Additional keyword arguments.
+
+    Returns:
+        dict: A dictionary containing the enrollment object if found, otherwise an empty dictionary.
+    """
+    if not enrollment:
+        try:
+            return {
+                "enrollment": CourseEnrollment.objects.get(id=enrollment_id)
+            }
+        except ObjectDoesNotExist:
+            pass
+
+    return {}

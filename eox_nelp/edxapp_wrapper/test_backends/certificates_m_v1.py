@@ -47,3 +47,12 @@ def get_generated_certificate():
     return create_test_model(
         "GeneratedCertificate", "eox_nelp", __package__, generated_certificate_fields
     )
+
+
+def get_generate_course_certificate_method():
+    """Return generate_course_certificate mock method.
+
+    Returns:
+        Mock instance.
+    """
+    return Mock()

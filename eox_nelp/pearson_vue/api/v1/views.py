@@ -34,6 +34,7 @@ from eox_nelp.pearson_vue.constants import (
     UNREVOKE_RESULT,
 )
 from eox_nelp.pearson_vue.models import PearsonRTENEvent
+from eox_nelp.pearson_vue.rti_backend import ResultNotificationBackend
 
 
 class PearsonRTENBaseView(generics.ListCreateAPIView):
@@ -130,8 +131,25 @@ class ResultNotificationView(PearsonRTENBaseView):
     This view handles the creation of Result Notification events in the Pearson RTEN system.
     The `event_type` attribute is set to "resultNotification".
     """
-
     event_type = RESULT_NOTIFICATION
+
+    def create(self, request, *args, **kwargs):
+        """
+        Execute the parent create method and allow to run the result notification pipeline.
+
+        Args:
+            request (Request): The request object containing the data.
+
+        Returns:
+            Response: Response object with status code 201 and an empty dictionary.
+        """
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_200_OK and getattr(settings, "ENABLE_CERTIFICATE_PUBLISHER", False):
+            result_notification = ResultNotificationBackend(request_data=request.data)
+            result_notification.run_pipeline()
+
+        return response
 
 
 class PlaceHoldView(PearsonRTENBaseView):

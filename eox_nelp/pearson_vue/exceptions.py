@@ -96,3 +96,8 @@ class PearsonImportError(PearsonBaseError):
     Error related with a failure response from Pearson Vue site.
     """
     exception_type = "import-error"
+
+
+class PearsonTypeError(PearsonBaseError):
+    """Pearson type error class"""
+    exception_type = "type-error"

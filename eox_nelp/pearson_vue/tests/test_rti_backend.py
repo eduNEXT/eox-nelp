@@ -13,6 +13,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     ErrorRealTimeImportHandler,
     ExamAuthorizationDataImport,
     RealTimeImport,
+    ResultNotificationBackend,
 )
 
 
@@ -237,3 +238,10 @@ class TestErrorRealTimeImportHandler(TestAbstractBackendMixin, unittest.TestCase
     Unit tests for the rti_backend class.
     """
     rti_backend_class = ErrorRealTimeImportHandler
+
+
+class TestResultNotificationBackend(TestRealTimeImport):
+    """
+    Unit tests for the ResultNotificationBackend class.
+    """
+    rti_backend_class = ResultNotificationBackend

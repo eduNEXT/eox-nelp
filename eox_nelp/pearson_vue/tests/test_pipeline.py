@@ -845,6 +845,19 @@ class TestValidateCddRequest(unittest.TestCase):
         {"primaryAddress": {"phone": {"phoneCountryCode": ""}}},
         {"primaryAddress": {"phone": {"phoneNumber": ""}}},
         {"webAccountInfo": {"email": ""}},
+        {"@clientCandidateID": "فلان"},
+        {"@clientID": "فلان"},
+        {"candidateName": {"firstName": "فلان"}},
+        {"candidateName": {"lastName": "فلان"}},
+        {"lastUpdate": "فلان"},
+        {"primaryAddress": {"address1": "فلان"}},
+        {"primaryAddress": {"city": "فلان"}},
+        {"primaryAddress": {"country": "فلان"}},
+        {"primaryAddress": {"mobile": {"mobileCountryCode": "فلان"}}},
+        {"primaryAddress": {"mobile": {"mobileNumber": "فلان"}}},
+        {"primaryAddress": {"phone": {"phoneCountryCode": "فلان"}}},
+        {"primaryAddress": {"phone": {"phoneNumber": "فلان"}}},
+        {"webAccountInfo": {"email": "فلان"}},
     )
     def test_wrong_cdd_request(self, wrong_update):
         """Test validator with a wrong cdd_request updating with empty string
@@ -898,6 +911,15 @@ class TestValidateEadRequest(unittest.TestCase):
         {"examAuthorizationCount": ""},
         {"examSeriesCode": ""},
         {"lastUpdate": ""},
+        {"@authorizationTransactionType": "فلان"},
+        {"@clientAuthorizationID": "فلان"},
+        {"@clientID": "فلان"},
+        {"clientCandidateID": "فلان"},
+        {"eligibilityApptDateFirst": "فلان"},
+        {"eligibilityApptDateLast": "فلان"},
+        {"examAuthorizationCount": "فلان"},
+        {"examSeriesCode": "فلان"},
+        {"lastUpdate": "فلان"},
     )
     def test_wrong_ead_request(self, wrong_update):
         """Test validator with a wrong ead_request updating with empty string

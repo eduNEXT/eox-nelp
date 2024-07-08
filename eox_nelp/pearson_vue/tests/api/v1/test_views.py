@@ -14,11 +14,13 @@ import unittest
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from eox_nelp.edxapp_wrapper.student import AnonymousUserId
 from eox_nelp.pearson_vue.constants import (
     CANCEL_APPOINTMENT,
     MODIFY_APPOINTMENT,
@@ -48,6 +50,13 @@ class RTENMixin:
         self.user, _ = User.objects.get_or_create(username='testuser', password='12345')
         self.client.force_authenticate(user=self.user)
 
+    def tearDown(self):  # pylint: disable=invalid-name
+        """
+        Reset the mocked objects after each test.
+        """
+        AnonymousUserId.reset_mock()
+        AnonymousUserId.objects.get.side_effect = None
+
     @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
     def test_create_result_notification_event(self):
         """
@@ -57,18 +66,49 @@ class RTENMixin:
             - The number of records has increased in 1.
             - Response returns a 200 status code.
             - Response data is empty.
-
+            - AnonymousUserId.objects.get has been called with the expected data.
         """
         # pylint: disable=no-member
-        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
+        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=self.user).count()
+        AnonymousUserId.objects.get.return_value.user = self.user
 
-        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
+        response = self.client.post(
+            reverse(f"pearson-vue-api:v1:{self.event_type}"),
+            {"clientCandidateID": "NELC123456"},
+            format="json",
+        )
 
-        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
+        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=self.user).count()
 
         self.assertEqual(final_count, initial_count + 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {})
+        AnonymousUserId.objects.get.assert_called_once_with(anonymous_user_id="123456")
+
+    @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
+    def test_create_result_notification_event_without_user(self):
+        """
+        Test creating an event without clienCandidateID.
+
+        Expected behavior:
+            - The number of records has increased in 1.
+            - Response returns a 200 status code.
+            - Response data is empty.
+            - AnonymousUserId.objects.get has been called with the expected data.
+        """
+        # pylint: disable=no-member
+        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=None).count()
+        AnonymousUserId.DoesNotExist = ObjectDoesNotExist
+        AnonymousUserId.objects.get.side_effect = AnonymousUserId.DoesNotExist
+
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
+
+        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=None).count()
+
+        self.assertEqual(final_count, initial_count + 1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {})
+        AnonymousUserId.objects.get.assert_called_once_with(anonymous_user_id="")
 
     def test_get_event(self):
         """

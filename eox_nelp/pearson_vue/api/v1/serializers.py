@@ -34,7 +34,7 @@ class PearsonRTENSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = PearsonRTENEvent
-        fields = ["event_type", "content", "created_at"]
+        fields = ["event_type", "content", "candidate", "created_at"]
         read_only_fields = ["event_type", "created_at"]
 
     def to_internal_value(self, data):

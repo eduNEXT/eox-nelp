@@ -22,6 +22,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from eox_nelp.edxapp_wrapper.student import AnonymousUserId
 from eox_nelp.pearson_vue.api.v1.serializers import PearsonRTENSerializer
 from eox_nelp.pearson_vue.constants import (
     CANCEL_APPOINTMENT,
@@ -102,7 +103,7 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
             serializer (Serializer): The serializer instance used for data validation and saving.
         """
         content_data = self.request.data.copy()
-        serializer.save(event_type=self.event_type, content=content_data)
+        serializer.save(event_type=self.event_type, candidate=self.get_candidate(), content=content_data)
 
     def create(self, request, *args, **kwargs):
         """
@@ -122,6 +123,24 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response({}, status=status.HTTP_200_OK, headers=headers)
+
+    def get_candidate(self):
+        """
+        Retrieves the candidate user based on the client candidate ID provided in the request data.
+
+        This method extracts the `clientCandidateID` from the request data, removes the "NELC" prefix,
+        and attempts to retrieve the corresponding user from the `AnonymousUserId` model. If the candidate
+        ID does not exist, it returns `None`.
+
+        Returns:
+            user (object or None): The user object associated with the anonymous user ID, or `None` if not found.
+        """
+        anonymous_user_id = self.request.data.get("clientCandidateID", "").replace("NELC", "")
+
+        try:
+            return AnonymousUserId.objects.get(anonymous_user_id=anonymous_user_id).user
+        except AnonymousUserId.DoesNotExist:
+            return None
 
 
 class ResultNotificationView(PearsonRTENBaseView):

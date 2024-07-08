@@ -22,9 +22,9 @@ class PearsonRTENEventAdmin(admin.ModelAdmin):
         list_display (list): List of fields to display in the admin list view.
         readonly_fields (tuple): Tuple of fields that are read-only in the admin interface.
     """
-    list_display = ("event_type", "created_at")
-    readonly_fields = ("created_at",)
-    list_filter = ["event_type",]
+    list_display = ("event_type", "created_at", "candidate")
+    readonly_fields = ("created_at", "candidate", "event_type")
+    list_filter = ["event_type"]
 
 
 admin.site.register(PearsonRTENEvent, PearsonRTENEventAdmin)

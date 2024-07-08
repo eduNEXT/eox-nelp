@@ -10,6 +10,7 @@ Constants:
     EVENT_TYPE_CHOICES: A list of tuples representing the possible choices
         for an event type. Each choice represents a different type of event.
 """
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from eox_nelp.pearson_vue.constants import (
@@ -33,6 +34,7 @@ EVENT_TYPE_CHOICES = [
     (MODIFY_APPOINTMENT, "Modify Appointment"),
     (CANCEL_APPOINTMENT, "Cancel Appointment"),
 ]
+User = get_user_model()
 
 
 class PearsonRTENEvent(models.Model):
@@ -47,3 +49,4 @@ class PearsonRTENEvent(models.Model):
     content = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
+    candidate = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)

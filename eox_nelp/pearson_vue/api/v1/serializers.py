@@ -28,13 +28,13 @@ class PearsonRTENSerializer(serializers.ModelSerializer):
     Attributes:
         content (serializers.JSONField): A field to handle JSON content.
     """
-
+    course = serializers.SerializerMethodField()
     content = serializers.JSONField()
 
     class Meta:
         """Meta class"""
         model = PearsonRTENEvent
-        fields = ["event_type", "content", "candidate", "created_at"]
+        fields = ["event_type", "content", "candidate", "course", "created_at"]
         read_only_fields = ["event_type", "created_at"]
 
     def to_internal_value(self, data):
@@ -48,3 +48,19 @@ class PearsonRTENSerializer(serializers.ModelSerializer):
             dict: A dictionary containing the serialized data.
         """
         return {"content": data}
+
+    def get_course(self, obj):
+        """
+        Retrieves the course associated with the given object as a string.
+
+        This method checks if the `course` attribute of the provided object exists.
+        If it does, it returns the string representation of the course.
+        Otherwise, it returns `None`.
+
+        Args:
+            obj (object): The object containing the `course` attribute.
+
+        Returns:
+            str or None: The string representation of the course if it exists, otherwise `None`.
+        """
+        return str(obj.course) if obj.course else None

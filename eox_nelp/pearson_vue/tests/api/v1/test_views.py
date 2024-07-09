@@ -11,15 +11,17 @@ Classes:
     TestUnrevokeResultView: Unit tests for the UnrevokeResultView.
 """
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import override_settings
 from django.urls import reverse
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId
 from eox_nelp.pearson_vue.constants import (
     CANCEL_APPOINTMENT,
@@ -49,6 +51,8 @@ class RTENMixin:
         self.client = APIClient()
         self.user, _ = User.objects.get_or_create(username='testuser', password='12345')
         self.client.force_authenticate(user=self.user)
+        self.course_key = CourseKey.from_string("course-v1:test+CS501+2022_T4")
+        self.course, _ = CourseOverview.objects.get_or_create(id=self.course_key)
 
     def tearDown(self):  # pylint: disable=invalid-name
         """
@@ -57,8 +61,9 @@ class RTENMixin:
         AnonymousUserId.reset_mock()
         AnonymousUserId.objects.get.side_effect = None
 
+    @patch("eox_nelp.pearson_vue.api.v1.views.get_enrollment_from_id")
     @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
-    def test_create_result_notification_event(self):
+    def test_create_result_notification_event(self, enrollment_from_id_mock):
         """
         Test creating an event.
 
@@ -67,23 +72,39 @@ class RTENMixin:
             - Response returns a 200 status code.
             - Response data is empty.
             - AnonymousUserId.objects.get has been called with the expected data.
+            - get_enrollment_from_id has been called with the expected data.
         """
         # pylint: disable=no-member
-        initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=self.user).count()
+        initial_count = PearsonRTENEvent.objects.filter(
+            event_type=self.event_type,
+            candidate=self.user,
+            course=self.course,
+        ).count()
+        enrollment_from_id_mock.return_value = {"enrollment": Mock(course=self.course)}
         AnonymousUserId.objects.get.return_value.user = self.user
 
         response = self.client.post(
             reverse(f"pearson-vue-api:v1:{self.event_type}"),
-            {"clientCandidateID": "NELC123456"},
+            {
+                "clientCandidateID": "NELC123456",
+                "authorization": {
+                    "clientAuthorizationID": "1584-4785"
+                },
+            },
             format="json",
         )
 
-        final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=self.user).count()
+        final_count = PearsonRTENEvent.objects.filter(
+            event_type=self.event_type,
+            candidate=self.user,
+            course=self.course,
+        ).count()
 
         self.assertEqual(final_count, initial_count + 1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {})
         AnonymousUserId.objects.get.assert_called_once_with(anonymous_user_id="123456")
+        enrollment_from_id_mock.assert_called_once_with("1584")
 
     @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
     def test_create_result_notification_event_without_user(self):
@@ -109,6 +130,39 @@ class RTENMixin:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {})
         AnonymousUserId.objects.get.assert_called_once_with(anonymous_user_id="")
+
+    @patch("eox_nelp.pearson_vue.api.v1.views.get_enrollment_from_id")
+    @override_settings(ENABLE_CERTIFICATE_PUBLISHER=False)
+    def test_create_result_notification_event_with_invalid_authorization_id(self, enrollment_from_id_mock):
+        """
+        Test creating an event with invalid clienAuthorizationID.
+
+        Expected behavior:
+            - The number of records has increased in 1.
+            - Response returns a 200 status code.
+            - Response data is empty.
+            - the course record is None
+            - get_enrollment_from_id has been called with the expected data.
+        """
+        # pylint: disable=no-member
+        initial_record_ids = list(
+            PearsonRTENEvent.objects.filter(event_type=self.event_type).values_list('id', flat=True)
+        )
+        enrollment_from_id_mock.return_value = {}
+
+        response = self.client.post(
+            reverse(f"pearson-vue-api:v1:{self.event_type}"),
+            {"authorization": {"clientAuthorizationID": "1584-4785"}},
+            format="json",
+        )
+
+        new_records = PearsonRTENEvent.objects.filter(event_type=self.event_type).exclude(id__in=initial_record_ids)
+
+        self.assertEqual(1, new_records.count())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {})
+        self.assertIsNone(new_records[0].course)
+        enrollment_from_id_mock.assert_called_once_with("1584")
 
     def test_get_event(self):
         """

@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
 from eox_nelp.pearson_vue.tasks import cdd_task
+from eox_nelp.utils import save_extrainfo_field
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,15 @@ def update_user_data(request):
                         setattr(request.user, field, value)
 
                 request.user.save()
+
+            # This extra code block is required since the method update_account_settings just
+            # allows to update fields defined in the AccountUserSerializer and the AccountLegacyProfileSerializer
+            # so some fields related ExtraInfo are not editable in the standad implementation.
+            required_user_extra_info_fields = getattr(settings, 'REQUIRED_USER_EXTRA_INFO_FIELDS', [])
+            if required_user_extra_info_fields:
+                for field, value in request.data.items():
+                    if field in required_user_extra_info_fields:
+                        save_extrainfo_field(request.user, field, value)
 
     except errors.AccountValidationError as err:
         return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)

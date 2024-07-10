@@ -13,6 +13,7 @@ Constants:
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.pearson_vue.constants import (
     CANCEL_APPOINTMENT,
     MODIFY_APPOINTMENT,
@@ -50,3 +51,4 @@ class PearsonRTENEvent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES)
     candidate = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    course = models.ForeignKey(CourseOverview, null=True, on_delete=models.DO_NOTHING)

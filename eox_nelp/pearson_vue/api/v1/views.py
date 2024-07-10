@@ -35,6 +35,7 @@ from eox_nelp.pearson_vue.constants import (
     UNREVOKE_RESULT,
 )
 from eox_nelp.pearson_vue.models import PearsonRTENEvent
+from eox_nelp.pearson_vue.pipeline import get_enrollment_from_id
 from eox_nelp.pearson_vue.rti_backend import ResultNotificationBackend
 
 
@@ -103,7 +104,12 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
             serializer (Serializer): The serializer instance used for data validation and saving.
         """
         content_data = self.request.data.copy()
-        serializer.save(event_type=self.event_type, candidate=self.get_candidate(), content=content_data)
+        serializer.save(
+            event_type=self.event_type,
+            candidate=self.get_candidate(),
+            content=content_data,
+            course=self.get_course(),
+        )
 
     def create(self, request, *args, **kwargs):
         """
@@ -141,6 +147,28 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
             return AnonymousUserId.objects.get(anonymous_user_id=anonymous_user_id).user
         except AnonymousUserId.DoesNotExist:
             return None
+
+    def get_course(self):
+        """
+        Retrieves the course associated with the enrollment ID from the request data.
+
+        This method extracts the `clientAuthorizationID` from the request data. If the ID is present,
+        it splits the ID to obtain the `enrollment_id` and then retrieves the enrollment object using
+        the `get_enrollment_from_id` function. If the enrollment object exists, it returns the associated course.
+        Otherwise, it returns `None`.
+
+        Returns:
+            Course or None: The course associated with the enrollment if it exists, otherwise `None`.
+        """
+        client_authorization_id = self.request.data.get("authorization", {}).get("clientAuthorizationID")
+
+        if not client_authorization_id:
+            return None
+
+        enrollment_id = client_authorization_id.split("-")[0]
+        enrollment = get_enrollment_from_id(enrollment_id).get("enrollment")
+
+        return enrollment.course if enrollment else None
 
 
 class ResultNotificationView(PearsonRTENBaseView):

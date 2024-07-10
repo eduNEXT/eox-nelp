@@ -59,11 +59,11 @@ def update_user_data(request):
             # so some fields like first_name and last_name are not editable in the standad implementation.
             # so some fields related ExtraInfo are not editable in the standad implementation.
 
-            extra_account_user_fields = getattr(settings, "EXTRA_ACCOUNT_USER_FIELDS", [])
+            required_user_account_fields = getattr(settings, "REQUIRED_USER_ACCOUNT_FIELDS", [])
             required_user_extra_info_fields = getattr(settings, 'REQUIRED_USER_EXTRA_INFO_FIELDS', [])
 
             for field, value in request.data.items():
-                if field in extra_account_user_fields and hasattr(request.user, field):
+                if field in required_user_account_fields and hasattr(request.user, field):
                     setattr(request.user, field, value)
                     request.user.save()
                 if field in required_user_extra_info_fields:

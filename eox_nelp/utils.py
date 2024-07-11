@@ -1,7 +1,6 @@
 """Utils that can be used for the plugin project"""
 import re
 from copy import copy
-from importlib import import_module
 
 from opaque_keys.edx.keys import CourseKey
 

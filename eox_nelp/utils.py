@@ -166,7 +166,7 @@ def save_extrainfo_field(user, field, value):
         field (string): extrainfo field to change
         value (any): value set in extrainfo field
     """
-    ExtraInfo = import_module("custom_reg_form.models").ExtraInfo  # pylint: disable=invalid-name
+    from custom_reg_form.models import ExtraInfo  # pylint: disable=import-outside-toplevel
     if not hasattr(ExtraInfo, field):
         return
 

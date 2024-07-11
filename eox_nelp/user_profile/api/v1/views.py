@@ -59,13 +59,15 @@ def update_user_data(request):
             # so some fields like first_name and last_name are not editable in the standad implementation.
 
             extra_account_user_fields = getattr(settings, "EXTRA_ACCOUNT_USER_FIELDS", [])
+
             for field in extra_account_user_fields:
                 if (value := request.data.get(field)) and hasattr(request.user, field):
                     setattr(request.user, field, value)
                     request.user.save()
-            # Also some fields related ExtraInfo are not editable too  in the standad implementation. So we need
+            # Also some fields related ExtraInfo are not editable too  in the standard implementation. So we need
             # save_extrainfo_field method with the desired settings.
             required_user_extra_info_fields = getattr(settings, 'USER_PROFILE_API_EXTRA_INFO_FIELDS', [])
+
             for field in required_user_extra_info_fields:
                 if value := request.data.get(field):
                     save_extrainfo_field(request.user, field, value)

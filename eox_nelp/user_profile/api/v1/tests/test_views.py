@@ -144,7 +144,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
 
     @override_settings(
         ENABLE_OTP_VALIDATION=False,
-        REQUIRED_USER_EXTRA_INFO_FIELDS=["arabic_first_name", "arabic_last_name"],
+        USER_PROFILE_API_EXTRA_INFO_FIELDS=["arabic_first_name", "arabic_last_name"],
         PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
     )
     @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
@@ -156,9 +156,8 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check the response says that the field has been updated.
             - Status code 200.
             - Check that update_account_settings method has called once.
-            - Check that user first_name has been updated.
-            - Check that user last_name has been updated.
-            - Check cdd_task async task is called with user.id
+            - Check that user extra info arabic_first_name has been updated.
+            - Check that user extra info arabic_last_name has been updated.
         """
         payload = {
             "arabic_first_name": "أناكين",

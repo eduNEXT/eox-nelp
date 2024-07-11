@@ -65,7 +65,7 @@ def update_user_data(request):
                     request.user.save()
             # Also some fields related ExtraInfo are not editable too  in the standad implementation. So we need
             # save_extrainfo_field method with the desired settings.
-            required_user_extra_info_fields = getattr(settings, 'REQUIRED_USER_EXTRA_INFO_FIELDS', [])
+            required_user_extra_info_fields = getattr(settings, 'USER_PROFILE_API_EXTRA_INFO_FIELDS', [])
             for field in required_user_extra_info_fields:
                 if value := request.data.get(field):
                     save_extrainfo_field(request.user, field, value)

@@ -162,11 +162,11 @@ def save_extrainfo_field(user, field, value):
     If the extrainfo doesnt exist, the extrainfo model is created
 
     Args:
-        user (User):
-        field (string):
-        value (any):
+        user (User): user instace
+        field (string): extrainfo field to change
+        value (any): value set in extrainfo field
     """
-    ExtraInfo = import_module("custom_reg_form.models").ExtraInfo
+    ExtraInfo = import_module("custom_reg_form.models").ExtraInfo  # pylint: disable=invalid-name
     if not hasattr(ExtraInfo, field):
         return
 

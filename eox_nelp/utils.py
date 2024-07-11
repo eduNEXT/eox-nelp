@@ -1,8 +1,8 @@
 """Utils that can be used for the plugin project"""
 import re
 from copy import copy
+from importlib import import_module
 
-from custom_reg_form.models import ExtraInfo
 from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.edxapp_wrapper.course_overviews import get_course_overviews
@@ -166,6 +166,7 @@ def save_extrainfo_field(user, field, value):
         field (string):
         value (any):
     """
+    ExtraInfo = import_module("custom_reg_form.models").ExtraInfo
     if not hasattr(ExtraInfo, field):
         return
 

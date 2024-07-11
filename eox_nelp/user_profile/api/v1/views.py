@@ -57,16 +57,17 @@ def update_user_data(request):
             # This extra code block is required since the method update_account_settings just
             # allows to update fields defined in the AccountUserSerializer and the AccountLegacyProfileSerializer
             # so some fields like first_name and last_name are not editable in the standad implementation.
-            # so some fields related ExtraInfo are not editable in the standad implementation.
 
             extra_account_user_fields = getattr(settings, "EXTRA_ACCOUNT_USER_FIELDS", [])
-            required_user_extra_info_fields = getattr(settings, 'REQUIRED_USER_EXTRA_INFO_FIELDS', [])
-
-            for field, value in request.data.items():
-                if field in extra_account_user_fields and hasattr(request.user, field):
+            for field in extra_account_user_fields:
+                if (value := request.data.get(field)) and hasattr(request.user, field):
                     setattr(request.user, field, value)
                     request.user.save()
-                if field in required_user_extra_info_fields:
+            # Also some fields related ExtraInfo are not editable too  in the standad implementation. So we need
+            # save_extrainfo_field method with the desired settings.
+            required_user_extra_info_fields = getattr(settings, 'REQUIRED_USER_EXTRA_INFO_FIELDS', [])
+            for field in required_user_extra_info_fields:
+                if value := request.data.get(field):
                     save_extrainfo_field(request.user, field, value)
 
     except errors.AccountValidationError as err:

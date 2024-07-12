@@ -16,6 +16,7 @@ Classes:
 import importlib
 from abc import ABC, abstractmethod
 
+from eox_nelp.pearson_vue.decorators import audit_backend
 from eox_nelp.pearson_vue.exceptions import PearsonBaseError
 from eox_nelp.pearson_vue.pipeline import (
     audit_pearson_error,
@@ -140,6 +141,9 @@ class RealTimeImport(AbstractBackend):
         run_pipeline(): Executes the RTI pipeline by iterating through the pipeline functions.
         get_pipeline(): Returns the RTI pipeline, which is a list of functions to be executed.
     """
+    @audit_backend
+    def run_pipeline(self):
+        return super().run_pipeline()
 
     def handle_error(self, exception, failed_step_pipeline):
         """

@@ -35,17 +35,17 @@ def audit_backend(func):
 
         @audit_method(action=f"Backend Execution: {backend_name}")
         @rename_function(name=f"audit_backend_{camel_to_snake(backend_name)}")
-        def audit_backend_manager(self, *args, **kwargs):
-            try:
-                return func(self, *args, **kwargs)
-            finally:
-                if hasattr(self, "backend_data"):
-                    logger.info(
-                        "Backend %s executed. \n backend_data: %s",
-                        backend_name,
-                        self.backend_data,
-                    )
+        def audit_backend_manager(backend_data, **kwargs):
+            logger.info(
+                "Backend %s executed. \n backend_data: %s",
+                backend_name,
+                backend_data,
+            )
 
-        return audit_backend_manager(self, *args, **kwargs)
+        try:
+            return func(self, *args, **kwargs)
+        finally:
+            if self.use_audit_backend and not self.backend_data.get("catched_pearson_error"):
+                audit_backend_manager(backend_data=self.backend_data, **kwargs)
 
     return wrapper

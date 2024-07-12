@@ -53,6 +53,7 @@ class AbstractBackend(ABC):
         get_pipeline(): Returns the pipeline, which is a list of functions to be executed (abstract method).
         handle_error(exception: Exception, failed_step_pipeline: str): Handles errors during pipeline execution.
     """
+    use_audit_backend = True
 
     def __init__(self, **kwargs):
         """
@@ -63,6 +64,7 @@ class AbstractBackend(ABC):
         """
         self.backend_data = kwargs.copy()
 
+    @audit_backend
     def run_pipeline(self):
         """
         Executes the pipeline by iterating through the pipeline functions.
@@ -141,9 +143,7 @@ class RealTimeImport(AbstractBackend):
         run_pipeline(): Executes the RTI pipeline by iterating through the pipeline functions.
         get_pipeline(): Returns the RTI pipeline, which is a list of functions to be executed.
     """
-    @audit_backend
-    def run_pipeline(self):
-        return super().run_pipeline()
+    use_audit_backend = False
 
     def handle_error(self, exception, failed_step_pipeline):
         """

@@ -58,9 +58,9 @@ CDD_REQUEST_SAMPLE = {
         "nativeAddress": {
             "address1": "123 Main St",
             "city": "Anytown",
-            "firstName": "فلان الفلاني",
+            "firstName": "كلارك",
             "language": "UKN",
-            "lastName": "فلان الفلاني",
+            "lastName": "كينت",
             "potentialMismatch": "false",
         },
         "phone": {"phoneCountryCode": "1", "phoneNumber": "5551234567"},
@@ -252,6 +252,8 @@ class TestGetUserData(unittest.TestCase):
         )
         self.extrainfo = MagicMock(
             arabic_name="كلارك كينت",
+            arabic_first_name="كلارك",
+            arabic_last_name="كينت",
         )
         anonymous_id_for_user.return_value = "ABCDF1245678899"
         setattr(User, "profile", self.profile)
@@ -290,6 +292,8 @@ class TestGetUserData(unittest.TestCase):
                 "mobile_number": phone_number,
                 "mobile_country_code": country_code,
                 "arabic_name": self.extrainfo.arabic_name,
+                "arabic_first_name": self.extrainfo.arabic_first_name,
+                "arabic_last_name": self.extrainfo.arabic_last_name,
             },
         }
         result = get_user_data(self.user.id)
@@ -692,6 +696,8 @@ class TestBuildCddRequest(unittest.TestCase):
                 "mobile_number": "5551234567",
                 "mobile_country_code": "1",
                 "arabic_name": "فلان الفلاني",
+                "arabic_first_name": "كلارك",
+                "arabic_last_name": "كينت",
             }
         }
 
@@ -708,7 +714,6 @@ class TestBuildCddRequest(unittest.TestCase):
         }
 
         result = build_cdd_request(**self.input_data)
-
         self.assertDictEqual(expected_output, result)
 
     @patch("eox_nelp.pearson_vue.pipeline.timezone")

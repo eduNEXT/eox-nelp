@@ -132,6 +132,8 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
     phone_country_code = str(pn.country_code)
     extrainfo = getattr(user, "extrainfo", None)
     arabic_name = extrainfo.arabic_name if extrainfo else ""
+    arabic_first_name = extrainfo.arabic_first_name if extrainfo else ""
+    arabic_last_name = extrainfo.arabic_last_name if extrainfo else ""
 
     return {
         "profile_metadata": {
@@ -148,6 +150,8 @@ def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument
             "mobile_number": phone,
             "mobile_country_code": phone_country_code,
             "arabic_name": arabic_name,
+            "arabic_first_name": arabic_first_name,
+            "arabic_last_name": arabic_last_name,
         },
     }
 
@@ -375,8 +379,8 @@ def build_cdd_request(profile_metadata, **kwargs):  # pylint: disable=unused-arg
                 "nativeAddress": {
                     "language": getattr(settings, "PEARSON_RTI_NATIVE_ADDRESS_LANGUAGE", "UKN"),
                     "potentialMismatch": "false",
-                    "firstName": profile_metadata["arabic_name"],
-                    "lastName": profile_metadata["arabic_name"],
+                    "firstName": profile_metadata["arabic_first_name"],
+                    "lastName": profile_metadata["arabic_last_name"],
                     "address1": profile_metadata["address"],
                     "city": profile_metadata["city"],
                 },

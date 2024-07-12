@@ -323,6 +323,12 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
         User.objects.get(id=user_id),
         course_id,
     )
+    # configure eligibility appt date with settings course delta starting from now. Default one year.
+    elegibility_appt_delta_days = exam_metadata.get("elegibility_appt_delta_days", 365)
+    exam_metadata["eligibility_appt_date_first"] = timezone.now().strftime("%Y/%m/%d %H:%M:%S")
+    exam_metadata["eligibility_appt_date_last"] = (
+        timezone.now() + timezone.timedelta(days=elegibility_appt_delta_days)
+    ).strftime("%Y/%m/%d %H:%M:%S")
 
     required_fields = {
         "eligibility_appt_date_first",

@@ -81,6 +81,7 @@ class AbstractBackend(ABC):
             try:
                 result = func(**self.backend_data) or {}
             except PearsonBaseError as pearson_error:
+                self.backend_data["catched_pearson_error"] = True
                 self.handle_error(pearson_error, func.__name__)
                 break
 
@@ -113,6 +114,7 @@ class AbstractBackend(ABC):
 
 class ErrorRealTimeImportHandler(AbstractBackend):
     """Class for managing validation error pipe  executing the pipeline for data validation."""
+    use_audit_backend = False
 
     def handle_error(self, exception, failed_step_pipeline):
         """
@@ -143,8 +145,6 @@ class RealTimeImport(AbstractBackend):
         run_pipeline(): Executes the RTI pipeline by iterating through the pipeline functions.
         get_pipeline(): Returns the RTI pipeline, which is a list of functions to be executed.
     """
-    use_audit_backend = False
-
     def handle_error(self, exception, failed_step_pipeline):
         """
         Handles errors during pipeline execution.

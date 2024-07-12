@@ -35,7 +35,7 @@ def audit_backend(func):
 
         @audit_method(action=f"Backend Execution: {backend_name}")
         @rename_function(name=f"audit_backend_{camel_to_snake(backend_name)}")
-        def audit_backend_manager(backend_data, **kwargs):
+        def audit_backend_manager(backend_data, **kwargs):  # pylint: disable=unused-argument
             logger.info(
                 "Backend %s executed. \n backend_data: %s",
                 backend_name,

@@ -15,7 +15,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/edunext/eox-nelp#readme",
   "dependencies": {
-    "@edunext/frontend-essentials": "^2.5.0",
+    "@edunext/frontend-essentials": "^2.6.0",
     "@edx/brand": "github:nelc/brand-openedx#open-release/palm.nelp",
     "@edx/frontend-platform": "npm:@edunext/frontend-platform@^4.7.0",
     "@edx/paragon": "npm:@edunext/paragon@20.47.0",

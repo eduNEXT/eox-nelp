@@ -4,12 +4,21 @@ Classes:
     ExtractCourseIdFromStringTestCase: Tests cases for the extract_course_id_from_string method.
     GetCourseFromIdTestCase: Tests cases for the get_course_from_id method.
 """
-from ddt import data, ddt
+from ddt import data, ddt, unpack
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
-from eox_nelp.utils import camel_to_snake, extract_course_id_from_string, get_course_from_id, get_item_label
+from eox_nelp.utils import (
+    camel_to_snake,
+    extract_course_id_from_string,
+    get_course_from_id,
+    get_item_label,
+    save_extrainfo_field,
+)
+
+User = get_user_model()
 
 
 @ddt
@@ -222,3 +231,43 @@ class CamelToSnakeTestCase(TestCase):
             - TypeError is raised
         """
         self.assertRaises(TypeError, camel_to_snake, input_value)
+
+
+@ddt
+class SaveExtraInfoFieldTestCase(TestCase):
+    """Test class for the save_extrainfo_field method."""
+    @data(
+        {"field": "arabic_name", "value": "أناكين سكاي ووكر"},
+        {"field": "is_phone_validated", "value": True},
+        {"field": "arabic_first_name", "value": " أناكين"},
+        {"field": "arabic_last_name", "value": "سكاي ووكر"},
+    )
+    @unpack
+    def test_save_extrainfo_field(self, field, value):
+        """ Test right functionality.
+
+        Expected behavior:
+            - Extrainfo related objed has  the expected value.
+        """
+        user, _ = User.objects.get_or_create(username="vader1798")
+
+        save_extrainfo_field(user, field, value)
+
+        self.assertEqual(getattr(user.extrainfo, field), value)
+
+    @data(
+        {"field": "arabic_name2", "value": "loool"},
+        {"field": "otp-crazy", "value": True},
+    )
+    @unpack
+    def test_wrong_extra_info_field(self, field, value):
+        """ Test when the input is not a extra info field.
+
+        Expected behavior:
+            - The user has no extra info model.
+        """
+        user, _ = User.objects.get_or_create(username="vader19")
+
+        save_extrainfo_field(user, field, value)
+
+        self.assertFalse(hasattr(user, "extrainfo"))

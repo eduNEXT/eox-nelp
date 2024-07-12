@@ -154,3 +154,23 @@ def camel_to_snake(string):
         String in snake case.
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
+
+
+def save_extrainfo_field(user, field, value):
+    """Given a user save in extrainfo a value in the desired field.
+    If the extrainfo doesnt exist, the extrainfo model is created
+
+    Args:
+        user (User): user instace
+        field (string): extrainfo field to change
+        value (any): value set in extrainfo field
+    """
+    from custom_reg_form.models import ExtraInfo  # pylint: disable=import-outside-toplevel
+    if not hasattr(ExtraInfo, field):
+        return
+
+    if extra_info := getattr(user, "extrainfo", None):
+        setattr(extra_info, field, value)
+        extra_info.save()
+    else:
+        ExtraInfo.objects.create(user=user, **{field: value})  # pylint: disable=no-member

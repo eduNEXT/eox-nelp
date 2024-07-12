@@ -231,7 +231,7 @@ def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unu
     response = api_client.import_candidate_demographics(payload)
 
     if response.get("status", "error") == "accepted":
-        return response
+        return {"cdd_import": response}
 
     raise PearsonImportError(
         exception_reason=f"Import candidate demographics pipeline has failed with the following response: {response}",
@@ -280,7 +280,7 @@ def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-
     response = api_client.import_exam_authorization(payload)
 
     if response.get("status", "error") == "accepted":
-        return response
+        return {"ead_import": response}
 
     raise PearsonImportError(
         exception_reason=f"Import exam authorization pipeline has failed with the following response: {response}",

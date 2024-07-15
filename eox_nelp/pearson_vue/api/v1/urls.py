@@ -13,7 +13,7 @@ URL Patterns:
     - revokeResult: Endpoint for revoking a result.
     - unrevokeResult: Endpoint for unrevoking a result.
 """
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 from eox_nelp.pearson_vue.api.v1.views import (
     CancelAppointmentView,
@@ -38,13 +38,14 @@ from eox_nelp.pearson_vue.constants import (
 
 app_name = "eox_nelp"  # pylint: disable=invalid-name
 
-urlpatterns = [
-    path('resultNotification/', ResultNotificationView.as_view(), name=RESULT_NOTIFICATION),
-    path('placeHold/', PlaceHoldView.as_view(), name=PLACE_HOLD),
-    path('releaseHold/', ReleaseHoldView.as_view(), name=RELEASE_HOLD),
-    path('modifyResultStatus/', ModifyResultStatusView.as_view(), name=MODIFY_RESULT_STATUS),
-    path('revokeResult/', RevokeResultView.as_view(), name=REVOKE_RESULT),
-    path('unrevokeResult/', UnrevokeResultView.as_view(), name=UNREVOKE_RESULT),
-    path('modifyAppointment/', ModifyAppointmentView.as_view(), name=MODIFY_APPOINTMENT),
-    path('cancelAppointment/', CancelAppointmentView.as_view(), name=CANCEL_APPOINTMENT),
-]
+router = DefaultRouter()
+router.register('resultNotification', ResultNotificationView, basename=RESULT_NOTIFICATION)
+router.register('placeHold', PlaceHoldView, basename=PLACE_HOLD)
+router.register('releaseHold', ReleaseHoldView, basename=RELEASE_HOLD)
+router.register('modifyResultStatus', ModifyResultStatusView, basename=MODIFY_RESULT_STATUS)
+router.register('revokeResult', RevokeResultView, basename=REVOKE_RESULT)
+router.register('unrevokeResult', UnrevokeResultView, basename=UNREVOKE_RESULT)
+router.register('modifyAppointment', ModifyAppointmentView, basename=MODIFY_APPOINTMENT)
+router.register('cancelAppointment', CancelAppointmentView, basename=CANCEL_APPOINTMENT)
+
+urlpatterns = router.urls

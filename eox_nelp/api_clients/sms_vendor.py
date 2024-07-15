@@ -6,7 +6,7 @@ Classes:
 from django.conf import settings
 
 from eox_nelp.api_clients import AbstractAPIRestClient
-from eox_nelp.api_clients.authenticators import SMSVendoAuthenticator
+from eox_nelp.api_clients.authenticators import Oauth2BasicAuthenticator
 
 try:
     from eox_audit_model.decorators import audit_method
@@ -18,7 +18,7 @@ except ImportError:
 
 class SMSVendorApiClient(AbstractAPIRestClient):
     """Allow to perform SMS send operations."""
-    authentication_class = SMSVendoAuthenticator
+    authentication_class = Oauth2BasicAuthenticator
 
     @property
     def base_url(self):
@@ -27,6 +27,7 @@ class SMSVendorApiClient(AbstractAPIRestClient):
     def __init__(self):
         self.user = getattr(settings, "SMS_VENDOR_USERNAME")
         self.password = getattr(settings, "SMS_VENDOR_PASSWORD")
+        self.token_path = getattr(settings, "SMS_VENDOR_TOKEN_PATH")
 
         super().__init__()
 

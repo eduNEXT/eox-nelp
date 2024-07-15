@@ -19,7 +19,7 @@ from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eox_core.edxapp_wrapper.bearer_authentication import BearerAuthentication
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -174,7 +174,7 @@ class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
         return enrollment.course if enrollment else None
 
 
-class ResultNotificationView(PearsonRTENBaseView):
+class ResultNotificationView(RetrieveModelMixin, PearsonRTENBaseView):
     """
     View for handling Result Notification events.
 
@@ -182,6 +182,7 @@ class ResultNotificationView(PearsonRTENBaseView):
     The `event_type` attribute is set to "resultNotification".
     """
     event_type = RESULT_NOTIFICATION
+    lookup_field = "course"
 
     def create(self, request, *args, **kwargs):
         """
@@ -200,6 +201,30 @@ class ResultNotificationView(PearsonRTENBaseView):
             result_notification.run_pipeline()
 
         return response
+
+    def get_object(self):
+        """
+        Retrieves the latest object for the given candidate and course.
+
+        This method filters the queryset to find objects matching the current user
+        and the course specified by the lookup field in the URL. If no objects are found,
+        it raises a 404 error. If objects are found, it returns the most recently created object.
+
+        Returns:
+            object: The most recently created object that matches the given candidate and course.
+
+        Raises:
+            Http404: If no objects match the given candidate and course.
+        """
+        objects = self.get_queryset().filter(
+            candidate=self.request.user,
+            course=self.kwargs[self.lookup_field],
+        )
+
+        if not objects:
+            raise Http404
+
+        return objects.latest("created_at")
 
 
 class PlaceHoldView(PearsonRTENBaseView):

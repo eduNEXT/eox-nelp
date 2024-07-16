@@ -19,6 +19,7 @@ from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eox_core.edxapp_wrapper.bearer_authentication import BearerAuthentication
 from rest_framework import status
+from rest_framework.filters import SearchFilter
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -59,6 +60,8 @@ class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = PearsonRTENSerializer
     queryset = PearsonRTENEvent.objects.all()  # pylint: disable=no-member
     authentication_classes = [BearerAuthentication, JwtAuthentication]
+    filter_backends = [SearchFilter]
+    search_fields = ["candidate__username", "course__id"]
 
     def dispatch(self, request, *args, **kwargs):
         """
@@ -132,6 +135,30 @@ class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
             return Response({}, status=status.HTTP_200_OK, headers=response.headers)
 
         return response
+
+    def list(self, request, *args, **kwargs):
+        """
+        Retrieve a list of objects if the user has the necessary permissions.
+
+        This method overrides the default list method to add a permission check.
+        Only users who are superusers or staff members are allowed to retrieve the list of objects.
+        If the user does not have the necessary permissions, an HTTP 404 error is raised.
+
+        Args:
+            request (HttpRequest): The request object containing user information.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            Response: The response object containing the list of objects if the user has the necessary permissions.
+
+        Raises:
+            Http404: If the user does not have the necessary permissions.
+        """
+        if request.user.is_superuser or request.user.is_staff:
+            return super().list(request, *args, **kwargs)
+
+        raise Http404
 
     def get_candidate(self):
         """

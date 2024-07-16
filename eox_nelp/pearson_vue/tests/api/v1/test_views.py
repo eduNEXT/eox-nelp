@@ -84,7 +84,7 @@ class RTENMixin:
         AnonymousUserId.objects.get.return_value.user = self.user
 
         response = self.client.post(
-            reverse(f"pearson-vue-api:v1:{self.event_type}"),
+            reverse(f"pearson-vue-api:v1:{self.event_type}-list"),
             {
                 "clientCandidateID": "NELC123456",
                 "authorization": {
@@ -122,7 +122,7 @@ class RTENMixin:
         AnonymousUserId.DoesNotExist = ObjectDoesNotExist
         AnonymousUserId.objects.get.side_effect = AnonymousUserId.DoesNotExist
 
-        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), {}, format="json")
 
         final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type, candidate=None).count()
 
@@ -151,7 +151,7 @@ class RTENMixin:
         enrollment_from_id_mock.return_value = {}
 
         response = self.client.post(
-            reverse(f"pearson-vue-api:v1:{self.event_type}"),
+            reverse(f"pearson-vue-api:v1:{self.event_type}-list"),
             {"authorization": {"clientAuthorizationID": "1584-4785"}},
             format="json",
         )
@@ -185,7 +185,7 @@ class RTENMixin:
                 'created_at': event.created_at.isoformat(),
             })
 
-        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}"), format="json")
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], len(events))
@@ -201,7 +201,7 @@ class RTENMixin:
         """
         initial_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()  # pylint: disable=no-member
 
-        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), {}, format="json")
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), {}, format="json")
 
         final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()  # pylint: disable=no-member
 
@@ -216,7 +216,7 @@ class RTENMixin:
         Expected behavior:
             - Response returns a 404 status code.
         """
-        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}"), format="json")
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -253,7 +253,7 @@ class TestResultNotificationView(RTENMixin, unittest.TestCase):
             }
         }
 
-        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}"), payload, format="json")
+        response = self.client.post(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), payload, format="json")
 
         final_count = PearsonRTENEvent.objects.filter(event_type=self.event_type).count()
 

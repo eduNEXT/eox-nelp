@@ -18,9 +18,11 @@ from django.conf import settings
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from eox_core.edxapp_wrapper.bearer_authentication import BearerAuthentication
-from rest_framework import generics, status
+from rest_framework import status
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId
 from eox_nelp.pearson_vue.api.v1.serializers import PearsonRTENSerializer
@@ -39,7 +41,7 @@ from eox_nelp.pearson_vue.pipeline import get_enrollment_from_id
 from eox_nelp.pearson_vue.rti_backend import ResultNotificationBackend
 
 
-class PearsonRTENBaseView(generics.ListCreateAPIView):
+class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
     """
     Base view for Pearson RTEN (Real Time Event Notification) API endpoints.
 
@@ -124,11 +126,12 @@ class PearsonRTENBaseView(generics.ListCreateAPIView):
         Returns:
             Response: Response object with status code 201 and an empty dictionary.
         """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response({}, status=status.HTTP_200_OK, headers=headers)
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({}, status=status.HTTP_200_OK, headers=response.headers)
+
+        return response
 
     def get_candidate(self):
         """

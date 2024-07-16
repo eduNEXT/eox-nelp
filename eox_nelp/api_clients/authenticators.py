@@ -127,3 +127,37 @@ class PKCS12Authenticator(AbstractAuthenticator):
         )
 
         return session
+
+
+class Oauth2BasicAuthenticator(BasicAuthAuthenticator):
+    """Authenticator for custom use using basic auth to get a Oauth2 Token (Bearer or JWT).
+    Token_type on depends of the response used after the oauth2 token request.
+    Then the token is used for the next requests.
+    """
+
+    def authenticate(self, api_client):
+        """Authenticate the session with basic auth in order to get token(Bearer or JWT).
+        Then the token is added to a new session Headers.
+        Is needed the user, password and token_path class atrributes to the get oauth2 token,
+        based on the client configuration.
+        """
+        auth_session = super().authenticate(api_client)
+        key = f"oauth2-basic-{api_client.user}-{api_client.password}"
+        headers = cache.get(key)
+
+        if not headers:
+            authenticate_url = f"{api_client.base_url}/{api_client.token_path}"
+            response = auth_session.post(
+                url=authenticate_url,
+                data={"grant_type": "client_credentials", "scope": "notification"}
+            ).json()
+            headers = {
+                "Authorization": f"{response.get('token_type')} {response.get('access_token')}"
+            }
+
+            cache.set(key, headers, int(response.get("expires_in", 300)))
+
+        session = requests.Session()
+        session.headers.update(headers)
+
+        return session

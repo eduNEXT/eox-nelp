@@ -53,7 +53,8 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.SMS_VENDOR_URL = 'https://testing.com'
     settings.SMS_VENDOR_USERNAME = 'test-user'
     settings.SMS_VENDOR_PASSWORD = 'test-password'
-    settings.SMS_VENDOR_MSG_SENDER = 'Nelc-test'
+    settings.SMS_VENDOR_TOKEN_PATH = "oauth2/v1/token"
+    settings.SMS_VENDOR_SEND_SMS_PATH = 'sms/send'
 
     settings.PEARSON_RTI_WSDL_URL = 'https://testing.com'
     settings.PEARSON_RTI_CERT = '/openedx/certs/cert.p12'

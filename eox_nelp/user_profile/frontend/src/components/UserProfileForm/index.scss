@@ -6,6 +6,23 @@
   z-index: 9999 !important;
 
   .user-profile-modal {
+
+    .user-profile-form {
+      .user-profile-phone-number-field {
+        button {
+          box-shadow: none;
+
+          &:hover {
+            box-shadow: none;
+          }
+
+          &:focus-visible {
+            outline: none;
+          }
+        }
+      }
+    }
+
     .btn {
       background-image: none;
     }

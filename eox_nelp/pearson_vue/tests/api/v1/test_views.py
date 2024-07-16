@@ -50,7 +50,7 @@ class RTENMixin:
         Set up test client.
         """
         self.client = APIClient()
-        self.user, _ = User.objects.get_or_create(username='testuser', password='12345')
+        self.user, _ = User.objects.get_or_create(username='testuser', password='12345', is_staff=True)
         self.client.force_authenticate(user=self.user)
         self.course_key = CourseKey.from_string("course-v1:test+CS501+2022_T4")
         self.course, _ = CourseOverview.objects.get_or_create(id=self.course_key)
@@ -190,6 +190,25 @@ class RTENMixin:
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], len(events))
+
+    def test_get_event_no_permission(self):
+        """
+        Test retrieving an event without the necessary permissions.
+
+        Expected behavior:
+            - The response returns a 404 status code.
+        """
+        # Create a record to ensure there is at least one element
+        PearsonRTENEvent.objects.create(event_type=self.event_type, content={})  # pylint: disable=no-member
+
+        # Create non staff user
+        non_staff_user, _ = User.objects.get_or_create(username='non_staff', password='12345')
+        self.client.force_authenticate(user=non_staff_user)
+
+        # Attempt to retrieve all the events of the same type
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}-list"), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @override_settings(PEARSON_RTEN_API_ENABLED=False)
     def test_create_result_notification_event_disabled(self):

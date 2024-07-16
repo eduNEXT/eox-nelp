@@ -64,3 +64,23 @@ class PearsonRTENSerializer(serializers.ModelSerializer):
             str or None: The string representation of the course if it exists, otherwise `None`.
         """
         return str(obj.course) if obj.course else None
+
+    def to_representation(self, instance):
+        """
+        Convert the object instance to its dictionary representation.
+
+        This method overrides the default `to_representation` method to include
+        the candidate's username in the serialized representation.
+
+        Args:
+            instance (object): The object instance being serialized.
+
+        Returns:
+            dict: A dictionary representation of the object instance, including
+                  the candidate's username if a candidate is associated with the instance.
+                  If no candidate is associated, the value will be None.
+        """
+        representation = super().to_representation(instance)
+        representation["candidate"] = instance.candidate.username if instance.candidate else None
+
+        return representation

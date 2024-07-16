@@ -607,20 +607,23 @@ class TestGetExamData(unittest.TestCase):
             - The result is the expected value.
         """
         mock_now.return_value = timezone.datetime(2024, 5, 20, 12, 0, 0)
+        course_id = self.course_id
         exam_data = {
             "exam_authorization_count": 3,
             "exam_series_code": "ABD",
+        }
+        course_settings = {
+            course_id: exam_data
+        }
+        setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
+        expected_data = {
+            **exam_data,
             "eligibility_appt_date_first": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
             "eligibility_appt_date_last": (mock_now() + timezone.timedelta(days=365)).strftime("%Y/%m/%d %H:%M:%S"),
         }
-        course_id = self.course_id
-        course_settings = {
-            course_id: exam_data.copy()
-        }
-        setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
 
         result = get_exam_data(self.user.id, course_id)
-        for key, value in exam_data.items():
+        for key, value in expected_data.items():
             self.assertEqual(result["exam_metadata"][key], value)
 
     @override_settings()

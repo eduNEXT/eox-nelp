@@ -331,8 +331,6 @@ def get_exam_data(user_id, course_id, **kwargs):  # pylint: disable=unused-argum
     ).strftime("%Y/%m/%d %H:%M:%S")
 
     required_fields = {
-        "eligibility_appt_date_first",
-        "eligibility_appt_date_last",
         "exam_authorization_count",
         "exam_series_code",
     }

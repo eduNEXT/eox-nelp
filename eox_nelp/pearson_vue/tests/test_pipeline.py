@@ -597,29 +597,34 @@ class TestGetExamData(unittest.TestCase):
         """Restore mocks' state"""
         CourseEnrollment.reset_mock()
 
+    @patch.object(timezone, "now")
     @override_settings()
-    def test_get_exam_data_success(self):
+    def test_get_exam_data_success(self, mock_now):
         """
         Test that the get_exam_data function return the set values.
 
             Expected behavior:
             - The result is the expected value.
         """
+        mock_now.return_value = timezone.datetime(2024, 5, 20, 12, 0, 0)
+        course_id = self.course_id
         exam_data = {
-            "eligibility_appt_date_first": "2024/05/05 12:00:00",
-            "eligibility_appt_date_last": "2025/05/05 12:00:00",
             "exam_authorization_count": 3,
             "exam_series_code": "ABD",
         }
-        course_id = self.course_id
         course_settings = {
             course_id: exam_data
         }
         setattr(settings, "PEARSON_RTI_COURSES_DATA", course_settings)
+        expected_data = {
+            **exam_data,
+            "eligibility_appt_date_first": mock_now().strftime("%Y/%m/%d %H:%M:%S"),
+            "eligibility_appt_date_last": (mock_now() + timezone.timedelta(days=365)).strftime("%Y/%m/%d %H:%M:%S"),
+        }
 
         result = get_exam_data(self.user.id, course_id)
-
-        self.assertEqual(result["exam_metadata"], exam_data)
+        for key, value in expected_data.items():
+            self.assertEqual(result["exam_metadata"][key], value)
 
     @override_settings()
     def test_get_exam_data_failure(self):
@@ -634,7 +639,6 @@ class TestGetExamData(unittest.TestCase):
         course_settings = {
             course_id: {
                 "invalid_key": "test",
-                "eligibility_appt_date_last": "2024/05/05 12:00:00",
                 "exam_authorization_count": 4,
             }
         }

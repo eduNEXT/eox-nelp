@@ -11,6 +11,7 @@ Classes:
     TestUnrevokeResultView: Unit tests for the UnrevokeResultView.
 """
 import unittest
+from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
@@ -262,6 +263,47 @@ class TestResultNotificationView(RTENMixin, unittest.TestCase):
         self.assertEqual(response.data, {})
         result_notification_mock.assert_called_once_with(request_data=payload)
         result_notification_mock.return_value.run_pipeline.assert_called_once()
+
+    def test_detail_view(self):
+        """
+        Test that the detail view correctly retrieves the latest event for a candidate and course.
+
+        Expected behavior:
+            - Response returns a 200 status code.
+            - Response data contains the correct event details.
+        """
+        PearsonRTENEvent.objects.create(  # pylint: disable=no-member
+            event_type=self.event_type,
+            candidate=self.user,
+            course=self.course,
+            created_at=datetime.now(),
+            content={},
+        )
+        latest_event = PearsonRTENEvent.objects.create(  # pylint: disable=no-member
+            event_type=self.event_type,
+            candidate=self.user,
+            course=self.course,
+            created_at=datetime.now() + timedelta(seconds=1),  # Ensure this is the latest event
+            content={},
+        )
+
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}-detail", args=[str(self.course_key)]))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['created_at'], latest_event.created_at.isoformat())
+
+    def test_detail_not_found(self):
+        """
+        Test that the detail view returns a 404 status when no event is found for the given candidate and course.
+
+        Expected behavior:
+            - Response returns a 404 status code.
+        """
+        PearsonRTENEvent.objects.filter(candidate=self.user, course=self.course).delete()  # pylint: disable=no-member
+
+        response = self.client.get(reverse(f"pearson-vue-api:v1:{self.event_type}-detail", args=[str(self.course_key)]))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class TestPlaceHoldView(RTENMixin, unittest.TestCase):

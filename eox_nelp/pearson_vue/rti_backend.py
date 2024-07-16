@@ -220,6 +220,7 @@ class ResultNotificationBackend(RealTimeImport):
     for handling result notifications, including extracting result notification data,
     retrieving enrollment information, and generating external certificates.
     """
+    use_audit_backend = False
 
     def get_pipeline(self):
         """

@@ -64,6 +64,12 @@ class EoxNelpConfig(AppConfig):
                         'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
                     },
                     {
+                        'receiver_func_name': 'create_usersignupsource_by_enrollment',
+                        'signal_path': 'django.db.models.signals.post_save',
+                        'dispatch_uid': 'create_usersignupsource_by_enrollment_receiver',
+                        'sender_path': 'common.djangoapps.student.models.CourseEnrollment',
+                    },
+                    {
                         'receiver_func_name': 'update_payment_notifications',
                         'signal_path': 'django.db.models.signals.post_save',
                         'dispatch_uid': 'update_payment_notifications_receiver',

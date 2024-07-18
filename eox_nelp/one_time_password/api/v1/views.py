@@ -15,6 +15,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from eox_nelp.api_clients.sms_vendor import SMSVendorApiClient
 from eox_nelp.one_time_password.generators import generate_otp_code
 from eox_nelp.one_time_password.view_decorators import validate_otp
 
@@ -60,6 +61,12 @@ def generate_otp(request):
     user_otp_key = f"{request.user.username}-{user_phone_number}"
     logger.info("generating otp %s*****", user_otp_key[:-5])
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
+    sms_vendor_response = SMSVendorApiClient().send_sms(user_phone_number, f"Futurex Phone Validation Code: {otp}")
+    if "error" in sms_vendor_response:
+        return JsonResponse(
+            data={"detail": "error with SMS Vendor communication"},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
     return Response({"message": "Success generate-otp!"}, status=status.HTTP_201_CREATED)
 

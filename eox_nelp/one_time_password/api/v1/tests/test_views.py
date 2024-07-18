@@ -11,6 +11,7 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
+from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -42,7 +43,8 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), {"detail": "missing phone_number in data."})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_generate_otp(self):
+    @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
+    def test_generate_otp(self, sms_vendor_mock):
         """
         Test  the post request to generate otp.
         Expected behavior:
@@ -52,8 +54,15 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that in cache the OTP is stored(not None).
             - Check that the expiration OTP is less than default value 600s, and bigger than a prudent execution time.
             - Check the length of the OTP code is the default 8.
+            - Check SMSVendorApiClient called with expected parameters.
         """
-        payload = {"phone_number": 3218995688}
+        payload = {"phone_number": "+573218995688"}
+        sms_vendor_mock().send_sms.return_value = {
+            'message': 'Operation completed successfully',
+            'transaction_id': 'fxlms-4177f72b-2f36-4668-b86b-adasdasdasds3',
+            'recipient': payload['phone_number'],
+            'timestamp': '1721336004372'
+        }
         url_endpoint = reverse(self.reverse_viewname)
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
@@ -70,13 +79,52 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertIsNotNone(otp_stored)
         self.assertTrue(500 < expiration_otp < 600)
         self.assertEqual(len(otp_stored), 8)
+        sms_vendor_mock().send_sms.assert_called_with(
+            payload['phone_number'],
+            f"Futurex Phone Validation Code: {otp_stored}",
+        )
+
+    @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
+    def test_generate_otp_fails_sms_vendor(self, sms_vendor_mock):
+        """
+        Test  the post request to generate otp.
+        Expected behavior:
+            - Check logging generation
+            - Check the response say success otp generated.
+            - Status code 503.
+            - Check that in cache the OTP is stored(not None).
+            - Check SMSVendorApiClient called with expected parameters.
+        """
+        payload = {"phone_number": "+573218995699"}
+        sms_vendor_mock().send_sms.return_value = {'error': True, 'message': 'Invalid response with status 400'}
+        url_endpoint = reverse(self.reverse_viewname)
+        user_otp_key = f"{self.user.username}-{payload['phone_number']}"
+
+        with self.assertLogs(views.__name__, level="INFO") as logs:
+            response = self.client.post(url_endpoint, payload, format="json")
+
+        otp_stored = cache.get(user_otp_key)
+        expiration_otp = get_cache_expiration_time(user_otp_key)
+        self.assertEqual(logs.output, [
+            f"INFO:{views.__name__}:generating otp {user_otp_key[:-5]}*****"
+        ])
+        self.assertDictEqual(response.json(), {"detail": "error with SMS Vendor communication"})
+        self.assertEqual(response.status_code, status.HTTP_503_SERVICE_UNAVAILABLE)
+        self.assertIsNotNone(otp_stored)
+        self.assertTrue(500 < expiration_otp < 600)
+        self.assertEqual(len(otp_stored), 8)
+        sms_vendor_mock().send_sms.assert_called_with(
+            payload['phone_number'],
+            f"Futurex Phone Validation Code: {otp_stored}",
+        )
 
     @override_settings(
         PHONE_VALIDATION_OTP_LENGTH=20,
         PHONE_VALIDATION_OTP_CHARSET="01",
         PHONE_VALIDATION_OTP_TIMEOUT=1200,
     )
-    def test_generate_otp_custom_settings(self):
+    @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
+    def test_generate_otp_custom_settings(self, sms_vendor_mock):
         """
         Test  the post request to generate otp with custom settings.
         Expected behavior:
@@ -87,8 +135,15 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that the expiration OTP is less than settings value, and bigger than a prudent execution time.
             - Check the length of the OTP code is the settings value.
             - Check that the chars of setting value is presented in the otp code.
+            - Check SMSVendorApiClient called with expected parameters.
         """
-        payload = {"phone_number": 3218995688}
+        payload = {"phone_number": "+9663218995688"}
+        sms_vendor_mock().send_sms.return_value = {
+            'message': 'Operation completed successfully',
+            'transaction_id': 'fxlms-4177f72b-2f36-4668-b86b-adasdasdasds3',
+            'recipient': payload['phone_number'],
+            'timestamp': '1721336004372'
+        }
         url_endpoint = reverse(self.reverse_viewname)
         user_otp_key = f"{self.user.username}-{payload['phone_number']}"
 
@@ -108,6 +163,10 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         )
         self.assertEqual(len(otp_stored), settings.PHONE_VALIDATION_OTP_LENGTH)
         self.assertIn(settings.PHONE_VALIDATION_OTP_CHARSET[0], otp_stored)
+        sms_vendor_mock().send_sms.assert_called_with(
+            payload['phone_number'],
+            f"Futurex Phone Validation Code: {otp_stored}",
+        )
 
 
 @ddt

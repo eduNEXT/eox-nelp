@@ -19,6 +19,8 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
+from eox_core.edxapp_wrapper.users import get_user_signup_source
+from eox_tenant.tenant_wise.proxies import TenantSiteConfigProxy
 from eventtracking import tracker
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
@@ -35,6 +37,7 @@ from eox_nelp.signals.tasks import (
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
 User = get_user_model()
+UserSignupSource = get_user_signup_source()
 LOGGER = logging.getLogger(__name__)
 CourseGradeFactory = get_course_grade_factory()
 
@@ -225,6 +228,38 @@ def enrollment_publisher(instance, **kwargs):  # pylint: disable=unused-argument
             instance.user.username,
             instance.course_id,
         )
+
+
+def create_usersignupsource_by_enrollment(instance, **kwargs):  # pylint: disable=unused-argument
+    """
+    Receiver that is connected to the course enrollment post_save signal. This will generate a
+    UserSignupSource record if possilbe
+    based on the `SITE_NAME` tenant settings.
+    If there is not SITE_NAME configurated this would be skipped with a log.
+
+    Args:
+        instance<CourseEnrollment>: This an instance of the model CourseEnrollment.
+    """
+    site_name = TenantSiteConfigProxy.get_value_for_org(instance.course_id.org, "SITE_NAME")
+
+    if not site_name:
+        LOGGER.info(
+            "TenantSiteConfig related the course org %s has not `SITE_NAME` configurated to create usersignupsource "
+            "for the user %s",
+            instance.course_id.org,
+            instance.user.username,
+        )
+        return
+
+    usersignupsource, was_created = UserSignupSource.objects.get_or_create(user=instance.user, site=site_name)
+
+    LOGGER.info(
+        "UserSignupSource by enrollment managed and created=%s for user %s with site_name %s, and org %s",
+        was_created,
+        instance.user.username,
+        usersignupsource.site,
+        instance.course_id.org,
+    )
 
 
 def update_payment_notifications(instance, **kwargs):  # pylint: disable=unused-argument

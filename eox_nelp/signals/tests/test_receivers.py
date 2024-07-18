@@ -14,6 +14,7 @@ import unittest
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils import timezone
+from eox_core.edxapp_wrapper.users import get_user_signup_source
 from eventtracking.tracker import get_tracker
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -26,6 +27,7 @@ from eox_nelp.signals.receivers import (
     block_completion_progress_publisher,
     certificate_publisher,
     course_grade_changed_progress_publisher,
+    create_usersignupsource_by_enrollment,
     emit_initialized_course_event,
     emit_subsection_attempt_event,
     enrollment_publisher,
@@ -40,6 +42,7 @@ from eox_nelp.signals.receivers import (
 from eox_nelp.tests.utils import set_key_values
 
 User = get_user_model()
+UserSignupSource = get_user_signup_source()
 
 
 class CourseGradeChangedProgressPublisherTestCase(unittest.TestCase):
@@ -765,4 +768,105 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
             user_id=user_instance.id,
             is_passing=True,
             is_graded=True
+        )
+
+
+class CreateUserSignUpSourceByEnrollmentTestCase(unittest.TestCase):
+    """Test class for create_usersignupsource_by_enrollment."""
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.user, _ = User.objects.update_or_create(
+            username="vader",
+            email="vader@example.com"
+        )
+        self.course_key = CourseKey.from_string("course-v1:test+Cx105+2022_T4")
+        course_enrollment_data = {
+            "user": self.user,
+            "created": timezone.now(),
+            "mode": "no-id-professional",
+            "course_id": self.course_key
+        }
+        self.course_enrollment = set_key_values(course_enrollment_data)
+
+    @patch("eox_nelp.signals.receivers.TenantSiteConfigProxy")
+    def test_not_site_name(self, tenant_site_config_proxy_mock):
+        """Test that the asynchronous task wont' be called when the setting is not active.
+
+        Expected behavior:
+            - expected logs of not found SITE_NAME
+            - tenant_site_config_proxy_mock called with expected args
+        """
+        course_org = self.course_enrollment.course_id.org
+        tenant_site_config_proxy_mock.get_value_for_org.return_value = None
+
+        expected_log = [
+            f"INFO:{receivers.__name__}:"
+            f"TenantSiteConfig related the course org {course_org} "
+            f"has not `SITE_NAME` configurated to create usersignupsource "
+            f"for the user {self.user.username}"
+        ]
+
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            create_usersignupsource_by_enrollment(self.course_enrollment)
+
+        self.assertListEqual(logs.output, expected_log)
+        tenant_site_config_proxy_mock.get_value_for_org.assert_called_once_with(course_org, "SITE_NAME")
+
+    @patch("eox_nelp.signals.receivers.TenantSiteConfigProxy")
+    def test_usersignupsource_not_exists(self, tenant_site_config_proxy_mock):
+        """Test that the usersignupcourse is created.
+
+        Expected behavior:
+            - expected logs of creation
+            - tenant_site_config_proxy_mock called with expected args
+            - the desired UserSignupSource objects exists(not DoesNotExis Exception raised)
+        """
+        course_org = self.course_enrollment.course_id.org
+        site_name = "created.tenant.com"
+        tenant_site_config_proxy_mock.get_value_for_org.return_value = site_name
+        created = True
+        expected_log = [
+            f"INFO:{receivers.__name__}:"
+            f"UserSignupSource by enrollment managed and created={created} "
+            f"for user {self.user.username} with site_name {site_name}, and org {course_org}"
+        ]
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            create_usersignupsource_by_enrollment(self.course_enrollment)
+
+        self.assertListEqual(logs.output, expected_log)
+        tenant_site_config_proxy_mock.get_value_for_org.assert_called_once_with(course_org, "SITE_NAME")
+        self.assertIsInstance(
+            UserSignupSource.objects.get(user=self.user, site=site_name),
+            UserSignupSource,
+        )
+
+    @patch("eox_nelp.signals.receivers.TenantSiteConfigProxy")
+    def test_usersignupsource_already_exists(self, tenant_site_config_proxy_mock):
+        """Test that the usersignupcourse is not created. Logs match that exists.
+
+        Expected behavior:
+            - expected logs of creation
+            - tenant_site_config_proxy_mock called with expected args
+            - the desired UserSignupSource objects exists(not DoesNotExis Exception raised)
+        """
+        course_org = self.course_enrollment.course_id.org
+        site_name = "exist.tenant.com"
+        UserSignupSource.objects.get_or_create(user=self.user, site=site_name)
+        tenant_site_config_proxy_mock.get_value_for_org.return_value = site_name
+        created = False
+        expected_log = [
+            f"INFO:{receivers.__name__}:"
+            f"UserSignupSource by enrollment managed and created={created} "
+            f"for user {self.user.username} with site_name {site_name}, and org {course_org}"
+        ]
+
+        with self.assertLogs(receivers.__name__, level="INFO") as logs:
+            create_usersignupsource_by_enrollment(self.course_enrollment)
+
+        self.assertListEqual(logs.output, expected_log)
+        tenant_site_config_proxy_mock.get_value_for_org.assert_called_once_with(course_org, "SITE_NAME")
+        self.assertIsInstance(
+            UserSignupSource.objects.get(user=self.user, site=site_name),
+            UserSignupSource,
         )

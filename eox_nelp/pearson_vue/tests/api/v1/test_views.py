@@ -210,7 +210,7 @@ class RTENMixin:
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_settings(PEARSON_RTEN_API_ENABLED=False)
+    @override_settings(PEARSON_RTEN_API_WRITE_ENABLED=False)
     def test_create_result_notification_event_disabled(self):
         """
         Test creating an event when PEARSON_RTEN_ENABLED is False.
@@ -228,7 +228,7 @@ class RTENMixin:
         self.assertEqual(final_count, initial_count)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_settings(PEARSON_RTEN_API_ENABLED=False)
+    @override_settings(PEARSON_RTEN_API_READ_ENABLED=False)
     def test_get_event_disabled(self):
         """
         Test retrieving an event when PEARSON_RTEN_ENABLED is False.

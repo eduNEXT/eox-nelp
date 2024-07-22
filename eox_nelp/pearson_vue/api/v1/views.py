@@ -65,11 +65,12 @@ class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Override the dispatch method to check if the PEARSON_RTEN_API_ENABLED setting is active.
+        Override the dispatch method to check if specific PEARSON_RTEN_API settings are active.
 
-        This method checks if the PEARSON_RTEN_API_ENABLED setting is set to True. If it is not,
-        it raises an Http404 exception, resulting in a 404 Not Found response. If the setting
-        is active, it proceeds with the normal dispatch process.
+        This method checks the PEARSON_RTEN_API_WRITE_ENABLED and PEARSON_RTEN_API_READ_ENABLED
+        settings based on the request method. If neither setting is active for the corresponding
+        request method, it raises an Http404 exception, resulting in a 404 Not Found response.
+        If the appropriate setting is active, it proceeds with the normal dispatch process.
 
         Args:
             request (Request): The request object containing the data.
@@ -80,12 +81,35 @@ class PearsonRTENBaseView(CreateModelMixin, ListModelMixin, GenericViewSet):
             Response: Parent dispatch result.
 
         Raises:
-            Http404: If the PEARSON_RTEN_API_ENABLED setting is not active.
+            Http404: If neither the PEARSON_RTEN_API_WRITE_ENABLED nor the PEARSON_RTEN_API_READ_ENABLED
+            setting is active for the corresponding request method.
         """
-        if not getattr(settings, "PEARSON_RTEN_API_ENABLED", False):
+        if not self.is_api_enabled(request):
             raise Http404
 
         return super().dispatch(request, *args, **kwargs)
+
+    def is_api_enabled(self, request):
+        """
+        Check if the Pearson RTEN API is enabled based on the request method and relevant settings.
+
+        This method verifies the following settings:
+        - PEARSON_RTEN_API_WRITE_ENABLED: If set to True and the request method is POST, the API is enabled.
+        - PEARSON_RTEN_API_READ_ENABLED: If set to True and the request method is GET, the API is enabled.
+
+        Args:
+            request (Request): The request object containing the data.
+
+        Returns:
+            bool: True if the API is enabled based on the settings and request method, False otherwise.
+        """
+        if getattr(settings, "PEARSON_RTEN_API_WRITE_ENABLED", False) and request.method == "POST":
+            return True
+
+        if getattr(settings, "PEARSON_RTEN_API_READ_ENABLED", False) and request.method == "GET":
+            return True
+
+        return False
 
     def get_queryset(self):
         """

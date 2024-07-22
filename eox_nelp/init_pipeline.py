@@ -89,10 +89,20 @@ def patch_generate_password():
     with custom nelp `generate_password`.
     """
     # pylint: disable=import-outside-toplevel, unused-import
-    from edx_django_utils import user
+    from eox_tenant.tenant_wise import set_as_proxy
 
     from eox_nelp.user_authn.utils import generate_password
-    user.generate_password = generate_password
+
+    set_as_proxy(
+        modules=[
+            "lms.djangoapps.support.views.manage_user",
+            "openedx.core.djangoapps.user_api.accounts.utils",
+            "openedx.core.djangoapps.user_authn.views.auto_auth",
+            "openedx.core.djangoapps.user_authn.views.register",
+        ],
+        model="generate_password",
+        proxy=generate_password
+    )
 
 
 def patch_registration_form_factory():

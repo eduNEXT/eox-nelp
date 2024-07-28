@@ -63,6 +63,12 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.PEARSON_RTI_WSDL_PASSWORD = "12345678p"
     settings.PEARSON_RTI_WSDL_CLIENT_ID = "12345678"
 
+    settings.PEARSON_ENGINE_API_URL = 'https://testing.com'
+    settings.PEARSON_ENGINE_API_CLIENT_SECRET = "12345678p"
+    settings.PEARSON_ENGINE_API_CLIENT_ID = "12345678"
+
+
+PLATFORM_NAME = "Testing environment"
 
 SETTINGS = SettingsClass()
 plugin_settings(SETTINGS)

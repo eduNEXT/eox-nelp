@@ -57,7 +57,7 @@ class Oauth2Authenticator(AbstractAuthenticator):
         if not headers:
             client = BackendApplicationClient(client_id=api_client.client_id)
             oauth = OAuth2Session(client_id=api_client.client_id, client=client)
-            authenticate_url = f"{api_client.base_url}/oauth/token"
+            authenticate_url = f"{api_client.base_url}/{api_client.authentication_path}"
             response = oauth.fetch_token(
                 token_url=authenticate_url,
                 client_secret=api_client.client_secret,

@@ -22,6 +22,7 @@ class FuturexApiClient(AbstractAPIRestClient):
     def __init__(self):
         self.client_id = getattr(settings, "FUTUREX_API_CLIENT_ID")
         self.client_secret = getattr(settings, "FUTUREX_API_CLIENT_SECRET")
+        self.authentication_path = "oauth/token/"
 
         super().__init__()
 

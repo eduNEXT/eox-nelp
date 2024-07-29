@@ -7,7 +7,6 @@ Classes:
     TestSOAPClientMixin: Basic tests that can be implemented by AbstractSOAPClient children.
     TestPKCS12AuthenticatorMixin: Basic tests that can be implemented by PKCS12Authenticator children.
 """
-from django.conf import settings
 from django.core.cache import cache
 from mock import Mock, patch
 from oauthlib.oauth2 import MissingTokenError
@@ -279,16 +278,14 @@ class TestOauth2AuthenticatorMixin:
             "expires_in": 200,
         }
         oauth2_session_mock.return_value.fetch_token = fetch_token_mock
-        authentication_url = f"{settings.FUTUREX_API_URL}/oauth/token"
-        client_secret = settings.FUTUREX_API_CLIENT_SECRET
 
         api_client = self.api_class()
 
         self.assertTrue(hasattr(api_client, "session"))
         self.assertTrue("Authorization" in api_client.session.headers)
         fetch_token_mock.assert_called_with(
-            token_url=authentication_url,
-            client_secret=client_secret,
+            token_url=f"{api_client.base_url}/{api_client.authentication_path}",
+            client_secret=api_client.client_secret,
             include_client_id=True,
         )
 

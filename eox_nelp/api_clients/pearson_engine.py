@@ -82,7 +82,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             "external_key": exam_id,
         }
 
-    def import_candidate_demographics(self, user):
+    def import_candidate_demographics(self, user, **kwargs):
         """
         Import candidate demographics into Pearson Engine.
 
@@ -97,11 +97,12 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
         candidate = {
             "user_data": self._get_user_data(user),
             "platform_data": self._get_platform_data(),
+            **kwargs
         }
 
         return self.make_post(path, candidate)
 
-    def import_exam_authorization(self, user, exam_id, transaction_type="Add"):
+    def import_exam_authorization(self, user, exam_id, **kwargs):
         """
         Import exam authorization data into Pearson Engine.
 
@@ -116,12 +117,12 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
         exam_data = {
             "user_data": {"username": user.username},
             "exam_data": self._get_exam_data(exam_id),
-            "transaction_type": transaction_type,
+            **kwargs
         }
 
         return self.make_post(path, exam_data)
 
-    def real_time_import(self, user, exam_id):
+    def real_time_import(self, user, exam_id, **kwargs):
         """
         Perform a real-time import of exam authorization data.
 
@@ -137,6 +138,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             "user_data": self._get_user_data(user),
             "exam_data": self._get_exam_data(exam_id),
             "platform_data": self._get_platform_data(),
+            **kwargs
         }
 
         return self.make_post(path, data)

@@ -82,7 +82,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
         exam_id = "exam-123"
         api_client = self.api_class()
 
-        response = api_client.import_exam_authorization(user, exam_id)
+        response = api_client.import_exam_authorization(user, exam_id, transaction_type="Add")
 
         self.assertDictEqual(response, expected_value)
         post_mock.assert_called_with("rti/api/v1/exam-authorization/", {

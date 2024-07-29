@@ -8,7 +8,7 @@ Classes:
 from unittest.mock import MagicMock, patch
 
 from ddt import data, ddt, unpack
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
 
 from eox_nelp.admin import (
     NelpCourseEnrollmentAdmin,
@@ -25,6 +25,42 @@ class TestPearsonAction(TestCase):
     """
     Unit tests for the pearson actions functions.
     """
+
+    def setUp(self):
+        """Setup common conditions for every test case"""
+        self.request = RequestFactory().get("/admin")
+
+    def _create_mock_enrollment(self, course_id):
+        """Create a mock course enrollment."""
+        user = MagicMock()
+        user.id = 1
+        enrollment = MagicMock()
+        enrollment.course_id = course_id
+        enrollment.user = user
+
+        return enrollment
+
+    def _prepare_call_kwargs(self, enrollments, call_args, extra_call_kwargs):
+        """Prepare the call arguments for the mocked task."""
+        mocks_call_kwargs = []
+        for enrollment in enrollments:
+            call_kwargs = {
+                "user_id": enrollment.user.id,
+                "course_id": enrollment.course_id,
+                "exam_id": enrollment.course_id,
+            }
+            # Retain only required arguments and update with extra kwargs
+            call_kwargs = {key: call_kwargs[key] for key in call_args if key in call_kwargs}
+            call_kwargs.update(extra_call_kwargs)
+            mocks_call_kwargs.append(call_kwargs)
+
+        return mocks_call_kwargs
+
+    def _assert_mocked_task_calls(self, mocked_task, mocks_call_kwargs):
+        """Assert that the mocked task was called with the correct parameters."""
+        for mock_call_kwargs in mocks_call_kwargs:
+            mocked_task.assert_any_call(**mock_call_kwargs)
+        self.assertEqual(mocked_task.call_count, len(mocks_call_kwargs))
 
     @data(
         {
@@ -70,43 +106,76 @@ class TestPearsonAction(TestCase):
     @unpack
     def test_pearson_course_enrollment_action(self, mock_task, admin_action, call_args, extra_call_kwargs):
         """
-        Test that a pearson_action function calls the a task delay with correct parameters.
+        Test that a pearson_action function calls a task delay with correct parameters.
         """
-        user = MagicMock()
-        user.id = 1
-        course_enrollment_1 = MagicMock()
-        course_enrollment_1.course_id = "course-v1:TestX+T101+2024_T1"
-        course_enrollment_1.user = user
-        course_enrollment_2 = MagicMock()
-        course_enrollment_2.course_id = "course-v1:FutureX+T102+2025_T1"
-        course_enrollment_2.user = user
-        mocks_call_kwargs = [
-            {
-                "course_id": course_enrollment_1.course_id,
-                "user_id": user.id,
-            },
-            {
-                "course_id": course_enrollment_2.course_id,
-                "user_id": user.id,
-            }
+        queryset = [
+            self._create_mock_enrollment("course-v1:TestX+T101+2024_T1"),
+            self._create_mock_enrollment("course-v1:FutureX+T102+2025_T1"),
         ]
-        for mock_call_kwargs in mocks_call_kwargs:
-            for key in set(mock_call_kwargs.keys()).difference(call_args):  # set main call args
-                del mock_call_kwargs[key]
-            mock_call_kwargs.update(extra_call_kwargs)
-
-        queryset = [course_enrollment_1, course_enrollment_2]
-        modeladmin = MagicMock()
-
-        request = RequestFactory().get("/admin")
+        mocks_call_kwargs = self._prepare_call_kwargs(queryset, call_args, extra_call_kwargs)
 
         # Call the admin action
         with patch(mock_task) as mocked_task:
-            admin_action(modeladmin, request, queryset)
-            for mock_call_kwargs in mocks_call_kwargs:
-                mocked_task.assert_any_call(**mock_call_kwargs)
-                mocked_task.assert_any_call(**mock_call_kwargs)
-            self.assertEqual(mocked_task.call_count, len(mocks_call_kwargs))
+            admin_action(MagicMock(), self.request, queryset)
+            self._assert_mocked_task_calls(mocked_task, mocks_call_kwargs)
+
+    @data(
+        {
+            "admin_action": pearson_real_time_action,
+            "call_args": ["user_id", "exam_id"],
+            "extra_call_kwargs": {
+                "action_name": "rti",
+            },
+        },
+        {
+            "admin_action": pearson_add_ead_action,
+            "call_args": ["user_id", "exam_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Add",
+                "action_name": "ead",
+            },
+
+        },
+        {
+            "admin_action": pearson_update_ead_action,
+            "call_args": ["user_id", "exam_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Update",
+                "action_name": "ead",
+            },
+        },
+        {
+            "admin_action": pearson_delete_ead_action,
+            "call_args": ["user_id", "exam_id"],
+            "extra_call_kwargs": {
+                "transaction_type": "Delete",
+                "action_name": "ead",
+            },
+        },
+        {
+            "admin_action": pearson_cdd_action,
+            "call_args": ["user_id"],
+            "extra_call_kwargs": {
+                "action_name": "cdd",
+            },
+        },
+    )
+    @unpack
+    @override_settings(USE_PEARSON_ENGINE_SERVICE=True)
+    def test_pearson_course_enrollment_action_v2(self, admin_action, call_args, extra_call_kwargs):
+        """
+        Test that a pearson_action function calls a task delay with correct parameters.
+        """
+        queryset = [
+            self._create_mock_enrollment("course-v1:TestX+T101+2024_T1"),
+            self._create_mock_enrollment("course-v1:FutureX+T102+2025_T1"),
+        ]
+        mocks_call_kwargs = self._prepare_call_kwargs(queryset, call_args, extra_call_kwargs)
+
+        # Call the admin action
+        with patch("eox_nelp.pearson_vue.tasks.real_time_import_task_v2.delay") as mocked_task:
+            admin_action(MagicMock(), self.request, queryset)
+            self._assert_mocked_task_calls(mocked_task, mocks_call_kwargs)
 
 
 @ddt

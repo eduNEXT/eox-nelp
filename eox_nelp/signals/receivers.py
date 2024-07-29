@@ -26,7 +26,7 @@ from openedx_events.learning.data import CertificateData, CourseData, UserData, 
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
-from eox_nelp.pearson_vue.tasks import real_time_import_task
+from eox_nelp.pearson_vue.tasks import real_time_import_task, real_time_import_task_v2
 from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     create_external_certificate,
@@ -393,10 +393,17 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
     if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False):
         return
 
-    real_time_import_task.delay(
-        user_id=instance.user_id,
-        course_id=str(instance.context_key),
-    )
+    if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+        real_time_import_task_v2.delay(
+            user_id=instance.user_id,
+            exam_id=str(instance.context_key),
+            action_name="rti",
+        )
+    else:
+        real_time_import_task.delay(
+            user_id=instance.user_id,
+            course_id=str(instance.context_key),
+        )
 
 
 def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unused-argument
@@ -412,9 +419,18 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
     if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False):
         return
 
-    real_time_import_task.delay(
-        course_id=str(course_id),
-        user_id=user.id,
-        is_passing=True,
-        is_graded=True,
-    )
+    if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+        real_time_import_task_v2.delay(
+            user_id=user.id,
+            exam_id=str(course_id),
+            action_name="rti",
+            is_passing=True,
+            is_graded=True,
+        )
+    else:
+        real_time_import_task.delay(
+            course_id=str(course_id),
+            user_id=user.id,
+            is_passing=True,
+            is_graded=True,
+        )

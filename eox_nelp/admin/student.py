@@ -9,11 +9,12 @@ Functions:
         for selected course enrollments.
 """
 
+from django.conf import settings
 from django.contrib import admin
 
 from eox_nelp.admin.register_admin_model import register_admin_model as register
 from eox_nelp.edxapp_wrapper.student import CourseEnrollment, CourseEnrollmentAdmin
-from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task
+from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task, real_time_import_task_v2
 
 
 @admin.action(description="Execute Pearson RTI request")
@@ -30,10 +31,17 @@ def pearson_real_time_action(modeladmin, request, queryset):  # pylint: disable=
         queryset: The QuerySet of selected CourseEnrollment instances.
     """
     for course_enrollment in queryset:
-        real_time_import_task.delay(
-            course_id=str(course_enrollment.course_id),
-            user_id=course_enrollment.user.id,
-        )
+        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+            real_time_import_task_v2.delay(
+                user_id=course_enrollment.user.id,
+                exam_id=str(course_enrollment.course_id),
+                action_name="rti",
+            )
+        else:
+            real_time_import_task.delay(
+                course_id=str(course_enrollment.course_id),
+                user_id=course_enrollment.user.id,
+            )
 
 
 @admin.action(description="Execute Pearson EAD Add request")
@@ -50,11 +58,19 @@ def pearson_add_ead_action(modeladmin, request, queryset):  # pylint: disable=un
         queryset: The QuerySet of selected CourseEnrollment instances.
     """
     for course_enrollment in queryset:
-        ead_task.delay(
-            course_id=str(course_enrollment.course_id),
-            user_id=course_enrollment.user.id,
-            transaction_type="Add",
-        )
+        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+            real_time_import_task_v2.delay(
+                user_id=course_enrollment.user.id,
+                exam_id=str(course_enrollment.course_id),
+                action_name="ead",
+                transaction_type="Add",
+            )
+        else:
+            ead_task.delay(
+                course_id=str(course_enrollment.course_id),
+                user_id=course_enrollment.user.id,
+                transaction_type="Add",
+            )
 
 
 @admin.action(description="Execute Pearson EAD Update request")
@@ -71,11 +87,19 @@ def pearson_update_ead_action(modeladmin, request, queryset):  # pylint: disable
         queryset: The QuerySet of selected CourseEnrollment instances.
     """
     for course_enrollment in queryset:
-        ead_task.delay(
-            course_id=str(course_enrollment.course_id),
-            user_id=course_enrollment.user.id,
-            transaction_type="Update",
-        )
+        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+            real_time_import_task_v2.delay(
+                user_id=course_enrollment.user.id,
+                exam_id=str(course_enrollment.course_id),
+                action_name="ead",
+                transaction_type="Update",
+            )
+        else:
+            ead_task.delay(
+                course_id=str(course_enrollment.course_id),
+                user_id=course_enrollment.user.id,
+                transaction_type="Update",
+            )
 
 
 @admin.action(description="Execute Pearson EAD Delete request")
@@ -92,11 +116,19 @@ def pearson_delete_ead_action(modeladmin, request, queryset):  # pylint: disable
         queryset: The QuerySet of selected CourseEnrollment instances.
     """
     for course_enrollment in queryset:
-        ead_task.delay(
-            course_id=str(course_enrollment.course_id),
-            user_id=course_enrollment.user.id,
-            transaction_type="Delete",
-        )
+        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+            real_time_import_task_v2.delay(
+                user_id=course_enrollment.user.id,
+                exam_id=str(course_enrollment.course_id),
+                action_name="ead",
+                transaction_type="Delete",
+            )
+        else:
+            ead_task.delay(
+                course_id=str(course_enrollment.course_id),
+                user_id=course_enrollment.user.id,
+                transaction_type="Delete",
+            )
 
 
 @admin.action(description="Execute Pearson CDD request for student.")
@@ -113,9 +145,15 @@ def pearson_cdd_action(modeladmin, request, queryset):  # pylint: disable=unused
         queryset: The QuerySet of selected CourseEnrollment instances.
     """
     for course_enrollment in queryset:
-        cdd_task.delay(
-            user_id=course_enrollment.user.id,
-        )
+        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+            real_time_import_task_v2.delay(
+                user_id=course_enrollment.user.id,
+                action_name="cdd",
+            )
+        else:
+            cdd_task.delay(
+                user_id=course_enrollment.user.id,
+            )
 
 
 class NelpCourseEnrollmentAdmin(CourseEnrollmentAdmin):

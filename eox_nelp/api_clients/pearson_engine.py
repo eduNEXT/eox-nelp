@@ -93,14 +93,13 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             dict: The response from Pearson Engine API.
         """
         path = "rti/api/v1/candidate-demographics/"
-
-        candidate = {
+        data = {
             "user_data": self._get_user_data(user),
             "platform_data": self._get_platform_data(),
             **kwargs
         }
 
-        return self.make_post(path, candidate)
+        return self.make_post(path, data)
 
     def import_exam_authorization(self, user, exam_id, **kwargs):
         """
@@ -114,13 +113,13 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             dict: The response from Pearson Engine API.
         """
         path = "rti/api/v1/exam-authorization/"
-        exam_data = {
+        data = {
             "user_data": {"username": user.username},
             "exam_data": self._get_exam_data(exam_id),
             **kwargs
         }
 
-        return self.make_post(path, exam_data)
+        return self.make_post(path, data)
 
     def real_time_import(self, user, exam_id, **kwargs):
         """

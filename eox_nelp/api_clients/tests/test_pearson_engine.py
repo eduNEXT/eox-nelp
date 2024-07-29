@@ -60,7 +60,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
         # pylint: disable=protected-access
         post_mock.assert_called_with("rti/api/v1/candidate-demographics/", {
             "user_data": api_client._get_user_data(user),
-            "platform_data": api_client._get_platform_data()
+            "platform_data": api_client._get_platform_data(),
         })
 
     @patch.object(PearsonEngineApiClient, "make_post")
@@ -87,7 +87,8 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
         self.assertDictEqual(response, expected_value)
         post_mock.assert_called_with("rti/api/v1/exam-authorization/", {
             "user_data": {"username": user.username},
-            "exam_data": api_client._get_exam_data(exam_id)  # pylint: disable=protected-access
+            "exam_data": api_client._get_exam_data(exam_id),  # pylint: disable=protected-access
+            "transaction_type": "Add",
         })
 
     @patch.object(PearsonEngineApiClient, "make_post")
@@ -102,7 +103,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
         """
         auth_mock.return_value = requests.Session()
         expected_value = {
-            "status": {"success": True, "message": "successful", "code": 1}
+            "status": {"success": True, "message": "successful", "code": 1},
         }
         post_mock.return_value = expected_value
         user = self._create_test_user()
@@ -116,7 +117,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
         post_mock.assert_called_with("rti/api/v1/exam-authorization/", {
             "user_data": api_client._get_user_data(user),
             "exam_data": api_client._get_exam_data(exam_id),
-            "platform_data": api_client._get_platform_data()
+            "platform_data": api_client._get_platform_data(),
         })
 
     def _create_test_user(self):

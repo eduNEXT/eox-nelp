@@ -101,7 +101,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
 
         return self.make_post(path, candidate)
 
-    def import_exam_authorization(self, user, exam_id):
+    def import_exam_authorization(self, user, exam_id, transaction_type="Add"):
         """
         Import exam authorization data into Pearson Engine.
 
@@ -115,7 +115,8 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
         path = "rti/api/v1/exam-authorization/"
         exam_data = {
             "user_data": {"username": user.username},
-            "exam_data": self._get_exam_data(exam_id)
+            "exam_data": self._get_exam_data(exam_id),
+            "transaction_type": transaction_type,
         }
 
         return self.make_post(path, exam_data)

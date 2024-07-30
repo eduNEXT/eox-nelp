@@ -2,9 +2,20 @@
 This module contains unit tests for the tasks.py module and its functions.
 """
 import unittest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
-from eox_nelp.pearson_vue.tasks import cdd_task, ead_task, real_time_import_task, rti_error_handler_task
+from django.contrib.auth import get_user_model
+from django.test import TestCase
+
+from eox_nelp.pearson_vue.tasks import (
+    cdd_task,
+    ead_task,
+    real_time_import_task,
+    real_time_import_task_v2,
+    rti_error_handler_task,
+)
+
+User = get_user_model()
 
 
 class TestRealTimeImportTask(unittest.TestCase):
@@ -94,3 +105,76 @@ class TestErrorValidationTask(TestRealTimeImportTask):
     """
     import_class_patch = "eox_nelp.pearson_vue.tasks.ErrorRealTimeImportHandler"
     import_task_function = rti_error_handler_task
+
+
+class TestRealTimeImportTaskV2(TestCase):
+    """
+    Unit tests for the real_time_import_task_v2 function.
+    """
+
+    def setUp(self):
+        """Set up a test user for the real-time import task."""
+        self.user, _ = User.objects.get_or_create(username="vader")
+        self.exam_id = "exam123"
+        self.kwargs = {"extra_info": "test"}
+
+    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    def test_real_time_import_rti(self, mock_api_client):
+        """Test real-time import action using the Pearson Engine API.
+
+        Expected behavior:
+            - The real_time_import method is called with the correct parameters.
+        """
+        mock_action = MagicMock()
+        mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
+
+        real_time_import_task_v2(self.user.id, action_name="rti", **self.kwargs)
+
+        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+
+    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    def test_real_time_import_cdd(self, mock_api_client):
+        """Test candidate demographics import action using the Pearson Engine API.
+
+        Expected behavior:
+            - The import_candidate_demographics method is called with the correct parameters.
+        """
+        mock_action = MagicMock()
+        mock_api_client.return_value = MagicMock(**{"import_candidate_demographics": mock_action})
+
+        real_time_import_task_v2(self.user.id, action_name="cdd", **self.kwargs)
+
+        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+
+    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    def test_real_time_import_ead(self, mock_api_client):
+        """Test exam authorization import action using the Pearson Engine API.
+
+        Expected behavior:
+            - The import_exam_authorization method is called with the correct parameters.
+        """
+        mock_action = MagicMock()
+        mock_api_client.return_value = MagicMock(**{"import_exam_authorization": mock_action})
+
+        real_time_import_task_v2(self.user.id, exam_id=self.exam_id, action_name="ead", **self.kwargs)
+
+        mock_action.assert_called_once_with(user=self.user, exam_id=self.exam_id, **self.kwargs)
+
+    def test_real_time_import_invalid_action(self):
+        """Test that a KeyError is raised for an invalid action name.
+
+        Expected behavior:
+            - KeyError is raised when an invalid action name is provided.
+        """
+        with self.assertRaises(KeyError):
+            real_time_import_task_v2(self.user.id, action_name="invalid_action")
+
+    @patch('eox_nelp.pearson_vue.tasks.PearsonEngineApiClient')
+    def test_real_time_import_user_not_found(self, mock_api_client):  # pylint: disable=unused-argument
+        """Test that a DoesNotExist is raised for an invalid user id.
+
+        Expected behavior:
+            - DoesNotExist is raised when an invalid usser id is provided.
+        """
+        with self.assertRaises(User.DoesNotExist):
+            real_time_import_task_v2(12345678, action_name="rti")

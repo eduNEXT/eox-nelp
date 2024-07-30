@@ -104,3 +104,9 @@ PAYLOAD_EAD = """
     </soapenv:Body>
 </soapenv:Envelope>
 """
+
+ALLOWED_RTI_ACTIONS = {
+    "rti": "real_time_import",
+    "cdd": "import_candidate_demographics",
+    "ead": "import_exam_authorization",
+}

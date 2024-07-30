@@ -732,6 +732,27 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
             course_id=course_id,
         )
 
+    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True, USE_PEARSON_ENGINE_SERVICE=True)
+    @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
+    def test_call_async_task_v2(self, task_mock):
+        """Test that the async task is called with the right parameters
+
+        Expected behavior:
+            - delay method is called with the right values.
+        """
+        instance = Mock()
+        instance.user_id = 5
+        course_id = "course-v1:test+Cx105+2022_T4"
+        instance.context_key = CourseKey.from_string(course_id)
+
+        pearson_vue_course_completion_handler(instance)
+
+        task_mock.delay.assert_called_with(
+            user_id=instance.user_id,
+            exam_id=course_id,
+            action_name="rti"
+        )
+
 
 class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_passed_handler function."""
@@ -768,6 +789,27 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
             user_id=user_instance.id,
             is_passing=True,
             is_graded=True
+        )
+
+    @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True, USE_PEARSON_ENGINE_SERVICE=True)
+    @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
+    def test_call_async_task_v2(self, task_mock):
+        """Test that the async task is called with the right parameters
+
+        Expected behavior:
+            - delay method is called with the right values.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user_instance, _ = User.objects.get_or_create(username="Severus")
+
+        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(course_id))
+
+        task_mock.delay.assert_called_with(
+            exam_id=course_id,
+            user_id=user_instance.id,
+            action_name="rti",
+            is_passing=True,
+            is_graded=True,
         )
 
 

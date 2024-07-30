@@ -6,13 +6,19 @@ Functions:
 """
 
 from celery import shared_task
+from django.contrib.auth import get_user_model
 
+from eox_nelp.api_clients.pearson_engine import PearsonEngineApiClient
+from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
+from eox_nelp.pearson_vue.pipeline import audit_method, rename_function
 from eox_nelp.pearson_vue.rti_backend import (
     CandidateDemographicsDataImport,
     ErrorRealTimeImportHandler,
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
+
+User = get_user_model()
 
 
 @shared_task(bind=True)
@@ -93,3 +99,42 @@ def rti_error_handler_task(self, pipeline_index=0, **kwargs):
         error_rti.run_pipeline()
     except Exception as exc:  # pylint: disable=broad-exception-caught
         self.retry(exc=exc, kwargs=error_rti.backend_data)
+
+
+@shared_task
+def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs):
+    """
+    Asynchronous task to perform a real-time import action using the Pearson Engine API.
+
+    This task handles different types of import actions, such as real-time import,
+    importing candidate demographics, and importing exam authorizations, by calling
+    the appropriate method on the PearsonEngineApiClient.
+
+    Args:
+        user_id (int): The ID of the user to be processed.
+        exam_id (str, optional): The ID of the exam for authorization. Default is None.
+        action_name (str, optional): The action to perform. Default is "rti".
+            Supported actions are:
+                - "rti" for real_time_import
+                - "cdd" for import_candidate_demographics
+                - "ead" for import_exam_authorization
+        **kwargs: Additional keyword arguments to pass to the API client method.
+
+    Raises:
+        KeyError: If action_name is not found in ALLOWED_RTI_ACTIONS.
+        User.DoesNotExist: If the user with the given user_id does not exist.
+    """
+    action_key = ALLOWED_RTI_ACTIONS[action_name]
+
+    @audit_method(action="Pearson Engine Action")
+    @rename_function(name=action_key)
+    def audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs):
+        action = getattr(PearsonEngineApiClient(), action_key)
+
+        action(
+            user=User.objects.get(id=user_id),
+            exam_id=exam_id,
+            **kwargs
+        )
+
+    audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs)

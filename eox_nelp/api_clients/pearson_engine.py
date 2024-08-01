@@ -132,7 +132,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
         Returns:
             dict: The response from Pearson Engine API.
         """
-        path = "rti/api/v1/exam-authorization/"
+        path = "rti/api/v1/real-time-import/"
         data = {
             "user_data": self._get_user_data(user),
             "exam_data": self._get_exam_data(exam_id),

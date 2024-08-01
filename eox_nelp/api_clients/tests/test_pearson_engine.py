@@ -114,7 +114,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
 
         self.assertDictEqual(response, expected_value)
         # pylint: disable=protected-access
-        post_mock.assert_called_with("rti/api/v1/exam-authorization/", {
+        post_mock.assert_called_with("rti/api/v1/real-time-import/", {
             "user_data": api_client._get_user_data(user),
             "exam_data": api_client._get_exam_data(exam_id),
             "platform_data": api_client._get_platform_data(),

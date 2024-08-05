@@ -29,7 +29,6 @@ from eox_nelp.pearson_vue.pipeline import (
     get_enrollment_from_id,
     get_exam_data,
     get_user_data,
-    handle_course_completion_status,
     import_candidate_demographics,
     import_exam_authorization,
     validate_cdd_request,
@@ -86,9 +85,6 @@ class AbstractBackend(ABC):
                 break
 
             self.backend_data.update(result)
-            if result.get("safely_pipeline_termination"):
-                self.backend_data["pipeline_index"] = len(pipeline) - 1
-                break
 
     @abstractmethod
     def get_pipeline(self):
@@ -145,6 +141,7 @@ class RealTimeImport(AbstractBackend):
         run_pipeline(): Executes the RTI pipeline by iterating through the pipeline functions.
         get_pipeline(): Returns the RTI pipeline, which is a list of functions to be executed.
     """
+
     def handle_error(self, exception, failed_step_pipeline):
         """
         Handles errors during pipeline execution.
@@ -166,7 +163,6 @@ class RealTimeImport(AbstractBackend):
         Returns the RTI pipeline, which is a list of functions to be executed.
         """
         return [
-            handle_course_completion_status,
             get_user_data,
             get_exam_data,
             build_cdd_request,

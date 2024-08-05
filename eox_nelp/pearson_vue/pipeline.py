@@ -5,7 +5,6 @@ Each function in this module is designed to perform a specific step in the pipel
 called sequentially, where each function processes data and passes it along to the next step in the pipeline.
 
 Functions:
-    handle_course_completion_status: Pipeline function to handle course completion status.
     get_user_data: Retrieves and processes user data.
     check_service_availability: Checks the availability of the Pearson VUE RTI service.
     import_candidate_demographics: Imports candidate demographics data.
@@ -36,7 +35,6 @@ from eox_nelp.pearson_vue.exceptions import (
     PearsonValidationError,
 )
 from eox_nelp.pearson_vue.utils import generate_client_authorization_id, update_xml_with_dict
-from eox_nelp.signals.utils import get_completed_and_graded
 
 try:
     from eox_audit_model.decorators import audit_method, rename_function
@@ -53,47 +51,6 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
-
-
-def handle_course_completion_status(user_id, course_id, **kwargs):
-    """Pipeline that check the case of completion cases on the pipeline execution. Also this pipe
-    has 4 behaviours depending the case:
-        - skip this pipeline if setting PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS is truthy.
-          Pipeline continues.
-        - is_passing is true means the course is graded(passed) and dont needs this pipe validation.
-          The pipeline continues without changes.
-        - is_complete=True and is_graded=False pipeline should continue.
-          (completed courses and not graded).
-        - Otherwise this indicates that the pipeline execution would be stopped,
-          for grading-courses the COURSE_GRADE_NOW_PASSED signal would act.
-
-    Args:
-        user_id (int): The ID of the user whose data is to be retrieved.
-        course_id (str): course_id to check completion or graded.
-        **kwargs: Additional keyword arguments.
-
-    Returns:
-        dict: Pipeline dict
-    """
-    if getattr(settings, "PEARSON_RTI_TESTING_SKIP_HANDLE_COURSE_COMPLETION_STATUS", False):
-        logger.info(
-            "Skipping `handle_course_completion_status` pipe for user_id:%s and course_id: %s",
-            str(user_id),
-            course_id
-        )
-        return None
-
-    if kwargs.get("is_passing"):
-        return None
-
-    is_complete, is_graded = get_completed_and_graded(user_id, course_id)
-
-    if is_complete and not is_graded:
-        return None
-
-    return {
-        "safely_pipeline_termination": True,
-    }
 
 
 def get_user_data(user_id, **kwargs):  # pylint: disable=unused-argument

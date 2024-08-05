@@ -11,6 +11,7 @@ Classes:
 """
 import unittest
 
+from ddt import data, ddt
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils import timezone
@@ -693,6 +694,7 @@ class MtCourseFailedHandlerTestCase(unittest.TestCase):
         )
 
 
+@ddt
 class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
     """Test class for pearson_vue_course_completion_handler function."""
 
@@ -712,9 +714,34 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
         task_mock.delay.assert_not_called()
 
+    @data(  # is_complete and graded values respectively
+        (True, True),
+        (False, True),
+        (False, False),
+    )
     @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
+    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_call_async_task(self, task_mock):
+    def test_invalid_course_state(self, invalid_state, task_mock, get_completed_and_graded_mock):
+        """Test when the course is graded or incomplete
+
+        Expected behavior:
+            - real_time_import_task mock has not been called.
+        """
+        instance = Mock()
+        instance.user_id = 17
+        course_id = "course-v1:test+Cx105+2022_T4"
+        instance.context_key = CourseKey.from_string(course_id)
+        get_completed_and_graded_mock.return_value = invalid_state
+
+        pearson_vue_course_completion_handler(instance)
+
+        task_mock.delay.assert_not_called()
+
+    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
+    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
+    def test_call_async_task(self, task_mock, get_completed_and_graded_mock):
         """Test that the async task is called with the right parameters
 
         Expected behavior:
@@ -724,6 +751,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
         instance.user_id = 5
         course_id = "course-v1:test+Cx105+2022_T4"
         instance.context_key = CourseKey.from_string(course_id)
+        get_completed_and_graded_mock.return_value = (True, False)  # is_complete and graded values respectively
 
         pearson_vue_course_completion_handler(instance)
 
@@ -733,8 +761,9 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
         )
 
     @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True, USE_PEARSON_ENGINE_SERVICE=True)
+    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
-    def test_call_async_task_v2(self, task_mock):
+    def test_call_async_task_v2(self, task_mock, get_completed_and_graded_mock):
         """Test that the async task is called with the right parameters
 
         Expected behavior:
@@ -744,6 +773,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
         instance.user_id = 5
         course_id = "course-v1:test+Cx105+2022_T4"
         instance.context_key = CourseKey.from_string(course_id)
+        get_completed_and_graded_mock.return_value = (True, False)  # is_complete and graded values respectively
 
         pearson_vue_course_completion_handler(instance)
 
@@ -787,8 +817,6 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
         task_mock.delay.assert_called_with(
             course_id=course_id,
             user_id=user_instance.id,
-            is_passing=True,
-            is_graded=True
         )
 
     @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True, USE_PEARSON_ENGINE_SERVICE=True)
@@ -808,8 +836,6 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
             exam_id=course_id,
             user_id=user_instance.id,
             action_name="rti",
-            is_passing=True,
-            is_graded=True,
         )
 
 

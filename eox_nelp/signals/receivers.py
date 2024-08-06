@@ -395,23 +395,25 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
 
     is_complete, graded = get_completed_and_graded(user_id=instance.user_id, course_id=str(instance.context_key))
 
-    if is_complete and not graded:
-        LOGGER.info(
-            "Initializing rti task for the user %s, action triggered by course completion status",
-            instance.user_id,
-        )
+    if graded or not is_complete:
+        return
 
-        if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
-            real_time_import_task_v2.delay(
-                user_id=instance.user_id,
-                exam_id=str(instance.context_key),
-                action_name="rti",
-            )
-        else:
-            real_time_import_task.delay(
-                user_id=instance.user_id,
-                course_id=str(instance.context_key),
-            )
+    LOGGER.info(
+        "Initializing rti task for the user %s, action triggered by course completion status",
+        instance.user_id,
+    )
+
+    if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+        real_time_import_task_v2.delay(
+            user_id=instance.user_id,
+            exam_id=str(instance.context_key),
+            action_name="rti",
+        )
+    else:
+        real_time_import_task.delay(
+            user_id=instance.user_id,
+            course_id=str(instance.context_key),
+        )
 
 
 def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unused-argument

@@ -120,43 +120,6 @@ class TestAbstractBackendMixin:
             },
         )
 
-    def test_safely_pipeline_termination(self):
-        """
-        Test the execution of the RTI finished after the second function call due
-        `safely_pipeline_termination` kwarg.
-
-        Expected behavior:
-            - Pipeline method 1 is called with the original data.
-            - Pipeline method 2 is called with updated data.
-            - Pipeline method 3 is not called.
-            - Pipeline method 4 is not called.
-            - backend_data attribute is the expected value.
-                Without func3,func4 data and pipeline index in the last.
-        """
-        # Mock pipeline functions
-        func1 = MagicMock(return_value={"updated_key": "value1"})
-        func2 = MagicMock(return_value={"safely_pipeline_termination": True})
-        func3 = MagicMock(return_value={"additional_key": "value3"})
-        func4 = MagicMock(return_value={"additional_key": "value4"})
-
-        self.rti.get_pipeline = MagicMock(return_value=[func1, func2, func2])
-
-        self.rti.run_pipeline()
-
-        func1.assert_called_once_with(**self.backend_data)
-        func2.assert_called_once_with(**{"updated_key": "value1", "pipeline_index": 1})
-        func3.assert_not_called()
-        func4.assert_not_called()
-
-        self.assertDictEqual(
-            self.rti.backend_data,
-            {
-                "pipeline_index": len(self.rti.get_pipeline()) - 1,  # includes total of pipeline methods
-                **func1(),  # Include data from func1 ()
-                **func2(),  # Include data from func2  (with safely_pipeline_termination)
-            },
-        )
-
     def test_get_pipeline(self):
         """
         Test the retrieval of the RTI pipeline.

@@ -12,7 +12,6 @@ edx-django-utils
 edx-drf-extensions
 edx-i18n-tools
 edx-opaque-keys
-edx-organizations
 eox-core
 eox-tenant
 eox-theming

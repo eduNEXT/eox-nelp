@@ -20,3 +20,5 @@ django-filter==21.1
 # django password validators for generate_password monkey patch
 django-password-validators==1.7.3
 edx-django-utils==5.2.0
+# eox tenant compatible version
+eox-tenant<=11.2.0

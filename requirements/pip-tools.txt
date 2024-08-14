@@ -20,7 +20,7 @@ tomli==2.0.1
     # via
     #   build
     #   pip-tools
-wheel==0.43.0
+wheel==0.44.0
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -124,6 +124,7 @@ django==3.2.25
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-i18n-tools
+    #   edx-organizations
     #   edx-proctoring
     #   edx-toggles
     #   edx-when
@@ -157,6 +158,7 @@ django-ipware==7.0.1
 django-model-utils==4.5.1
     # via
     #   -r requirements/base.txt
+    #   edx-organizations
     #   edx-proctoring
     #   edx-when
 django-oauth-toolkit==2.4.0
@@ -174,6 +176,7 @@ django-password-validators==1.7.3
 django-simple-history==3.6.0
     # via
     #   -r requirements/base.txt
+    #   edx-organizations
     #   edx-proctoring
 django-waffle==4.1.0
     # via
@@ -196,6 +199,7 @@ djangorestframework==3.12.4
     #   drf-yasg
     #   edx-api-doc-tools
     #   edx-drf-extensions
+    #   edx-organizations
     #   edx-proctoring
     #   eox-core
 djangorestframework-jsonapi==5.0.0
@@ -236,6 +240,7 @@ edx-drf-extensions==8.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
+    #   edx-organizations
     #   edx-proctoring
     #   edx-when
     #   eox-core
@@ -246,10 +251,13 @@ edx-opaque-keys[django]==2.10.0
     #   -r requirements/base.txt
     #   edx-ccx-keys
     #   edx-drf-extensions
+    #   edx-organizations
     #   edx-proctoring
     #   edx-when
     #   eox-core
     #   openedx-events
+edx-organizations==6.13.0
+    # via -r requirements/base.txt
 edx-proctoring==4.18.1
     # via
     #   -r requirements/base.txt
@@ -376,6 +384,10 @@ pbr==6.0.0
     #   stevedore
 phonenumbers==8.13.43
     # via -r requirements/base.txt
+pillow==10.4.0
+    # via
+    #   -r requirements/base.txt
+    #   edx-organizations
 platformdirs==4.2.2
     # via pylint
 polib==1.2.0

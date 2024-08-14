@@ -4,9 +4,9 @@ This module contains functions and classes for making asynchronous calls to Pear
 Functions:
     real_time_import_task(data: dict) -> None: Performs an asynchronous call to the RTI service.
 """
-
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from requests import exceptions
 
 from eox_nelp.api_clients.pearson_engine import PearsonEngineApiClient
 from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
@@ -101,7 +101,7 @@ def rti_error_handler_task(self, pipeline_index=0, **kwargs):
         self.retry(exc=exc, kwargs=error_rti.backend_data)
 
 
-@shared_task
+@shared_task(autoretry_for=(exceptions.Timeout, exceptions.ConnectionError), retry_backoff=5)
 def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs):
     """
     Asynchronous task to perform a real-time import action using the Pearson Engine API.
@@ -131,10 +131,13 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
     def audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs):
         action = getattr(PearsonEngineApiClient(), action_key)
 
-        action(
+        response = action(
             user=User.objects.get(id=user_id),
             exam_id=exam_id,
             **kwargs
         )
+
+        if response.get("error"):
+            raise Exception(response.get("message", "Unknown error"))  # pylint: disable=broad-exception-raised
 
     audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs)

@@ -126,6 +126,7 @@ class TestRealTimeImportTaskV2(TestCase):
             - The real_time_import method is called with the correct parameters.
         """
         mock_action = MagicMock()
+        mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
 
         real_time_import_task_v2(self.user.id, action_name="rti", **self.kwargs)
@@ -140,6 +141,7 @@ class TestRealTimeImportTaskV2(TestCase):
             - The import_candidate_demographics method is called with the correct parameters.
         """
         mock_action = MagicMock()
+        mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_candidate_demographics": mock_action})
 
         real_time_import_task_v2(self.user.id, action_name="cdd", **self.kwargs)
@@ -154,6 +156,7 @@ class TestRealTimeImportTaskV2(TestCase):
             - The import_exam_authorization method is called with the correct parameters.
         """
         mock_action = MagicMock()
+        mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_exam_authorization": mock_action})
 
         real_time_import_task_v2(self.user.id, exam_id=self.exam_id, action_name="ead", **self.kwargs)
@@ -178,3 +181,26 @@ class TestRealTimeImportTaskV2(TestCase):
         """
         with self.assertRaises(User.DoesNotExist):
             real_time_import_task_v2(12345678, action_name="rti")
+
+    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    def test_raise_exception_on_error_response(self, mock_api_client):
+        """Test that an exception is raised when the API response contains an Error.
+
+        Expected behavior:
+            - The exception is raised.
+            - The action method is called with the correct parameters.
+            - Exception contains the expected message.
+        """
+        mock_action = MagicMock()
+        expected_message = "Timeout error"
+        mock_action.return_value = {
+            "error": True,
+            "message": expected_message,
+        }
+        mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
+
+        with self.assertRaises(Exception) as context:
+            real_time_import_task_v2(self.user.id, action_name="rti", **self.kwargs)
+
+        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        self.assertEqual(expected_message, str(context.exception))

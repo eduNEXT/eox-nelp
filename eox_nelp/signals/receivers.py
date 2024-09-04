@@ -392,9 +392,7 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
     Arguments:
         instance<Blockcompletion>: Instance of BlockCompletion model.
     """
-    if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False) or not getattr(
-        settings, "PEARSON_RTI_COURSES_DATA", {}
-    ).get(str(instance.context_key)):
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False):
         return
 
     is_complete, graded = get_completed_and_graded(user_id=instance.user_id, course_id=str(instance.context_key))
@@ -408,12 +406,16 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
     )
 
     if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(instance.context_key)):
+            return
         real_time_import_task_v2.delay(
             user_id=instance.user_id,
             exam_id=str(instance.context_key),
             action_name="rti",
         )
     else:
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(instance.context_key)):
+            return
         real_time_import_task.delay(
             user_id=instance.user_id,
             course_id=str(instance.context_key),
@@ -430,9 +432,7 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
         user <User>: Instance of auth user model.
         course_id <CourseLocator>: Course locator.
     """
-    if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False) or not getattr(
-        settings, "PEARSON_RTI_COURSES_DATA", {}
-    ).get(str(course_id)):
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False):
         return
 
     LOGGER.info(
@@ -441,12 +441,16 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
     )
 
     if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(course_id)):
+            return
         real_time_import_task_v2.delay(
             user_id=user.id,
             exam_id=str(course_id),
             action_name="rti",
         )
     else:
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(course_id)):
+            return
         real_time_import_task.delay(
             course_id=str(course_id),
             user_id=user.id,

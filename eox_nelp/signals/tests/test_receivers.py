@@ -769,10 +769,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
         task_mock.delay.assert_not_called()
 
-    @override_settings(
-        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
-    )
+    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True, PEARSON_RTI_COURSES_DATA=course_exam_configuration,)
     @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_call_async_task(self, task_mock, get_completed_and_graded_mock):
@@ -796,7 +793,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
     @override_settings(
         PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
         USE_PEARSON_ENGINE_SERVICE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
@@ -858,10 +855,7 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
 
         task_mock.delay.assert_not_called()
 
-    @override_settings(
-        PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
-    )
+    @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True, PEARSON_RTI_COURSES_DATA=course_exam_configuration,)
     @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_call_async_task(self, task_mock):
         """Test that the async task is called with the right parameters
@@ -881,7 +875,7 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
     @override_settings(
         PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
         USE_PEARSON_ENGINE_SERVICE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
     def test_call_async_task_v2(self, task_mock):

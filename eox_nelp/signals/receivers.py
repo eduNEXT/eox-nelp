@@ -386,15 +386,13 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
     the pearson vue real_time_import_task , that basically runs the RTI pipeline
     on the completion logic.
     This sends only the user_id and course_id kwargs.
-    user_id -> instance.user_id
-    course_key -> instance.context_key
 
     Arguments:
         instance<Blockcompletion>: Instance of BlockCompletion model.
     """
-    if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False) or not getattr(
-        settings, "PEARSON_RTI_COURSES_DATA", {}
-    ).get(str(instance.context_key)):
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False) or not str(instance.context_key) in getattr(
+        settings, "PEARSON_ENGINE_COURSES_ENABLED", []
+    ):
         return
 
     is_complete, graded = get_completed_and_graded(user_id=instance.user_id, course_id=str(instance.context_key))
@@ -430,9 +428,9 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
         user <User>: Instance of auth user model.
         course_id <CourseLocator>: Course locator.
     """
-    if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False) or not getattr(
-        settings, "PEARSON_RTI_COURSES_DATA", {}
-    ).get(str(course_id)):
+    if not getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False) or not str(course_id) in getattr(
+        settings, "PEARSON_ENGINE_COURSES_ENABLED", []
+    ):
         return
 
     LOGGER.info(

@@ -700,14 +700,9 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
     """Test class for pearson_vue_course_completion_handler function."""
     course_id = "course-v1:test+Cx105+2022_T4"
     user_id = 5
-    course_exam_configuration = {
-        course_id: {
-            "exam_authorization_count": 3,
-            "exam_series_code": "OTT"
-        },
-    }
+    course_exam_configuration = [course_id]
 
-    @override_settings(PEARSON_RTI_COURSES_DATA=course_exam_configuration)
+    @override_settings(PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration)
     @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_invalid_feature_flag(self, task_mock):
         """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is False.
@@ -723,19 +718,19 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
         task_mock.delay.assert_not_called()
 
-    @data({}, {"course-v1:notdesired": {"exam_series_code": "OTT"}}, {"key": 6})
+    @data({}, [], ["exam_series_code"], ["key"], ["wrong_course_id"])
     @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
     @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_invalid_course_configuration(self, wrong_course_config, task_mock):
         """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is True,
-        but invalid course  configuration for PEARSON_RTI_COURSES_DATA.
+        but invalid course  configuration for PEARSON_ENGINE_COURSES_ENABLED.
         Expected behavior:
             - real_time_import_task mock has not been called.
         """
         instance = Mock()
         instance.user_id = self.user_id
         instance.context_key = CourseKey.from_string(self.course_id)
-        setattr(settings, "PEARSON_RTI_COURSES_DATA", wrong_course_config)
+        setattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", wrong_course_config)
 
         pearson_vue_course_completion_handler(instance)
 
@@ -743,7 +738,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
     @override_settings(
         PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @data(  # is_complete and graded values respectively
         (True, True),
@@ -769,7 +764,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
     @override_settings(
         PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task")
@@ -794,7 +789,7 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
     @override_settings(
         PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
         USE_PEARSON_ENGINE_SERVICE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.get_completed_and_graded")
     @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
@@ -822,12 +817,10 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_passed_handler function."""
     course_id = "course-v1:test+Cz105+2022_T4"
-    course_exam_configuration = {
-        course_id: True,
-    }
+    course_exam_configuration = [course_id]
 
-    @override_settings(PEARSON_RTI_COURSES_DATA=course_exam_configuration)
-    @patch("eox_nelp.signals.receivers.update_mt_training_stage")
+    @override_settings(PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration)
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_invalid_feature_flag(self, task_mock):
         """Test when the PEARSON_RTI_ACTIVATE_GRADED_GATE settings is False.
 
@@ -841,24 +834,24 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
         task_mock.delay.assert_not_called()
 
     @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True)
-    @data({}, {"course-v1:notdesired": True}, {"key": 6})
-    @patch("eox_nelp.signals.receivers.update_mt_training_stage")
+    @data({}, [], ["exam_series_code"], ["key"], ["wrong_course_id"])
+    @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_invalid_course_configuration(self, wrong_course_config, task_mock):
         """Test when the PEARSON_RTI_ACTIVATE_GRADED_GATE settings is True,
-        but invalid course configuration for PEARSON_RTI_COURSES_DATA
+        but invalid course configuration for PEARSON_ENGINE_COURSES_ENABLED
 
         Expected behavior:
             - real_time_import_task mock has not been called.
         """
         user_instance, _ = User.objects.get_or_create(username="Severus")
-        setattr(settings, "PEARSON_RTI_COURSES_DATA", wrong_course_config)
+        setattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", wrong_course_config)
         pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(self.course_id))
 
         task_mock.delay.assert_not_called()
 
     @override_settings(
         PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.real_time_import_task")
     def test_call_async_task(self, task_mock):
@@ -879,7 +872,7 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
     @override_settings(
         PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
         USE_PEARSON_ENGINE_SERVICE=True,
-        PEARSON_RTI_COURSES_DATA=course_exam_configuration,
+        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
     )
     @patch("eox_nelp.signals.receivers.real_time_import_task_v2")
     def test_call_async_task_v2(self, task_mock):

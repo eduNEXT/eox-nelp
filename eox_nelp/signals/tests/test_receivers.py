@@ -723,11 +723,10 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
 
         task_mock.delay.assert_not_called()
 
-    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
     @data({}, {"course-v1:notdesired": {"exam_series_code": "OTT"}}, {"key": 6})
-    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
+    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
     @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_course_configuration(self, wrong_course_config, task_mock, get_completed_and_graded_mock):
+    def test_invalid_course_configuration(self, wrong_course_config, task_mock):
         """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is True,
         but invalid course  configuration for PEARSON_RTI_COURSES_DATA.
         Expected behavior:
@@ -736,7 +735,6 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
         instance = Mock()
         instance.user_id = self.user_id
         instance.context_key = CourseKey.from_string(self.course_id)
-        get_completed_and_graded_mock.return_value = (True, False)
         setattr(settings, "PEARSON_RTI_COURSES_DATA", wrong_course_config)
 
         pearson_vue_course_completion_handler(instance)

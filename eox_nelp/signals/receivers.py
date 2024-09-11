@@ -406,7 +406,7 @@ def pearson_vue_course_completion_handler(instance, **kwargs):  # pylint: disabl
     )
 
     if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
-        if not getattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", {}).get(str(instance.context_key)):
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(instance.context_key)):
             return
         real_time_import_task_v2.delay(
             user_id=instance.user_id,
@@ -441,7 +441,7 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
     )
 
     if getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False):
-        if not getattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", {}).get(str(course_id)):
+        if not getattr(settings, "PEARSON_RTI_COURSES_DATA", {}).get(str(course_id)):
             return
         real_time_import_task_v2.delay(
             user_id=user.id,

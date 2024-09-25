@@ -4,6 +4,7 @@ This includes xml helpers:
 """
 import re
 
+from custom_reg_form.models import PearsonEngine
 import xmltodict
 from pydantic.v1.utils import deep_update
 

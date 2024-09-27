@@ -64,63 +64,6 @@ class TestPearsonAction(TestCase):
 
     @data(
         {
-            "mock_task": "eox_nelp.pearson_vue.tasks.real_time_import_task.delay",
-            "admin_action": pearson_real_time_action,
-            "call_args": ["user_id", "course_id"],
-            "extra_call_kwargs": {
-            },
-        },
-        {
-            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
-            "admin_action": pearson_add_ead_action,
-            "call_args": ["user_id", "course_id"],
-            "extra_call_kwargs": {
-                "transaction_type": "Add",
-            },
-
-        },
-        {
-            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
-            "admin_action": pearson_update_ead_action,
-            "call_args": ["user_id", "course_id"],
-            "extra_call_kwargs": {
-                "transaction_type": "Update",
-            },
-        },
-        {
-            "mock_task": "eox_nelp.pearson_vue.tasks.ead_task.delay",
-            "admin_action": pearson_delete_ead_action,
-            "call_args": ["user_id", "course_id"],
-            "extra_call_kwargs": {
-                "transaction_type": "Delete",
-            },
-        },
-        {
-            "mock_task": "eox_nelp.pearson_vue.tasks.cdd_task.delay",
-            "admin_action": pearson_cdd_action,
-            "call_args": ["user_id"],
-            "extra_call_kwargs": {
-            },
-        },
-    )
-    @unpack
-    def test_pearson_course_enrollment_action(self, mock_task, admin_action, call_args, extra_call_kwargs):
-        """
-        Test that a pearson_action function calls a task delay with correct parameters.
-        """
-        queryset = [
-            self._create_mock_enrollment("course-v1:TestX+T101+2024_T1"),
-            self._create_mock_enrollment("course-v1:FutureX+T102+2025_T1"),
-        ]
-        mocks_call_kwargs = self._prepare_call_kwargs(queryset, call_args, extra_call_kwargs)
-
-        # Call the admin action
-        with patch(mock_task) as mocked_task:
-            admin_action(MagicMock(), self.request, queryset)
-            self._assert_mocked_task_calls(mocked_task, mocks_call_kwargs)
-
-    @data(
-        {
             "admin_action": pearson_real_time_action,
             "call_args": ["user_id", "exam_id"],
             "extra_call_kwargs": {
@@ -197,6 +140,7 @@ class TestNelpCourseEnrollmentAdmin(TestCase):
         pearson_real_time_action,
         pearson_update_ead_action,
     )
+    @override_settings(USE_PEARSON_ENGINE_SERVICE=True)
     def test_actions(self, admin_action):
         """
         Test that the actions list contains pearson_real_time_action.

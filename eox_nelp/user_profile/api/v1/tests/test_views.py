@@ -31,9 +31,9 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
 
     @override_settings(
         ENABLE_OTP_VALIDATION=False,
-        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
+        USE_PEARSON_ENGINE_SERVICE=True,
     )
-    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
     def test_update_fields_successfully(self, cdd_task_mock):
         """
         Test that the request completes its execution successfully.
@@ -52,10 +52,10 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
-        cdd_task_mock.delay.assert_called_with(user_id=self.user.id)
+        cdd_task_mock.delay.assert_called_with(user_id=self.user.id, action_name="cdd")
 
     @override_settings(ENABLE_OTP_VALIDATION=False)
-    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
     def test_account_validation_error(self, cdd_task_mock):
         """
         Test that a bad request is returned when an AccountValidationError is raised.
@@ -80,7 +80,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         cdd_task_mock.delay.assert_not_called()
 
     @override_settings(ENABLE_OTP_VALIDATION=False)
-    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
     def test_account_update_error(self, cdd_task_mock):
         """
         Test that a bad request is returned when an AccountUpdateError is raised.
@@ -111,9 +111,9 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
     @override_settings(
         ENABLE_OTP_VALIDATION=False,
         EXTRA_ACCOUNT_USER_FIELDS=["first_name", "last_name"],
-        PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
+        USE_PEARSON_ENGINE_SERVICE=True,
     )
-    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
     def test_account_update_extra_fields(self, cdd_task_mock):
         """
         Test that extra account user fields has been set.
@@ -140,14 +140,14 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
         self.assertEqual(self.user.first_name, payload["first_name"])
         self.assertEqual(self.user.last_name, payload["last_name"])
-        cdd_task_mock.delay.assert_called_with(user_id=self.user.id)
+        cdd_task_mock.delay.assert_called_with(user_id=self.user.id, action_name="cdd")
 
     @override_settings(
         ENABLE_OTP_VALIDATION=False,
         USER_PROFILE_API_EXTRA_INFO_FIELDS=["arabic_first_name", "arabic_last_name"],
-        PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
+        USE_PEARSON_ENGINE_SERVICE=True,
     )
-    @patch("eox_nelp.user_profile.api.v1.views.cdd_task")
+    @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
     def test_update_extra_info_fields(self, cdd_task_mock):
         """
         Test that extra account user fields has been set.
@@ -173,4 +173,4 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
         self.assertEqual(self.user.extrainfo.arabic_first_name, payload["arabic_first_name"])
         self.assertEqual(self.user.extrainfo.arabic_last_name, payload["arabic_last_name"])
-        cdd_task_mock.delay.assert_called_with(user_id=self.user.id)
+        cdd_task_mock.delay.assert_called_with(user_id=self.user.id, action_name="cdd")

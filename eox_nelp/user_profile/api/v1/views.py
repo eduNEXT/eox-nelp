@@ -18,7 +18,7 @@ from rest_framework.response import Response
 
 from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
-from eox_nelp.pearson_vue.tasks import cdd_task
+from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
 from eox_nelp.utils import save_extrainfo_field
 
 logger = logging.getLogger(__name__)
@@ -83,9 +83,12 @@ def update_user_data(request):
             status=status.HTTP_400_BAD_REQUEST
         )
     if (
-        getattr(settings, "PEARSON_RTI_ACTIVATE_COMPLETION_GATE", False)
-        or getattr(settings, "PEARSON_RTI_ACTIVATE_GRADED_GATE", False)
+        getattr(settings, "USE_PEARSON_ENGINE_SERVICE", False)
+        and getattr(settings, "PEARSON_ENGINE_UPDATE_USER_PROFILE_ENABLED", True)
     ):
-        cdd_task.delay(user_id=request.user.id)  # Send cdd request with user updated.
+        real_time_import_task_v2.delay(
+            user_id=request.user.id,
+            action_name="cdd",
+        )
 
     return Response({"message": "User's fields has been updated successfully"}, status=status.HTTP_200_OK)

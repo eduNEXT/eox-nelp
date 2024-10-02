@@ -8,6 +8,7 @@ import xmltodict
 from pydantic.v1.utils import deep_update
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
+from eox_nelp.pearson_vue.models import PearsonEngine  # pylint: disable=import-outside-toplevel
 
 
 def update_xml_with_dict(xml: str, update_dict: dict) -> str:
@@ -52,3 +53,13 @@ def is_cp1252(text):
     cp1252_regex = r'^[\x00-\x7F\x80-\x9F\xA0-\xFF]*$'
 
     return re.match(cp1252_regex, text) is not None
+
+
+def update_user_engines(user, action_name, course_id=None):
+    """Given a user and action_name, update the desired engine record"""
+    pearson_engine = getattr(user, "pearsonengine", None)
+    if not pearson_engine:
+        pearson_engine = PearsonEngine.objects.create(user=user)  # pylint: disable=no-member
+    pearson_engine.increment_trigger(action_name)
+    if action_name in ("ead", "rti") and course_id:
+        pearson_engine.increment_course_value(action_name, course_id)

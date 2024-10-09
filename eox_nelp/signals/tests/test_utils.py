@@ -8,13 +8,14 @@ import unittest
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
 from eox_nelp.signals.utils import _generate_external_certificate_data, _user_has_passing_grade
+from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 
@@ -42,13 +43,13 @@ class UserHasPassingGradeTestCase(unittest.TestCase):
 
 
 @ddt
-class GenerateExternalCertificateDataTestCase(unittest.TestCase):
+class GenerateExternalCertificateDataTestCase(TestCase):
     """Test class for function `_generate_external_certificate_data`"""
 
     def setUp(self):
         """ Set common conditions for test cases."""
         self.user, _ = User.objects.get_or_create(
-            username="1333666888",
+            username="RonWeasley",
         )
         self.certificate_data = CertificateData(
             user=UserData(
@@ -69,6 +70,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             download_url="",
             name="",
         )
+        save_extrainfo_field(self.user, "national_id", "1234567890")
 
     @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
@@ -84,14 +86,14 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         passing_mock.return_value = True
 
         expected_value = {
-            'reference_id': '1333666888~course-v1:test+Cx105+2022_T4',
+            'reference_id': f'{self.user.extrainfo.national_id}~course-v1:test+Cx105+2022_T4',
             "created_at": str(time.date()),
             "expiration_date": None,
             "grade": self.certificate_data.grade * 100,
             "is_passing": True,
             "group_code": settings.EXTERNAL_CERTIFICATES_GROUP_CODES[str(self.certificate_data.course.course_key)],
             "user": {
-                "national_id": self.user.username,
+                "national_id": self.user.extrainfo.national_id,
                 "english_name": self.certificate_data.user.pii.name,
                 "arabic_name": "",
             }
@@ -131,8 +133,9 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         """
         passing_mock.return_value = True
         wrong_user, _ = User.objects.get_or_create(
-            username=wrong_national_id,
+            username="Albus",
         )
+        save_extrainfo_field(wrong_user, "national_id", wrong_national_id)
         certificate_data = CertificateData(
             user=UserData(
                 pii=UserPersonalData(
@@ -159,7 +162,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
 
         self.assertRaisesRegex(
             ValueError,
-            f"The username or national_id: {wrong_user.username} doesnt match national ID regex",
+            f"The username or national_id: {wrong_user.extrainfo.national_id} doesnt match national ID regex",
             _generate_external_certificate_data,
             **external_certificate_data,
         )
@@ -183,8 +186,9 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
         time = timezone.now()
         passing_mock.return_value = True
         saml_association_user, _ = User.objects.get_or_create(
-            username=saml_extra_association,
+            username="Severus",
         )
+        save_extrainfo_field(saml_association_user, "national_id", saml_extra_association)
         certificate_data = CertificateData(
             user=UserData(
                 pii=UserPersonalData(
@@ -204,7 +208,7 @@ class GenerateExternalCertificateDataTestCase(unittest.TestCase):
             download_url="",
             name="",
         )
-        national_id = saml_association_user.username[:10]
+        national_id = saml_association_user.extrainfo.national_id[:10]
 
         expected_value = {
             'reference_id': f'{national_id}~course-v1:test+Cx105+2022_T4',

@@ -228,6 +228,8 @@ def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=
         national_id (str): User identifier.
     """
     user = User.objects.get(id=user_id)
+    extra_info = getattr(user, "extrainfo", None)
+    national_id = extra_info.national_id if extra_info and extra_info.national_id else user.username
     is_complete, graded = get_completed_and_graded(user_id, course_id)
 
     if not is_complete or (force_graded and not graded) or (not force_graded and graded):
@@ -235,6 +237,6 @@ def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=
 
     update_mt_training_stage(
         course_id=course_id,
-        national_id=user.username,
+        national_id=national_id,
         stage_result=stage_result,
     )

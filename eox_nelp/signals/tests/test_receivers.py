@@ -14,7 +14,7 @@ import unittest
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from eox_core.edxapp_wrapper.users import get_user_signup_source
 from eventtracking.tracker import get_tracker
@@ -42,6 +42,7 @@ from eox_nelp.signals.receivers import (
     update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
+from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 UserSignupSource = get_user_signup_source()
@@ -620,7 +621,7 @@ class MtCourseCompletionHandlerTestCase(unittest.TestCase):
         )
 
 
-class MtCoursePassedHandlerTestCase(unittest.TestCase):
+class MtCoursePassedHandlerTestCase(TestCase):
     """Test class for mt_course_passed_handler function."""
 
     @patch("eox_nelp.signals.receivers.update_mt_training_stage")
@@ -647,12 +648,13 @@ class MtCoursePassedHandlerTestCase(unittest.TestCase):
         """
         course_id = "course-v1:test+Cx105+2022_T4"
         user_instance, _ = User.objects.get_or_create(username="Severus")
+        save_extrainfo_field(user_instance, "national_id", "1234567890")
 
         mt_course_passed_handler(user_instance, CourseKey.from_string(course_id))
 
         task_mock.delay.assert_called_with(
             course_id=course_id,
-            national_id=user_instance.username,
+            national_id=user_instance.extrainfo.national_id,
             stage_result=1,
         )
 

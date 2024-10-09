@@ -11,7 +11,7 @@ import unittest
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -32,6 +32,7 @@ from eox_nelp.signals.tasks import (
 )
 from eox_nelp.signals.utils import get_completion_summary
 from eox_nelp.tests.utils import generate_list_mock_data
+from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 FALSY_ACTIVATION_VALUES = [0, "", None, [], False, {}, ()]
@@ -534,7 +535,7 @@ class UpdateMtTrainingStageTestCase(unittest.TestCase):
 
 
 @ddt
-class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
+class CourseCompletionMtUpdaterTestCase(TestCase):
     """Test class for course_completion_mt_updater function."""
 
     def setUp(self):
@@ -617,7 +618,8 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
             - update_mt_training_stage was called with the right parameters.
             - mock validations pass
         """
-        user_instance, _ = User.objects.get_or_create(username="1245789652")
+        user_instance, _ = User.objects.get_or_create(username="Minerva")
+        save_extrainfo_field(user_instance, "national_id", "1234567890")
         completion_summary_mock.return_value = {"incomplete_count": 0}
         self.descriptor.grading_policy = {"GRADER": test_data[0]}
 
@@ -630,7 +632,7 @@ class CourseCompletionMtUpdaterTestCase(unittest.TestCase):
 
         updater_mock.assert_called_once_with(
             course_id=self.course_id,
-            national_id=user_instance.username,
+            national_id=user_instance.extrainfo.national_id,
             stage_result=2,
         )
         self.mock_validations()

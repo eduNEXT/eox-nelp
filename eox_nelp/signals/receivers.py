@@ -355,9 +355,12 @@ def mt_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unus
     if not getattr(settings, "ACTIVATE_MT_TRAINING_STAGE", False):
         return
 
+    extra_info = getattr(user, "extrainfo", None)
+    national_id = extra_info.national_id if extra_info and extra_info.national_id else user.username
+
     update_mt_training_stage.delay(
         course_id=str(course_id),
-        national_id=user.username,
+        national_id=national_id,
         stage_result=1,
     )
 

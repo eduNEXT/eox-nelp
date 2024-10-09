@@ -143,6 +143,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
             class ExtraInfo:
                 arabic_first_name = "اختبار"
                 arabic_last_name = "مستخدم"
+                national_id = "1234567890"
 
             profile = Profile()
             extrainfo = ExtraInfo()

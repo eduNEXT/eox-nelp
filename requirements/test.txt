@@ -279,6 +279,8 @@ event-tracking==3.0.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@main
+    # via -r requirements/base.txt
 fastavro==1.9.5
     # via
     #   -r requirements/base.txt

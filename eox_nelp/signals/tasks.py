@@ -15,9 +15,9 @@ from django.db.models import Q
 from django.utils import timezone
 from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eventtracking import tracker
+from nelc_api_clients.clients.certificates import ExternalCertificatesApiClient
 from opaque_keys.edx.keys import UsageKey
 
-from eox_nelp.api_clients.certificates import ExternalCertificatesApiClient
 from eox_nelp.api_clients.futurex import FuturexApiClient
 from eox_nelp.api_clients.mt import MinisterOfTourismApiClient
 from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict

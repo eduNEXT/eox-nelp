@@ -54,6 +54,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             "address": user.profile.mailing_address,
             "arabic_first_name": user.extrainfo.arabic_first_name,
             "arabic_last_name": user.extrainfo.arabic_last_name,
+            "national_id": user.extrainfo.national_id,
         }
 
     def _get_platform_data(self):

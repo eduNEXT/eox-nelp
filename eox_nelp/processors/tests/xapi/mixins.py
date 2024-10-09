@@ -114,6 +114,7 @@ class BaseModuleObjectTestCaseMixin:
         self.transformer_class.get_data.reset_mock()
         self.transformer_class.get_data.side_effect = None
         self.transformer_class.get_object_iri.reset_mock()
+        modulestore.reset_mock()
         modulestore.return_value.get_item.reset_mock()
 
     def test_course_id_property(self):

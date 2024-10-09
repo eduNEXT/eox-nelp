@@ -38,7 +38,15 @@ def _generate_external_certificate_data(time, certificate_data):
     group_codes = getattr(settings, "EXTERNAL_CERTIFICATES_GROUP_CODES", {})
     course_id = str(certificate_data.course.course_key)
     extra_info = getattr(user, "extrainfo", None)
-    national_id = user.username[:10]  # saml association extra filter
+
+    if extra_info:
+        national_id = extra_info.national_id
+        arabic_name = extra_info.arabic_name
+    else:
+        national_id = user.username
+        arabic_name = ""
+
+    national_id = national_id[:10]  # saml association extra filter
 
     return {
         "reference_id": generate_reference_id(national_id, course_id),
@@ -50,7 +58,7 @@ def _generate_external_certificate_data(time, certificate_data):
         "user": {
             "national_id": national_id,
             "english_name": certificate_data.user.pii.name,
-            "arabic_name": extra_info.arabic_name if extra_info else "",
+            "arabic_name": arabic_name,
         }
     }
 

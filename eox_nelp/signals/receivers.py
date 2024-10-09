@@ -356,7 +356,7 @@ def mt_course_passed_handler(user, course_id, **kwargs):  # pylint: disable=unus
         return
 
     extra_info = getattr(user, "extrainfo", None)
-    national_id = extra_info.national_id if extra_info else user.username
+    national_id = extra_info.national_id if extra_info and extra_info.national_id else user.username
 
     update_mt_training_stage.delay(
         course_id=str(course_id),

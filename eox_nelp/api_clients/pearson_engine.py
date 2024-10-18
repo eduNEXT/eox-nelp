@@ -43,7 +43,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
         Returns:
             dict: The user data formatted for the request.
         """
-        return {
+        user_data = {
             "username": user.username,
             "first_name": user.first_name,
             "last_name": user.last_name,
@@ -54,8 +54,12 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             "address": user.profile.mailing_address,
             "arabic_first_name": user.extrainfo.arabic_first_name,
             "arabic_last_name": user.extrainfo.arabic_last_name,
-            "national_id": user.extrainfo.national_id,
         }
+
+        if user.extrainfo.national_id:
+            user_data["national_id"] = user.extrainfo.national_id
+
+        return user_data
 
     def _get_platform_data(self):
         """

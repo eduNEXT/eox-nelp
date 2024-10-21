@@ -52,6 +52,7 @@ class PearsonEngineApiClient(AbstractAPIRestClient):
             "city": user.profile.city,
             "phone": user.profile.phone_number,
             "address": user.profile.mailing_address,
+            "arabic_full_name": user.extrainfo.arabic_name,
             "arabic_first_name": user.extrainfo.arabic_first_name,
             "arabic_last_name": user.extrainfo.arabic_last_name,
         }

@@ -141,6 +141,7 @@ class TestPearsonEngineApiClient(TestRestApiClientMixin, TestOauth2Authenticator
                 mailing_address = "123 Test St"
 
             class ExtraInfo:
+                arabic_name = "مستخدم اختبار"
                 arabic_first_name = "اختبار"
                 arabic_last_name = "مستخدم"
                 national_id = "1234567890"

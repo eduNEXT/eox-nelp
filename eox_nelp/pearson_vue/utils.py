@@ -57,9 +57,7 @@ def is_cp1252(text):
 
 def update_user_engines(user, action_name, course_id=None):
     """Given a user and action_name, update the desired engine record"""
-    pearson_engine = getattr(user, "pearsonengine", None)
-    if not pearson_engine:
-        pearson_engine = PearsonEngine.objects.create(user=user)  # pylint: disable=no-member
+    pearson_engine, _ = PearsonEngine.objects.get_or_create(user=user)  # pylint: disable=no-member
     pearson_engine.increment_trigger(action_name)
-    if action_name in ("ead", "rti") and course_id:
+    if course_id:
         pearson_engine.increment_course_value(action_name, course_id)

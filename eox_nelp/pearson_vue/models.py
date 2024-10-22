@@ -79,7 +79,7 @@ class PearsonEngine(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_triggers(self, trigger_type):
+    def get_triggers(self, trigger_name):
         """
         Get the number of triggers for a specific type.
 
@@ -92,16 +92,14 @@ class PearsonEngine(models.Model):
         Raises:
             ValueError: If an invalid trigger type is provided.
         """
-        if trigger_type.lower() == 'rti':
-            return self.rti_triggers
-        if trigger_type.lower() == 'cdd':
-            return self.cdd_triggers
-        if trigger_type.lower() == 'ead':
-            return self.ead_triggers
+        if not hasattr(self, trigger_name):
+             raise ValueError(f"Invalid trigger name: {trigger_name}")
+ 
+        return getattr(self, trigger_name, None)
 
         raise ValueError(f"Invalid trigger type: {trigger_type}")
 
-    def set_triggers(self, trigger_type, value):
+    def set_triggers(self, trigger_name, value):
         """
         Set the number of triggers for a specific type.
 
@@ -114,14 +112,11 @@ class PearsonEngine(models.Model):
         """
         if not isinstance(value, int) or value < 0:
             raise ValueError("Trigger value must be a non-negative integer")
-        if trigger_type.lower() == 'rti':
-            self.rti_triggers = value
-        elif trigger_type.lower() == 'cdd':
-            self.cdd_triggers = value
-        elif trigger_type.lower() == 'ead':
-            self.ead_triggers = value
-        else:
-            raise ValueError(f"Invalid trigger type: {trigger_type}")
+
+        if not hasattr(self, trigger_name):
+             raise ValueError(f"Invalid trigger name: {trigger_name}")
+  
+        setattr(self, trigger_name", value)
         self.save()
 
     def increment_trigger(self, trigger_type, increment=1):
@@ -132,8 +127,9 @@ class PearsonEngine(models.Model):
             trigger_type (str): The type of trigger ('rti', 'cdd', or 'ead').
             increment (int, optional): The amount to increment. Defaults to 1.
         """
-        current_value = self.get_triggers(trigger_type)
-        self.set_triggers(trigger_type, current_value + increment)
+        trigger_name = f"{trigger_type}_triggers"
+        current_value = self.get_triggers(trigger_name)
+        self.set_triggers(trigger_name, current_value + increment)
 
     def get_courses(self, action):
         """

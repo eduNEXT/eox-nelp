@@ -485,13 +485,12 @@ class TestUpdateUserEngineCustomForm(TestCase):
         - Other colums would not be affected
         """
         initial_cdd_count = 12
-        user = User.objects.create(
-            username="incrementcdd",
-            pearsonengine=PearsonEngine.objects.create(cdd_triggers=initial_cdd_count)
-        )
+        user = User.objects.create(username="incrementcdd")
+        PearsonEngine.objects.create(user=user, cdd_triggers=initial_cdd_count)
 
         update_user_engines(user, "cdd")
 
+        user.pearsonengine.refresh_from_db()
         self.assertEqual(user.pearsonengine.cdd_triggers, initial_cdd_count + 1)
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
@@ -508,17 +507,17 @@ class TestUpdateUserEngineCustomForm(TestCase):
         initial_ead_count = 23
         course_id = "course-v1:test+awesome"
         initial_course_id_count = 99
-        user = User.objects.create(
-            username="incrementead",
-            pearsonengine=PearsonEngine.objects.create(
-                ead_triggers=initial_ead_count,
-                courses={
-                    course_id: initial_course_id_count
-                }
-            )
+        user = User.objects.create(username="incrementead")
+        PearsonEngine.objects.create(
+            user=user,
+            ead_triggers=initial_ead_count,
+            courses={
+                course_id: initial_course_id_count
+            }
         )
 
         update_user_engines(user, "ead", course_id)
+        user.pearsonengine.refresh_from_db()
 
         self.assertEqual(user.pearsonengine.ead_triggers, initial_ead_count + 1)
         self.assertEqual(user.pearsonengine.cdd_triggers, 0)
@@ -528,21 +527,19 @@ class TestUpdateUserEngineCustomForm(TestCase):
     def test_increments_course_value_for_rti(self):
         """Tests if the `increment_course_value` method is called for "rti" actions
         and the course count is incremented.
+        Test not previous pearson engine one-one-relation instance but created.
         Expected Behavior:
         - The `rti_triggers` attribute of the `PearsonEngine` instance should be incremented by 1.
         - The course dict would be increment by one in the desired course.
         - Other colums would not be affected
         """
-        initial_rti_count = 23
-        user = User.objects.create(
-            username="incrementrti",
-            pearsonengine=PearsonEngine.objects.create(rti_triggers=initial_rti_count)
-        )
+        user = User.objects.create(username="incrementrti")
         course_id = "course-v1:test+awesome"
 
         update_user_engines(user, "rti", course_id)
 
-        self.assertEqual(user.pearsonengine.rti_triggers, initial_rti_count + 1)
+        user.pearsonengine.refresh_from_db()
+        self.assertEqual(user.pearsonengine.rti_triggers, 1)
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.cdd_triggers, 0)
         self.assertEqual(user.pearsonengine.courses[course_id], 1)

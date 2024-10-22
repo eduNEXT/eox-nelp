@@ -93,7 +93,7 @@ class PearsonEngine(models.Model):
         trigger_name = f"{trigger_type}_triggers"
 
         if not hasattr(self, trigger_name):
-             raise ValueError(f"Invalid trigger name: {trigger_name}")
+            raise ValueError(f"Invalid trigger name: {trigger_name}")
 
         return getattr(self, trigger_name, None)
 
@@ -114,7 +114,7 @@ class PearsonEngine(models.Model):
             raise ValueError("Trigger value must be a non-negative integer")
 
         if not hasattr(self, trigger_name):
-             raise ValueError(f"Invalid trigger name: {trigger_name}")
+            raise ValueError(f"Invalid trigger name: {trigger_name}")
 
         setattr(self, trigger_name, value)
         self.save()

@@ -97,7 +97,6 @@ class PearsonEngineTestCase(TestCase):
         with self.assertRaises(ValueError):
             self.engine.remove_course('course1')
 
-
     def test_course_aggregation(self):
         """
         Test course aggregation methods.

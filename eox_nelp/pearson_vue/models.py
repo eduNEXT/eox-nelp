@@ -64,8 +64,7 @@ class PearsonEngine(models.Model):
         rti_triggers (int): Number of RTI triggers.
         cdd_triggers (int): Number of CDD triggers.
         ead_triggers (int): Number of EAD triggers.
-        rti_courses (dict): JSON field storing RTI course data.
-        ead_courses (dict): JSON field storing EAD course data.
+        courses (dict): JSON field storing EAD course data.
         created_at (datetime): Timestamp of model instance creation.
         updated_at (datetime): Timestamp of last model instance update.
     """
@@ -74,12 +73,11 @@ class PearsonEngine(models.Model):
     rti_triggers = models.PositiveIntegerField(default=0)
     cdd_triggers = models.PositiveIntegerField(default=0)
     ead_triggers = models.PositiveIntegerField(default=0)
-    rti_courses = models.JSONField(default=dict)
-    ead_courses = models.JSONField(default=dict)
+    courses = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_triggers(self, trigger_name):
+    def get_triggers(self, trigger_type):
         """
         Get the number of triggers for a specific type.
 
@@ -92,14 +90,14 @@ class PearsonEngine(models.Model):
         Raises:
             ValueError: If an invalid trigger type is provided.
         """
+        trigger_name = f"{trigger_type}_triggers"
+
         if not hasattr(self, trigger_name):
              raise ValueError(f"Invalid trigger name: {trigger_name}")
- 
+
         return getattr(self, trigger_name, None)
 
-        raise ValueError(f"Invalid trigger type: {trigger_type}")
-
-    def set_triggers(self, trigger_name, value):
+    def set_triggers(self, trigger_type, value):
         """
         Set the number of triggers for a specific type.
 
@@ -110,13 +108,15 @@ class PearsonEngine(models.Model):
         Raises:
             ValueError: If the value is not a non-negative integer or if an invalid trigger type is provided.
         """
+        trigger_name = f"{trigger_type}_triggers"
+
         if not isinstance(value, int) or value < 0:
             raise ValueError("Trigger value must be a non-negative integer")
 
         if not hasattr(self, trigger_name):
              raise ValueError(f"Invalid trigger name: {trigger_name}")
-  
-        setattr(self, trigger_name", value)
+
+        setattr(self, trigger_name, value)
         self.save()
 
     def increment_trigger(self, trigger_type, increment=1):
@@ -127,51 +127,37 @@ class PearsonEngine(models.Model):
             trigger_type (str): The type of trigger ('rti', 'cdd', or 'ead').
             increment (int, optional): The amount to increment. Defaults to 1.
         """
-        trigger_name = f"{trigger_type}_triggers"
-        current_value = self.get_triggers(trigger_name)
-        self.set_triggers(trigger_name, current_value + increment)
+        current_value = self.get_triggers(trigger_type)
+        self.set_triggers(trigger_type, current_value + increment)
 
-    def get_courses(self, action):
+    def get_courses(self):
         """
         Get the courses for a specific action type.
-
-        Args:
-            action (str): The action type ('rti' or 'ead').
 
         Returns:
             dict: The courses for the specified action type.
 
-        Raises:
-            ValueError: If an invalid action type is provided.
         """
-        if action.lower() == 'rti':
-            return self.rti_courses
+        return self.courses
 
-        if action.lower() == 'ead':
-            return self.ead_courses
-
-        raise ValueError(f"Invalid action type: {action}")
-
-    def get_course_value(self, action, course_id):
+    def get_course_value(self, course_id):
         """
         Get the value of a specific course.
 
         Args:
-            action (str): The action type ('rti' or 'ead').
             course_id (str): The ID of the course.
 
         Returns:
             int: The value of the specified course, or 0 if not found.
         """
-        courses = self.get_courses(action)
+        courses = self.get_courses()
         return courses.get(course_id, 0)
 
-    def set_course_value(self, action, course_id, value):
+    def set_course_value(self, course_id, value):
         """
         Set the value of a specific course.
 
         Args:
-            action (str): The action type ('rti' or 'ead').
             course_id (str): The ID of the course.
             value (int or float): The new value for the course.
 
@@ -180,71 +166,57 @@ class PearsonEngine(models.Model):
         """
         if not isinstance(value, (int, float)) or value < 0:
             raise ValueError("Course value must be a non-negative number")
-        courses = self.get_courses(action)
+        courses = self.get_courses()
         courses[course_id] = value
-        if action.lower() == 'rti':
-            self.rti_courses = courses
-        elif action.lower() == 'ead':
-            self.ead_courses = courses
+        self.courses = courses
         self.save()
 
-    def increment_course_value(self, action, course_id, increment=1):
+    def increment_course_value(self, course_id, increment=1):
         """
         Increment the value of a specific course.
 
         Args:
-            action (str): The action type ('rti' or 'ead').
             course_id (str): The ID of the course.
             increment (int or float, optional): The amount to increment. Defaults to 1.
         """
-        current_value = self.get_course_value(action, course_id)
-        self.set_course_value(action, course_id, current_value + increment)
+        current_value = self.get_course_value(course_id)
+        self.set_course_value(course_id, current_value + increment)
 
-    def remove_course(self, action, course_id):
+    def remove_course(self, course_id):
         """
         Remove a course from the specified action type.
 
         Args:
-            action (str): The action type ('rti' or 'ead').
             course_id (str): The ID of the course to remove.
 
         Raises:
             ValueError: If the course is not found in the specified action type.
         """
-        courses = self.get_courses(action)
+        courses = self.get_courses()
         if course_id in courses:
             del courses[course_id]
-            if action.lower() == 'rti':
-                self.rti_courses = courses
-            elif action.lower() == 'ead':
-                self.ead_courses = courses
+            self.courses = courses
             self.save()
         else:
-            raise ValueError(f"Course {course_id} not found in {action} courses")
+            raise ValueError(f"Course {course_id} not found in courses")
 
-    def get_course_ids(self, action):
+    def get_course_ids(self):
         """
         Get all course IDs for a specific action type.
-
-        Args:
-            action (str): The action type ('rti' or 'ead').
 
         Returns:
             list: A list of all course IDs for the specified action type.
         """
-        return list(self.get_courses(action).keys())
+        return list(self.get_courses().keys())
 
-    def get_total_course_value(self, action):
+    def get_total_course_value(self):
         """
         Get the total value of all courses for a specific action type.
-
-        Args:
-            action (str): The action type ('rti' or 'ead').
 
         Returns:
             float: The sum of all course values for the specified action type.
         """
-        return sum(self.get_courses(action).values())
+        return sum(self.get_courses().values())
 
     @property
     def total_triggers(self):

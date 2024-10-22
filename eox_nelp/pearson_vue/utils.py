@@ -55,9 +55,15 @@ def is_cp1252(text):
     return re.match(cp1252_regex, text) is not None
 
 
-def update_user_engines(user, action_name, course_id=None):
-    """Given a user and action_name, update the desired engine record"""
+def update_user_engines(user, action_type, course_id=None):
+    """_summary_
+
+    Args:
+        user (User): User instance relation to update engine.
+        action_type (str): The type of action to trigger ('rti', 'cdd', or 'ead').
+        course_id (str): course_id to add update. Defaults to None.
+    """
     pearson_engine, _ = PearsonEngine.objects.get_or_create(user=user)  # pylint: disable=no-member
-    pearson_engine.increment_trigger(action_name)
+    pearson_engine.increment_trigger(action_type)
     if course_id:
-        pearson_engine.increment_course_value(action_name, course_id)
+        pearson_engine.increment_course_value(course_id)

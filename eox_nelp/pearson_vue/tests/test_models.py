@@ -83,27 +83,20 @@ class PearsonEngineTestCase(TestCase):
         - Setting negative course values should raise ValueError.
         """
         # Test setting and getting course values
-        self.engine.set_course_value('rti', 'course1', 10)
-        self.engine.set_course_value('ead', 'course33', 44)
-        self.assertEqual(self.engine.get_course_value('rti', 'course1'), 10)
+        self.engine.set_course_value('course1', 10)
+        self.engine.set_course_value('course33', 44)
+        self.assertEqual(self.engine.get_course_value('course1'), 10)
 
         # Test incrementing course values
-        self.engine.increment_course_value('rti', 'course1', 5)
-        self.assertEqual(self.engine.get_course_value('rti', 'course1'), 15)
+        self.engine.increment_course_value('course1', 5)
+        self.assertEqual(self.engine.get_course_value('course1'), 15)
 
         # Test removing courses
-        self.engine.remove_course('rti', 'course1')
-        self.engine.remove_course('ead', 'course33')
+        self.engine.remove_course('course1')
+        self.engine.remove_course('course33')
         with self.assertRaises(ValueError):
-            self.engine.remove_course('rti', 'course1')
+            self.engine.remove_course('course1')
 
-        # Test invalid action type
-        with self.assertRaises(ValueError):
-            self.engine.get_courses('invalid')
-
-        # Test setting negative value
-        with self.assertRaises(ValueError):
-            self.engine.set_course_value('ead', 'course2', -1)
 
     def test_course_aggregation(self):
         """
@@ -115,13 +108,12 @@ class PearsonEngineTestCase(TestCase):
         - get_course_ids should return a list of all course IDs for a specific action.
         - get_total_course_value should return the sum of all course values for a specific action.
         """
-        self.engine.set_course_value('rti', 'course1', 10)
-        self.engine.set_course_value('rti', 'course2', 20)
-        self.engine.set_course_value('ead', 'course3', 30)
+        self.engine.set_course_value('course1', 10)
+        self.engine.set_course_value('course2', 20)
+        self.engine.set_course_value('course3', 30)
 
-        self.assertEqual(set(self.engine.get_course_ids('rti')), {'course1', 'course2'})
-        self.assertEqual(self.engine.get_total_course_value('rti'), 30)
-        self.assertEqual(self.engine.get_total_course_value('ead'), 30)
+        self.assertEqual(set(self.engine.get_course_ids()), {'course1', 'course2', 'course3'})
+        self.assertEqual(self.engine.get_total_course_value(), 60)
 
     def test_total_triggers_property(self):
         """
@@ -148,8 +140,7 @@ class PearsonEngineTestCase(TestCase):
         self.assertEqual(new_engine.rti_triggers, 0)
         self.assertEqual(new_engine.cdd_triggers, 0)
         self.assertEqual(new_engine.ead_triggers, 0)
-        self.assertEqual(new_engine.rti_courses, {})
-        self.assertEqual(new_engine.ead_courses, {})
+        self.assertEqual(new_engine.courses, {})
         self.assertIsNotNone(new_engine.created_at)
         self.assertIsNotNone(new_engine.updated_at)
 

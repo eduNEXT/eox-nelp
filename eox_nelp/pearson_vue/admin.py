@@ -44,8 +44,7 @@ class PearsonEngineAdmin(admin.ModelAdmin):
         "rti_triggers",
         "cdd_triggers",
         "ead_triggers",
-        "ead_courses",
-        "rti_courses",
+        "courses",
         "created_at",
         "updated_at",
     )
@@ -56,8 +55,7 @@ class PearsonEngineAdmin(admin.ModelAdmin):
         "rti_triggers",
         "cdd_triggers",
         "ead_triggers",
-        "ead_courses",
-        "rti_courses",
+        "courses",
     )
 
 

@@ -495,8 +495,7 @@ class TestUpdateUserEngineCustomForm(TestCase):
         self.assertEqual(user.pearsonengine.cdd_triggers, initial_cdd_count + 1)
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
-        self.assertDictEqual(user.pearsonengine.ead_courses, {})
-        self.assertDictEqual(user.pearsonengine.rti_courses, {})
+        self.assertDictEqual(user.pearsonengine.courses, {})
 
     def test_increments_course_value_for_ead(self):
         """Tests if the `increment_course_value` method is called for "ead" actions
@@ -513,7 +512,7 @@ class TestUpdateUserEngineCustomForm(TestCase):
             username="incrementead",
             pearsonengine=PearsonEngine.objects.create(
                 ead_triggers=initial_ead_count,
-                ead_courses={
+                courses={
                     course_id: initial_course_id_count
                 }
             )
@@ -524,8 +523,7 @@ class TestUpdateUserEngineCustomForm(TestCase):
         self.assertEqual(user.pearsonengine.ead_triggers, initial_ead_count + 1)
         self.assertEqual(user.pearsonengine.cdd_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
-        self.assertEqual(user.pearsonengine.ead_courses[course_id], initial_course_id_count + 1)
-        self.assertDictEqual(user.pearsonengine.rti_courses, {})
+        self.assertEqual(user.pearsonengine.courses[course_id], initial_course_id_count + 1)
 
     def test_increments_course_value_for_rti(self):
         """Tests if the `increment_course_value` method is called for "rti" actions
@@ -545,10 +543,9 @@ class TestUpdateUserEngineCustomForm(TestCase):
         update_user_engines(user, "rti", course_id)
 
         self.assertEqual(user.pearsonengine.rti_triggers, initial_rti_count + 1)
-        self.assertEqual(user.pearsonengine.rti_courses[course_id], 1)
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.cdd_triggers, 0)
-        self.assertDictEqual(user.pearsonengine.ead_courses, {})
+        self.assertEqual(user.pearsonengine.courses[course_id], 1)
 
     def test_does_not_increment_course_value_for_other_actions(self):
         """Tests if the `increment_course_value` method is not called for other action names.
@@ -569,5 +566,4 @@ class TestUpdateUserEngineCustomForm(TestCase):
         self.assertEqual(user.pearsonengine.cdd_triggers, 0)
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
-        self.assertDictEqual(user.pearsonengine.ead_courses, {})
-        self.assertDictEqual(user.pearsonengine.rti_courses, {})
+        self.assertDictEqual(user.pearsonengine.courses, {})

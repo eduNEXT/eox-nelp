@@ -13,7 +13,13 @@ from django.test import TestCase
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
-from eox_nelp.pearson_vue.utils import generate_client_authorization_id, is_cp1252, update_xml_with_dict
+from eox_nelp.pearson_vue.models import PearsonEngine
+from eox_nelp.pearson_vue.utils import (
+    generate_client_authorization_id,
+    is_cp1252,
+    update_user_engines,
+    update_xml_with_dict,
+)
 
 User = get_user_model()
 
@@ -451,3 +457,110 @@ class TestIsCp1252(TestCase):
         text = "This string has ©®€ symbols"
 
         self.assertFalse(is_cp1252(text))
+
+
+class TestUpdateUserEngineCustomForm(TestCase):
+    """Class to test update_user_engines function"""
+    # pylint: disable=no-member
+
+    def test_creates_pearson_engine_if_none_exists(self):
+        """Tests if a `PearsonEngine` instance is created if it doesn't exist.
+
+        Expected Behavior:
+
+        - If a `PearsonEngine` instance does not exist for the given user,
+        a new instance should be created and associated with the user.
+        """
+
+        user = User.objects.create(username="not_exists_rti_user")
+
+        update_user_engines(user, "cdd")
+
+        self.assertIsInstance(user.pearsonengine, PearsonEngine)
+
+    def test_increments_trigger_for_cdd(self):
+        """Tests if the `increment_trigger` method is called and the trigger count is incremented.
+        Expected Behavior:
+        - The `cdd_triggers` attribute of the `PearsonEngine` instance should be incremented by 1.
+        - Other colums would not be affected
+        """
+        initial_cdd_count = 12
+        user = User.objects.create(username="incrementcdd")
+        PearsonEngine.objects.create(user=user, cdd_triggers=initial_cdd_count)
+
+        update_user_engines(user, "cdd")
+
+        user.pearsonengine.refresh_from_db()
+        self.assertEqual(user.pearsonengine.cdd_triggers, initial_cdd_count + 1)
+        self.assertEqual(user.pearsonengine.ead_triggers, 0)
+        self.assertEqual(user.pearsonengine.rti_triggers, 0)
+        self.assertDictEqual(user.pearsonengine.courses, {})
+
+    def test_increments_course_value_for_ead(self):
+        """Tests if the `increment_course_value` method is called for "ead" actions
+        and the course count is incremented.
+        Expected Behavior:
+        - The `rti_triggers` attribute of the `PearsonEngine` instance should be incremented by 1.
+        - The course dict would be increment by one in the desired course.
+        - Other colums would not be affected
+        """
+        initial_ead_count = 23
+        course_id = "course-v1:test+awesome"
+        initial_course_id_count = 99
+        user = User.objects.create(username="incrementead")
+        PearsonEngine.objects.create(
+            user=user,
+            ead_triggers=initial_ead_count,
+            courses={
+                course_id: initial_course_id_count
+            }
+        )
+
+        update_user_engines(user, "ead", course_id)
+        user.pearsonengine.refresh_from_db()
+
+        self.assertEqual(user.pearsonengine.ead_triggers, initial_ead_count + 1)
+        self.assertEqual(user.pearsonengine.cdd_triggers, 0)
+        self.assertEqual(user.pearsonengine.rti_triggers, 0)
+        self.assertEqual(user.pearsonengine.courses[course_id], initial_course_id_count + 1)
+
+    def test_increments_course_value_for_rti(self):
+        """Tests if the `increment_course_value` method is called for "rti" actions
+        and the course count is incremented.
+        Test not previous pearson engine one-one-relation instance but created.
+        Expected Behavior:
+        - The `rti_triggers` attribute of the `PearsonEngine` instance should be incremented by 1.
+        - The course dict would be increment by one in the desired course.
+        - Other colums would not be affected
+        """
+        user = User.objects.create(username="incrementrti")
+        course_id = "course-v1:test+awesome"
+
+        update_user_engines(user, "rti", course_id)
+
+        user.pearsonengine.refresh_from_db()
+        self.assertEqual(user.pearsonengine.rti_triggers, 1)
+        self.assertEqual(user.pearsonengine.ead_triggers, 0)
+        self.assertEqual(user.pearsonengine.cdd_triggers, 0)
+        self.assertEqual(user.pearsonengine.courses[course_id], 1)
+
+    def test_does_not_increment_course_value_for_other_actions(self):
+        """Tests if the `increment_course_value` method is not called for other action names.
+        Expected Behavior:
+
+        - If the `action_name` is not "ead", "rti" or "cdd", raise ValueError.
+        - The pearsonengine attributes should remain unchanged.
+        """
+        user = User.objects.create(
+            username="otheactionincrement",
+            pearsonengine=PearsonEngine.objects.create()
+        )
+        course_id = "course-v1:test+awesome"
+
+        with self.assertRaises(ValueError):
+            update_user_engines(user, "other_action", course_id)
+
+        self.assertEqual(user.pearsonengine.cdd_triggers, 0)
+        self.assertEqual(user.pearsonengine.ead_triggers, 0)
+        self.assertEqual(user.pearsonengine.rti_triggers, 0)
+        self.assertDictEqual(user.pearsonengine.courses, {})

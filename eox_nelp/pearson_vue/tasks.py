@@ -17,6 +17,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
+from eox_nelp.pearson_vue.utils import update_user_engines
 
 User = get_user_model()
 
@@ -129,10 +130,11 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
     @audit_method(action="Pearson Engine Action")
     @rename_function(name=action_key)
     def audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs):
+        user = User.objects.get(id=user_id)
+        update_user_engines(user, action_name, exam_id)
         action = getattr(PearsonEngineApiClient(), action_key)
-
         response = action(
-            user=User.objects.get(id=user_id),
+            user=user,
             exam_id=exam_id,
             **kwargs
         )

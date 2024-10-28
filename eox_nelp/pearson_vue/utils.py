@@ -56,7 +56,7 @@ def is_cp1252(text):
 
 
 def update_user_engines(user, action_type, course_id=None):
-    """_summary_
+    """Update engines model using pearson vue actions.
 
     Args:
         user (User): User instance relation to update engine.

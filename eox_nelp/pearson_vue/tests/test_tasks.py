@@ -131,6 +131,7 @@ class TestRealTimeImportTaskV2(TestCase):
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
         action_name = "rti"
+
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
@@ -149,6 +150,7 @@ class TestRealTimeImportTaskV2(TestCase):
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_candidate_demographics": mock_action})
         action_name = "cdd"
+
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
@@ -167,6 +169,7 @@ class TestRealTimeImportTaskV2(TestCase):
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_exam_authorization": mock_action})
         action_name = "ead"
+
         real_time_import_task_v2(self.user.id, exam_id=self.exam_id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, self.exam_id,)

@@ -20,23 +20,34 @@ attrs==24.2.0
     # via openedx-events
 beautifulsoup4==4.12.3
     # via bs4
-billiard==4.2.0
+billiard==4.2.1
     # via celery
+bleach==6.2.0
+    # via ora2
+boto3==1.35.53
+    # via ora2
+botocore==1.35.53
+    # via
+    #   boto3
+    #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/base.in
 bs4==0.0.2
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   external-api-clients
 celery==5.4.0
     # via
+    #   eox-audit-model
     #   eox-core
     #   event-tracking
-certifi==2024.7.4
+certifi==2024.8.30
     # via requests
-cffi==1.17.0
+cffi==1.17.1
     # via
     #   cryptography
     #   pynacl
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via requests
 click==8.1.7
     # via
@@ -55,7 +66,7 @@ click-repl==0.3.0
     # via celery
 code-annotations==1.8.0
     # via edx-toggles
-cryptography==43.0.0
+cryptography==43.0.3
     # via
     #   jwcrypto
     #   pyjwt
@@ -63,6 +74,7 @@ cryptography==43.0.0
     #   social-auth-core
 defusedxml==0.8.0rc2
     # via
+    #   ora2
     #   python3-openid
     #   social-auth-core
 django==3.2.25
@@ -80,36 +92,49 @@ django==3.2.25
     #   drf-jwt
     #   drf-yasg
     #   edx-api-doc-tools
+    #   edx-django-release-util
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-i18n-tools
+    #   edx-milestones
     #   edx-proctoring
+    #   edx-submissions
     #   edx-toggles
     #   edx-when
+    #   eox-audit-model
     #   eox-core
+    #   eox-support
     #   eox-theming
     #   event-tracking
     #   jsonfield
     #   nelp-custom-registration-fields
     #   openedx-events
     #   openedx-filters
+    #   ora2
     #   social-auth-app-django
 django-crum==0.7.9
     # via
     #   edx-django-utils
     #   edx-proctoring
     #   edx-toggles
+    #   eox-audit-model
 django-filter==21.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   eox-core
 django-ipware==7.0.1
-    # via edx-proctoring
-django-model-utils==4.5.1
     # via
     #   edx-proctoring
+    #   eox-audit-model
+    #   eox-support
+django-model-utils==5.0.0
+    # via
+    #   edx-milestones
+    #   edx-proctoring
+    #   edx-submissions
     #   edx-when
+    #   ora2
 django-oauth-toolkit==2.4.0
     # via eox-core
 django-oauth2-provider==0.2.6.1
@@ -119,7 +144,9 @@ django-password-validators==1.7.3
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
 django-simple-history==3.6.0
-    # via edx-proctoring
+    # via
+    #   edx-proctoring
+    #   ora2
 django-waffle==4.1.0
     # via
     #   edx-django-utils
@@ -127,7 +154,7 @@ django-waffle==4.1.0
     #   edx-proctoring
     #   edx-toggles
     #   eox-core
-django-webpack-loader==3.1.0
+django-webpack-loader==3.1.1
     # via edx-proctoring
 djangorestframework==3.12.4
     # via
@@ -139,21 +166,26 @@ djangorestframework==3.12.4
     #   edx-api-doc-tools
     #   edx-drf-extensions
     #   edx-proctoring
+    #   edx-submissions
     #   eox-core
+    #   eox-support
+    #   ora2
 djangorestframework-jsonapi==5.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-dnspython==2.6.1
+dnspython==2.7.0
     # via pymongo
 drf-jwt==1.19.2
     # via edx-drf-extensions
-drf-yasg==1.21.7
+drf-yasg==1.21.8
     # via edx-api-doc-tools
-edx-api-doc-tools==1.8.0
+edx-api-doc-tools==2.0.0
     # via eox-core
 edx-ccx-keys==1.3.0
     # via openedx-events
+edx-django-release-util==1.4.0
+    # via edx-submissions
 edx-django-utils==5.2.0
     # via
     #   -c requirements/constraints.txt
@@ -164,6 +196,7 @@ edx-django-utils==5.2.0
     #   edx-when
     #   event-tracking
     #   openedx-events
+    #   ora2
 edx-drf-extensions==8.0.0
     # via
     #   -c requirements/constraints.txt
@@ -171,33 +204,50 @@ edx-drf-extensions==8.0.0
     #   edx-proctoring
     #   edx-when
     #   eox-core
-edx-i18n-tools==1.6.2
-    # via -r requirements/base.in
-edx-opaque-keys[django]==2.10.0
+edx-i18n-tools==1.6.3
+    # via
+    #   -r requirements/base.in
+    #   ora2
+edx-milestones==0.6.0
+    # via eox-support
+edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/base.in
     #   edx-ccx-keys
     #   edx-drf-extensions
+    #   edx-milestones
     #   edx-proctoring
     #   edx-when
     #   eox-core
+    #   eox-support
     #   openedx-events
-edx-proctoring==4.18.1
+    #   ora2
+edx-proctoring==4.18.2
     # via eox-core
-edx-rest-api-client==5.7.1
+edx-rest-api-client==6.0.0
     # via edx-proctoring
+edx-submissions==3.8.3
+    # via ora2
 edx-toggles==5.2.0
-    # via event-tracking
+    # via
+    #   event-tracking
+    #   ora2
 edx-when==2.5.0
     # via edx-proctoring
-eox-core==10.5.1
+eox-audit-model==5.0.0
+    # via
+    #   eox-support
+    #   external-api-clients
+eox-core==11.0.0
+    # via -r requirements/base.in
+eox-support @ git+ssh://git@github.com/eduNEXT/eox-support@v6.0.0
     # via -r requirements/base.in
 eox-tenant==11.2.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   eox-theming
-eox-theming==7.2.0
+eox-theming==8.0.0
     # via -r requirements/base.in
 event-tracking==3.0.0
     # via
@@ -205,13 +255,15 @@ event-tracking==3.0.0
     #   edx-proctoring
 external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@main
     # via -r requirements/base.in
-fastavro==1.9.5
+fastavro==1.9.7
     # via openedx-events
 fs==2.4.16
     # via xblock
 future==1.0.0
     # via pyjwkest
-idna==3.7
+html5lib==1.1
+    # via ora2
+idna==3.10
     # via requests
 inflection==0.5.1
     # via
@@ -219,58 +271,81 @@ inflection==0.5.1
     #   drf-yasg
 jinja2==3.1.4
     # via code-annotations
+jmespath==1.0.1
+    # via
+    #   boto3
+    #   botocore
 jsonfield==3.1.0
-    # via edx-proctoring
+    # via
+    #   edx-proctoring
+    #   edx-submissions
+    #   eox-audit-model
+    #   ora2
 jwcrypto==1.5.6
     # via django-oauth-toolkit
-kombu==5.4.0
+kombu==5.4.2
     # via celery
-lxml==5.3.0
+lazy==1.6
+    # via ora2
+loremipsum==1.0.5
+    # via ora2
+lxml[html-clean,html_clean]==5.3.0
     # via
     #   edx-i18n-tools
+    #   external-api-clients
+    #   ora2
     #   xblock
-mako==1.3.5
+mako==1.3.6
     # via
     #   -r requirements/base.in
     #   xblock
-markupsafe==2.1.5
+markupsafe==3.0.2
     # via
     #   jinja2
     #   mako
     #   xblock
 nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
     # via -r requirements/base.in
-newrelic==9.13.0
+newrelic==10.2.0
     # via edx-django-utils
 oauthlib==3.2.2
     # via
     #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
-openedx-events==9.11.0
+openedx-events==9.14.1
     # via
     #   -r requirements/base.in
     #   eox-core
     #   event-tracking
+    #   ora2
 openedx-filters==1.9.0
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   ora2
+ora2==6.12.3
+    # via eox-support
 packaging==24.1
     # via drf-yasg
 path==16.16.0
-    # via edx-i18n-tools
-pbr==6.0.0
+    # via
+    #   edx-i18n-tools
+    #   path-py
+path-py==12.5.0
+    # via ora2
+pbr==6.1.0
     # via stevedore
-phonenumbers==8.13.43
+phonenumbers==8.13.48
     # via -r requirements/base.in
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.47
+prompt-toolkit==3.0.48
     # via click-repl
-psutil==6.0.0
+psutil==6.1.0
     # via edx-django-utils
 pycparser==2.22
     # via cffi
-pycryptodomex==3.20.0
+pycryptodomex==3.21.0
     # via
     #   edx-proctoring
     #   pyjwkest
@@ -295,29 +370,36 @@ pynacl==1.5.0
     # via edx-django-utils
 python-dateutil==2.9.0.post0
     # via
+    #   botocore
     #   celery
     #   edx-drf-extensions
     #   edx-proctoring
+    #   ora2
     #   xblock
 python-ipware==3.0.0
     # via django-ipware
 python-slugify==8.0.4
     # via code-annotations
+python-swiftclient==4.6.0
+    # via ora2
 python3-openid==3.2.0
     # via social-auth-core
-pytz==2024.1
+pytz==2024.2
     # via
     #   django
     #   django-oauth-toolkit
     #   drf-yasg
     #   edx-proctoring
+    #   edx-submissions
     #   event-tracking
+    #   ora2
     #   tincan
     #   xblock
 pyyaml==6.0.2
     # via
     #   code-annotations
     #   drf-yasg
+    #   edx-django-release-util
     #   edx-i18n-tools
     #   xblock
 requests==2.32.3
@@ -325,37 +407,44 @@ requests==2.32.3
     #   django-oauth-toolkit
     #   edx-drf-extensions
     #   edx-rest-api-client
+    #   external-api-clients
     #   pyjwkest
+    #   python-swiftclient
     #   requests-oauthlib
     #   requests-pkcs12
-    #   slumber
     #   social-auth-core
 requests-oauthlib==2.0.0
     # via
     #   -r requirements/base.in
+    #   external-api-clients
     #   social-auth-core
 requests-pkcs12==1.22
-    # via -r requirements/base.in
-rules==3.4
+    # via
+    #   -r requirements/base.in
+    #   external-api-clients
+rules==3.5
     # via edx-proctoring
+s3transfer==0.10.3
+    # via boto3
 semantic-version==2.10.0
     # via edx-drf-extensions
 shortuuid==1.0.13
     # via django-oauth2-provider
-simplejson==3.19.2
+simplejson==3.19.3
     # via xblock
 six==1.16.0
     # via
     #   edx-ccx-keys
+    #   edx-django-release-util
     #   edx-drf-extensions
+    #   edx-milestones
     #   eox-core
     #   eox-theming
     #   event-tracking
     #   fs
+    #   html5lib
     #   pyjwkest
     #   python-dateutil
-slumber==0.7.1
-    # via edx-rest-api-client
 social-auth-app-django==5.4.2
     # via -r requirements/base.in
 social-auth-core==4.5.4
@@ -366,7 +455,7 @@ soupsieve==2.6
     # via beautifulsoup4
 sqlparse==0.5.1
     # via django
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   code-annotations
     #   edx-django-utils
@@ -382,25 +471,37 @@ typing-extensions==4.12.2
     #   jwcrypto
     #   pydantic
     #   pydantic-core
-tzdata==2024.1
-    # via celery
+tzdata==2024.2
+    # via
+    #   celery
+    #   kombu
 uritemplate==4.1.1
     # via drf-yasg
-urllib3==2.2.2
-    # via requests
+urllib3==2.2.3
+    # via
+    #   botocore
+    #   requests
 vine==5.1.0
     # via
     #   amqp
     #   celery
     #   kombu
+voluptuous==0.15.2
+    # via ora2
 wcwidth==0.2.13
     # via prompt-toolkit
 web-fragments==2.2.0
     # via xblock
-webob==1.8.8
+webencodings==0.5.1
+    # via
+    #   bleach
+    #   html5lib
+webob==1.8.9
     # via xblock
-xblock==5.0.0
-    # via edx-when
+xblock==5.1.0
+    # via
+    #   edx-when
+    #   ora2
 xmltodict==0.13.0
     # via -r requirements/base.in
 

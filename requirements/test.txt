@@ -26,7 +26,7 @@ asgiref==3.8.1
     #   django
     #   django-countries
     #   django-simple-history
-astroid==3.2.4
+astroid==3.3.5
     # via pylint
 attrs==24.2.0
     # via
@@ -36,29 +36,45 @@ beautifulsoup4==4.12.3
     # via
     #   -r requirements/base.txt
     #   bs4
-billiard==4.2.0
+billiard==4.2.1
     # via
     #   -r requirements/base.txt
     #   celery
+bleach==6.2.0
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+boto3==1.35.53
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+botocore==1.35.53
+    # via
+    #   -r requirements/base.txt
+    #   boto3
+    #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/base.txt
 bs4==0.0.2
-    # via -r requirements/base.txt
+    # via
+    #   -r requirements/base.txt
+    #   external-api-clients
 celery==5.4.0
     # via
     #   -r requirements/base.txt
+    #   eox-audit-model
     #   eox-core
     #   event-tracking
-certifi==2024.7.4
+certifi==2024.8.30
     # via
     #   -r requirements/base.txt
     #   requests
-cffi==1.17.0
+cffi==1.17.1
     # via
     #   -r requirements/base.txt
     #   cryptography
     #   pynacl
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via
     #   -r requirements/base.txt
     #   requests
@@ -88,9 +104,9 @@ code-annotations==1.8.0
     # via
     #   -r requirements/base.txt
     #   edx-toggles
-coverage==7.6.1
+coverage==7.6.4
     # via -r requirements/test.in
-cryptography==43.0.0
+cryptography==43.0.3
     # via
     #   -r requirements/base.txt
     #   jwcrypto
@@ -102,9 +118,10 @@ ddt==1.7.2
 defusedxml==0.8.0rc2
     # via
     #   -r requirements/base.txt
+    #   ora2
     #   python3-openid
     #   social-auth-core
-dill==0.3.8
+dill==0.3.9
     # via pylint
 django==3.2.25
     # via
@@ -121,19 +138,25 @@ django==3.2.25
     #   drf-jwt
     #   drf-yasg
     #   edx-api-doc-tools
+    #   edx-django-release-util
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-i18n-tools
+    #   edx-milestones
     #   edx-proctoring
+    #   edx-submissions
     #   edx-toggles
     #   edx-when
+    #   eox-audit-model
     #   eox-core
+    #   eox-support
     #   eox-theming
     #   event-tracking
     #   jsonfield
     #   nelp-custom-registration-fields
     #   openedx-events
     #   openedx-filters
+    #   ora2
     #   social-auth-app-django
 django-countries==7.6.1
     # via -r requirements/test.in
@@ -143,6 +166,7 @@ django-crum==0.7.9
     #   edx-django-utils
     #   edx-proctoring
     #   edx-toggles
+    #   eox-audit-model
 django-fake-model==0.1.4
     # via -r requirements/test.in
 django-filter==21.1
@@ -154,11 +178,16 @@ django-ipware==7.0.1
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-django-model-utils==4.5.1
+    #   eox-audit-model
+    #   eox-support
+django-model-utils==5.0.0
     # via
     #   -r requirements/base.txt
+    #   edx-milestones
     #   edx-proctoring
+    #   edx-submissions
     #   edx-when
+    #   ora2
 django-oauth-toolkit==2.4.0
     # via
     #   -r requirements/base.txt
@@ -175,6 +204,7 @@ django-simple-history==3.6.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+    #   ora2
 django-waffle==4.1.0
     # via
     #   -r requirements/base.txt
@@ -183,7 +213,7 @@ django-waffle==4.1.0
     #   edx-proctoring
     #   edx-toggles
     #   eox-core
-django-webpack-loader==3.1.0
+django-webpack-loader==3.1.1
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -197,12 +227,15 @@ djangorestframework==3.12.4
     #   edx-api-doc-tools
     #   edx-drf-extensions
     #   edx-proctoring
+    #   edx-submissions
     #   eox-core
+    #   eox-support
+    #   ora2
 djangorestframework-jsonapi==5.0.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
-dnspython==2.6.1
+dnspython==2.7.0
     # via
     #   -r requirements/base.txt
     #   pymongo
@@ -210,11 +243,11 @@ drf-jwt==1.19.2
     # via
     #   -r requirements/base.txt
     #   edx-drf-extensions
-drf-yasg==1.21.7
+drf-yasg==1.21.8
     # via
     #   -r requirements/base.txt
     #   edx-api-doc-tools
-edx-api-doc-tools==1.8.0
+edx-api-doc-tools==2.0.0
     # via
     #   -r requirements/base.txt
     #   eox-core
@@ -222,6 +255,10 @@ edx-ccx-keys==1.3.0
     # via
     #   -r requirements/base.txt
     #   openedx-events
+edx-django-release-util==1.4.0
+    # via
+    #   -r requirements/base.txt
+    #   edx-submissions
 edx-django-utils==5.2.0
     # via
     #   -c requirements/constraints.txt
@@ -232,6 +269,7 @@ edx-django-utils==5.2.0
     #   edx-when
     #   event-tracking
     #   openedx-events
+    #   ora2
 edx-drf-extensions==8.0.0
     # via
     #   -c requirements/constraints.txt
@@ -239,41 +277,62 @@ edx-drf-extensions==8.0.0
     #   edx-proctoring
     #   edx-when
     #   eox-core
-edx-i18n-tools==1.6.2
-    # via -r requirements/base.txt
-edx-opaque-keys[django]==2.10.0
+edx-i18n-tools==1.6.3
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+edx-milestones==0.6.0
+    # via
+    #   -r requirements/base.txt
+    #   eox-support
+edx-opaque-keys[django]==2.11.0
     # via
     #   -r requirements/base.txt
     #   edx-ccx-keys
     #   edx-drf-extensions
+    #   edx-milestones
     #   edx-proctoring
     #   edx-when
     #   eox-core
+    #   eox-support
     #   openedx-events
-edx-proctoring==4.18.1
+    #   ora2
+edx-proctoring==4.18.2
     # via
     #   -r requirements/base.txt
     #   eox-core
-edx-rest-api-client==5.7.1
+edx-rest-api-client==6.0.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+edx-submissions==3.8.3
+    # via
+    #   -r requirements/base.txt
+    #   ora2
 edx-toggles==5.2.0
     # via
     #   -r requirements/base.txt
     #   event-tracking
+    #   ora2
 edx-when==2.5.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
-eox-core==10.5.1
+eox-audit-model==5.0.0
+    # via
+    #   -r requirements/base.txt
+    #   eox-support
+    #   external-api-clients
+eox-core==11.0.0
+    # via -r requirements/base.txt
+eox-support @ git+ssh://git@github.com/eduNEXT/eox-support@v6.0.0
     # via -r requirements/base.txt
 eox-tenant==11.2.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.txt
     #   eox-theming
-eox-theming==7.2.0
+eox-theming==8.0.0
     # via -r requirements/base.txt
 event-tracking==3.0.0
     # via
@@ -281,7 +340,7 @@ event-tracking==3.0.0
     #   edx-proctoring
 external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@main
     # via -r requirements/base.txt
-fastavro==1.9.5
+fastavro==1.9.7
     # via
     #   -r requirements/base.txt
     #   openedx-events
@@ -295,7 +354,11 @@ future==1.0.0
     # via
     #   -r requirements/base.txt
     #   pyjwkest
-idna==3.7
+html5lib==1.1
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+idna==3.10
     # via
     #   -r requirements/base.txt
     #   requests
@@ -310,28 +373,46 @@ jinja2==3.1.4
     # via
     #   -r requirements/base.txt
     #   code-annotations
+jmespath==1.0.1
+    # via
+    #   -r requirements/base.txt
+    #   boto3
+    #   botocore
 jsonfield==3.1.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+    #   edx-submissions
+    #   eox-audit-model
+    #   ora2
 jwcrypto==1.5.6
     # via
     #   -r requirements/base.txt
     #   django-oauth-toolkit
-kombu==5.4.0
+kombu==5.4.2
     # via
     #   -r requirements/base.txt
     #   celery
-lxml==5.3.0
+lazy==1.6
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+loremipsum==1.0.5
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+lxml[html-clean]==5.3.0
     # via
     #   -r requirements/base.txt
     #   edx-i18n-tools
+    #   external-api-clients
+    #   ora2
     #   xblock
-mako==1.3.5
+mako==1.3.6
     # via
     #   -r requirements/base.txt
     #   xblock
-markupsafe==2.1.5
+markupsafe==3.0.2
     # via
     #   -r requirements/base.txt
     #   jinja2
@@ -345,7 +426,7 @@ mock==5.1.0
     # via -r requirements/test.in
 nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
     # via -r requirements/base.txt
-newrelic==9.13.0
+newrelic==10.2.0
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -355,13 +436,20 @@ oauthlib==3.2.2
     #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
-openedx-events==9.11.0
+openedx-events==9.14.1
     # via
     #   -r requirements/base.txt
     #   eox-core
     #   event-tracking
+    #   ora2
 openedx-filters==1.9.0
-    # via -r requirements/base.txt
+    # via
+    #   -r requirements/base.txt
+    #   ora2
+ora2==6.12.3
+    # via
+    #   -r requirements/base.txt
+    #   eox-support
 packaging==24.1
     # via
     #   -r requirements/base.txt
@@ -372,24 +460,27 @@ path==16.16.0
     #   edx-i18n-tools
     #   path-py
 path-py==12.5.0
-    # via -r requirements/test.in
-pbr==6.0.0
+    # via
+    #   -r requirements/base.txt
+    #   -r requirements/test.in
+    #   ora2
+pbr==6.1.0
     # via
     #   -r requirements/base.txt
     #   stevedore
-phonenumbers==8.13.43
+phonenumbers==8.13.48
     # via -r requirements/base.txt
-platformdirs==4.2.2
+platformdirs==4.3.6
     # via pylint
 polib==1.2.0
     # via
     #   -r requirements/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.47
+prompt-toolkit==3.0.48
     # via
     #   -r requirements/base.txt
     #   click-repl
-psutil==6.0.0
+psutil==6.1.0
     # via
     #   -r requirements/base.txt
     #   edx-django-utils
@@ -401,7 +492,7 @@ pycparser==2.22
     # via
     #   -r requirements/base.txt
     #   cffi
-pycryptodomex==3.20.0
+pycryptodomex==3.21.0
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
@@ -426,7 +517,7 @@ pyjwt[crypto]==2.9.0
     #   edx-proctoring
     #   edx-rest-api-client
     #   social-auth-core
-pylint==3.2.6
+pylint==3.3.1
     # via -r requirements/test.in
 pymongo==4.4.0
     # via
@@ -440,9 +531,11 @@ pynacl==1.5.0
 python-dateutil==2.9.0.post0
     # via
     #   -r requirements/base.txt
+    #   botocore
     #   celery
     #   edx-drf-extensions
     #   edx-proctoring
+    #   ora2
     #   xblock
 python-ipware==3.0.0
     # via
@@ -452,18 +545,24 @@ python-slugify==8.0.4
     # via
     #   -r requirements/base.txt
     #   code-annotations
+python-swiftclient==4.6.0
+    # via
+    #   -r requirements/base.txt
+    #   ora2
 python3-openid==3.2.0
     # via
     #   -r requirements/base.txt
     #   social-auth-core
-pytz==2024.1
+pytz==2024.2
     # via
     #   -r requirements/base.txt
     #   django
     #   django-oauth-toolkit
     #   drf-yasg
     #   edx-proctoring
+    #   edx-submissions
     #   event-tracking
+    #   ora2
     #   tincan
     #   xblock
 pyyaml==6.0.2
@@ -471,6 +570,7 @@ pyyaml==6.0.2
     #   -r requirements/base.txt
     #   code-annotations
     #   drf-yasg
+    #   edx-django-release-util
     #   edx-i18n-tools
     #   xblock
 requests==2.32.3
@@ -479,21 +579,29 @@ requests==2.32.3
     #   django-oauth-toolkit
     #   edx-drf-extensions
     #   edx-rest-api-client
+    #   external-api-clients
     #   pyjwkest
+    #   python-swiftclient
     #   requests-oauthlib
     #   requests-pkcs12
-    #   slumber
     #   social-auth-core
 requests-oauthlib==2.0.0
     # via
     #   -r requirements/base.txt
+    #   external-api-clients
     #   social-auth-core
 requests-pkcs12==1.22
-    # via -r requirements/base.txt
-rules==3.4
+    # via
+    #   -r requirements/base.txt
+    #   external-api-clients
+rules==3.5
     # via
     #   -r requirements/base.txt
     #   edx-proctoring
+s3transfer==0.10.3
+    # via
+    #   -r requirements/base.txt
+    #   boto3
 semantic-version==2.10.0
     # via
     #   -r requirements/base.txt
@@ -502,7 +610,7 @@ shortuuid==1.0.13
     # via
     #   -r requirements/base.txt
     #   django-oauth2-provider
-simplejson==3.19.2
+simplejson==3.19.3
     # via
     #   -r requirements/base.txt
     #   xblock
@@ -510,17 +618,16 @@ six==1.16.0
     # via
     #   -r requirements/base.txt
     #   edx-ccx-keys
+    #   edx-django-release-util
     #   edx-drf-extensions
+    #   edx-milestones
     #   eox-core
     #   eox-theming
     #   event-tracking
     #   fs
+    #   html5lib
     #   pyjwkest
     #   python-dateutil
-slumber==0.7.1
-    # via
-    #   -r requirements/base.txt
-    #   edx-rest-api-client
 social-auth-app-django==5.4.2
     # via -r requirements/base.txt
 social-auth-core==4.5.4
@@ -536,7 +643,7 @@ sqlparse==0.5.1
     # via
     #   -r requirements/base.txt
     #   django
-stevedore==5.2.0
+stevedore==5.3.0
     # via
     #   -r requirements/base.txt
     #   code-annotations
@@ -550,7 +657,7 @@ text-unidecode==1.3
     #   python-slugify
 tincan==1.0.0
     # via -r requirements/base.txt
-tomli==2.0.1
+tomli==2.0.2
     # via pylint
 tomlkit==0.13.2
     # via pylint
@@ -564,17 +671,19 @@ typing-extensions==4.12.2
     #   jwcrypto
     #   pydantic
     #   pydantic-core
-tzdata==2024.1
+tzdata==2024.2
     # via
     #   -r requirements/base.txt
     #   celery
+    #   kombu
 uritemplate==4.1.1
     # via
     #   -r requirements/base.txt
     #   drf-yasg
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   -r requirements/base.txt
+    #   botocore
     #   requests
 vine==5.1.0
     # via
@@ -582,6 +691,10 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
+voluptuous==0.15.2
+    # via
+    #   -r requirements/base.txt
+    #   ora2
 wcwidth==0.2.13
     # via
     #   -r requirements/base.txt
@@ -590,14 +703,20 @@ web-fragments==2.2.0
     # via
     #   -r requirements/base.txt
     #   xblock
-webob==1.8.8
+webencodings==0.5.1
+    # via
+    #   -r requirements/base.txt
+    #   bleach
+    #   html5lib
+webob==1.8.9
     # via
     #   -r requirements/base.txt
     #   xblock
-xblock==5.0.0
+xblock==5.1.0
     # via
     #   -r requirements/base.txt
     #   edx-when
+    #   ora2
 xmltodict==0.13.0
     # via -r requirements/base.txt
 

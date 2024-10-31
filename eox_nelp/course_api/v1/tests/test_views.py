@@ -12,6 +12,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
+from eox_nelp.edxapp_wrapper.course_experience import course_home_url
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.test_backends.course_api_m_v1 import TEST_RAW_OVERVIEW
 
@@ -92,11 +93,13 @@ class NelpCoursesApiViewsTestCase(APITestCase):
             "results": [
                 {
                     "course_about_url": f"http://testserver/courses/{self.BASE_COURSE_ID}1/about",
+                    "course_home_url": course_home_url(f"{self.BASE_COURSE_ID}1"),
                     "overview": TEST_RAW_OVERVIEW,
                     "overview_object": self.expected_overview_object,
                 },
                 {
                     "course_about_url": f"http://testserver/courses/{self.BASE_COURSE_ID}2/about",
+                    "course_home_url": course_home_url(f"{self.BASE_COURSE_ID}2"),
                     "overview": TEST_RAW_OVERVIEW,
                     "overview_object": self.expected_overview_object,
                 },
@@ -122,12 +125,12 @@ class NelpCoursesApiViewsTestCase(APITestCase):
         url_endpoint = reverse(self.reverse_viewname_detail, kwargs=course_kwarg)
         expected_value = {
             "course_about_url": f"http://testserver/courses/{self.BASE_COURSE_ID}1/about",
+            "course_home_url": course_home_url(f"{self.BASE_COURSE_ID}1"),
             "overview": TEST_RAW_OVERVIEW,
             "overview_object": self.expected_overview_object,
         }
 
         response = self.client.get(url_endpoint)
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn(response.headers["Content-Type"], self.RESPONSE_CONTENT_TYPES)
         self.assertDictEqual(response.json(), expected_value)

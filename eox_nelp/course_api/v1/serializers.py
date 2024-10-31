@@ -6,6 +6,7 @@ from django.urls import NoReverseMatch, reverse
 from rest_framework import serializers
 
 from eox_nelp.edxapp_wrapper.course_api import CourseDetailSerializer
+from eox_nelp.edxapp_wrapper.course_experience import course_home_url as retrieve_course_home_url
 
 
 class NelpCourseDetailSerializer(CourseDetailSerializer):  # pylint: disable=abstract-method
@@ -36,6 +37,14 @@ class NelpCourseDetailSerializer(CourseDetailSerializer):  # pylint: disable=abs
             about_course_path = f"/courses/{course_overview.id}/about"
 
         return self.context["request"].build_absolute_uri(about_course_path)
+
+    course_home_url = serializers.SerializerMethodField()
+
+    def get_course_home_url(self, course_overview):
+        """
+        Get the representation for SerializerMethodField `course_home_url`
+        """
+        return retrieve_course_home_url(course_overview.id)
 
     overview = serializers.SerializerMethodField()
 

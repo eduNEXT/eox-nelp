@@ -28,4 +28,3 @@ tincan
 xmltodict==0.13.0
 git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
 git+ssh://git@github.com/nelc/external-api-clients.git@main
-git+ssh://git@github.com/eduNEXT/eox-support@v6.0.0

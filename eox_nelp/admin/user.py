@@ -23,7 +23,7 @@ User = get_user_model()
 
 class NelpUserAdmin(SupportUserAdmin):
     """EoxNelp User admin class."""
-    list_display = ('user_national_id',) + SupportUserAdmin.list_display
+    list_display = SupportUserAdmin.list_display[:2] + ('user_national_id',) + SupportUserAdmin.list_display[2:]
     search_fields = SupportUserAdmin.search_fields + ('extrainfo__national_id',)
     fieldsets = SupportUserAdmin.fieldsets + (
         ('Extra info Fields', {'fields': ('user_national_id',)}),

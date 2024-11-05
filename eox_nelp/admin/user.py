@@ -29,7 +29,6 @@ class NelpUserAdmin(SupportUserAdmin):
     list_display = SupportUserAdmin.list_display[:2] + ('user_national_id',) + SupportUserAdmin.list_display[2:]
     search_fields = SupportUserAdmin.search_fields + ('extrainfo__national_id',)
     inlines = SupportUserAdmin.inlines + (UserExtraInfoInline,)
-    readonly_fields = SupportUserAdmin.readonly_fields + ('user_national_id',)
 
     def user_national_id(self, instance):
         """Return national_id associated with the user extra_info instance."""

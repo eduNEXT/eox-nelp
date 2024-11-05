@@ -8,6 +8,8 @@ Classes:
 from unittest.mock import MagicMock, patch
 
 from ddt import data, ddt, unpack
+from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase, override_settings
 
 from eox_nelp.admin import (
@@ -18,6 +20,8 @@ from eox_nelp.admin import (
     pearson_real_time_action,
     pearson_update_ead_action,
 )
+
+User = get_user_model()
 
 
 @ddt
@@ -149,3 +153,37 @@ class TestNelpCourseEnrollmentAdmin(TestCase):
             - pearson_real_time_action method is in model actions.
         """
         self.assertIn(admin_action, self.modeladmin.actions)
+
+
+class TestNelpUserAdmin(TestCase):
+    """
+    Unit tests for the NelpUserAdmin class.
+    """
+
+    def test_load_module(self):
+        """
+        Test loading module of NelpUserAdmin when eox_support condition is bypassed.
+
+        Expected behavior:
+            - Test NelpUserAdmin is loaded in the user model key of admin registry.
+            - user_national_id is in list_display
+            - UserExtraInfoInline in inlines
+        """
+        class ProtoAdminUserSupportModule:
+            """Proto class to simulate module"""
+            class SupportUserAdmin(admin.ModelAdmin):
+                """Base User Model admin for testing purposes. With empty tuple to add the nelp values"""
+                list_display = ((),)
+                search_fields = ((),)
+                inlines = ((),)
+                readonly_fields = ((),)
+
+        with patch.dict("sys.modules", {"eox_support.admin.user": ProtoAdminUserSupportModule}):
+            from eox_nelp.admin.user import (  # pylint: disable=import-outside-toplevel
+                NelpUserAdmin,
+                UserExtraInfoInline,
+            )
+
+            self.assertIsInstance(admin.site._registry[User], NelpUserAdmin)  # pylint: disable=protected-access
+            self.assertIn("user_national_id", NelpUserAdmin.list_display)
+            self.assertIn(UserExtraInfoInline, NelpUserAdmin.inlines)

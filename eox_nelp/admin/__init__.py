@@ -13,5 +13,9 @@ from eox_nelp.notifications.admin import *  # noqa: F401
 from eox_nelp.payment_notifications.admin import *  # noqa: F401
 from eox_nelp.pearson_vue.admin import *  # noqa: F401
 
-if find_spec('eox_support') and 'eox_support.apps.EoxSupportConfig' in settings.INSTALLED_APPS:
+if (
+    find_spec("eox_support")
+    and "eox_support.apps.EoxSupportConfig" in settings.INSTALLED_APPS
+    and "custom_reg_form" in settings.INSTALLED_APPS
+):
     from eox_nelp.admin.user import *  # noqa: F401

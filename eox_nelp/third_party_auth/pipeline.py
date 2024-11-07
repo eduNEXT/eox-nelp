@@ -4,18 +4,14 @@ functions:
     social_details: Allows to map response fields to user standard fields.
     invalidate_current_user: Sets to None the current user.
 """
-import logging
-
 from django.conf import settings
 from django.contrib.auth import logout
-from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponseForbidden
 from django.utils.translation import gettext_lazy as _
 from social_core.pipeline.social_auth import social_details as social_core_details
 
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
-
-logger = logging.getLogger(__name__)
+from eox_nelp.third_party_auth.utils import match_user_using_uid_query
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -80,11 +76,6 @@ def safer_associate_user_by_national_id(  # pylint: disable=unused-argument
     request, backend, details, response, *args, user=None, **kwargs,
 ):
     """Pipeline to retrieve user if possible matching uid with the user.extrainfo.national_id records if possible.
-    The uid is based in the configuration of the saml with the field `attr_user_permanent_id`:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L49
-
-    This is using the idp and the uid inspired in:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L296C23-L297
 
     Returns:
         dict: Dict with user if matches once, if match multiple or not match return None.
@@ -92,13 +83,7 @@ def safer_associate_user_by_national_id(  # pylint: disable=unused-argument
     if user:
         return None
 
-    idp = backend.get_idp(response["idp_name"])
-    uid = idp.get_user_permanent_id(response["attributes"])
-    try:
-        user_match = backend.strategy.storage.user.get_user(extrainfo__national_id=uid)
-    except MultipleObjectsReturned as exc:
-        logger.info("Pipeline tries to match user with uid(%s) but Multiple users found: %s", uid, str(exc))
-        return None
+    user_match = match_user_using_uid_query(backend, response, user_query="extrainfo__national_id")
 
     if not user_match:
         return None
@@ -114,25 +99,13 @@ def safer_associate_user_by_social_auth_record(  # pylint: disable=unused-argume
 ):
     """Pipeline to retrieve user if possible matching uid with the if endswith with user.social_auth.uid
     records if possible.
-    The uid is based in the configuration of the saml with the field `attr_user_permanent_id`:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L49
-
-    This is using the idp and the uid inspired in:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L296C23-L297
-
     Returns:
         dict: Dict with user if matches once, if match multiple or not match return None.
     """
     if user:
         return None
 
-    idp = backend.get_idp(response["idp_name"])
-    uid = idp.get_user_permanent_id(response["attributes"])
-    try:
-        user_match = backend.strategy.storage.user.get_user(social_auth__uid__endswith=uid)
-    except MultipleObjectsReturned as exc:
-        logger.info("Pipeline tries to match user with uid(%s) but Multiple users found: %s", uid, str(exc))
-        return None
+    user_match = match_user_using_uid_query(backend, response, user_query="social_auth__uid__endswith")
 
     if not user_match:
         return None

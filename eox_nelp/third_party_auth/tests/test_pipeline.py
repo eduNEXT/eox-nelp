@@ -7,7 +7,7 @@ from django.test import TestCase
 from mock import Mock
 from rest_framework import status
 
-from eox_nelp.third_party_auth import pipeline
+from eox_nelp.third_party_auth import utils
 from eox_nelp.third_party_auth.pipeline import (
     disallow_staff_superuser_users,
     safer_associate_user_by_national_id,
@@ -80,9 +80,11 @@ class SaferAssociateUserUsingUid(SetUpPipeMixin):
         exc_msg = "return 7"
         self.backend.strategy.storage.user.get_user.side_effect = MultipleObjectsReturned(exc_msg)
         expected_log = [
-            f"INFO:{pipeline.__name__}:"
-            f"Pipeline tries to match user with uid({test_uid}) but Multiple users found: {exc_msg}"]
-        with self.assertLogs(pipeline.__name__, level="INFO") as logs:
+            f"INFO:{utils.__name__}:"
+            f"Pipeline tries to match user with uid({test_uid}) using {self.user_query}, "
+            f"but Multiple users found: {exc_msg}"
+        ]
+        with self.assertLogs(utils.__name__, level="INFO") as logs:
             pipe_output = self.uid_pipe(self.request, self.backend, self.details, self.response)
             self.assertIsNone(pipe_output)
         self.assertListEqual(logs.output, expected_log)

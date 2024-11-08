@@ -110,7 +110,7 @@ class SaferAssociaciateUserByNationalIdTestCase(SaferAssociateUserUsingUid, Test
         self.backend.get_idp.return_value.get_user_permanent_id.return_value = test_uid
         self.backend.strategy.storage.user.get_user.return_value = past_user
 
-        pipe_output = safer_associate_user_by_national_id(self.request, self.backend, self.details, self.response)
+        pipe_output = self.uid_pipe(self.request, self.backend, self.details, self.response)
 
         self.assertEqual({"user": past_user, "is_new": False}, pipe_output)
         self.backend.strategy.storage.user.get_user.assert_called_with(**{self.user_query: test_uid})
@@ -136,7 +136,7 @@ class SaferAssociaciateUserBySocialAuthRecordTestCase(SaferAssociateUserUsingUid
         self.backend.get_idp.return_value.get_user_permanent_id.return_value = test_uid
         self.backend.strategy.storage.user.get_user.return_value = past_user
 
-        pipe_output = safer_associate_user_by_social_auth_record(
+        pipe_output = self.uid_pipe(
             self.request,
             self.backend,
             self.details,
@@ -182,3 +182,20 @@ class DisallowStaffSuperuserUsersTestCase(SetUpPipeMixin, TestCase):
         pipe_output = disallow_staff_superuser_users(self.request, self.backend, self.details, self.response)
 
         self.assertIsNone(pipe_output)
+
+    def test_not_staff_or_superuser_user(self):
+        """Test the pipeline method receives a normal user(not staff and not superuser)
+        Expected behavior:
+            - The pipe method returns empty dict
+        """
+        past_user, _ = User.objects.get_or_create(username="notstaffsuperuser")
+
+        pipe_output = disallow_staff_superuser_users(
+            self.request,
+            self.backend,
+            self.details,
+            self.response,
+            user=past_user
+        )
+
+        self.assertDictEqual({}, pipe_output)

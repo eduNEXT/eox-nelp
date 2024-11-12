@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from social_core.pipeline.social_auth import social_details as social_core_details
 
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
+from eox_nelp.third_party_auth.utils import match_user_using_uid_query
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -71,31 +72,62 @@ def close_mismatch_session(request, *args, user=None, **kwargs):  # pylint: disa
     return {}
 
 
-def safer_associate_username_by_uid(  # pylint: disable=unused-argument
+def safer_associate_user_by_national_id(  # pylint: disable=unused-argument
     request, backend, details, response, *args, user=None, **kwargs,
 ):
-    """Pipeline to retrieve user if possible matching uid with the username of a user.
-    The uid is based in the configuration of the saml with the field `attr_user_permanent_id`:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L49
-
-    This is using the idp and the uid inspired in:
-    https://github.com/python-social-auth/social-core/blob/master/social_core/backends/saml.py#L296C23-L297
-    Raises:
-        EoxNelpAuthException: If someone tries to have staff or superuser permission using tpa.
+    """Pipeline to retrieve user if possible matching uid with the user.extrainfo.national_id records if possible.
 
     Returns:
-        dict: Dict with user if matches, if not return None.
+        dict: Dict with user if matches once, if match multiple or not match return None.
     """
     if user:
         return None
 
-    idp = backend.get_idp(response["idp_name"])
-    uid = idp.get_user_permanent_id(response["attributes"])
-    user_match = backend.strategy.storage.user.get_user(username=uid)
+    user_match = match_user_using_uid_query(backend, response, user_query="extrainfo__national_id")
 
     if not user_match:
         return None
-    if user_match.is_staff or user_match.is_superuser:
+
+    return {
+        "user": user_match,
+        "is_new": False,
+    }
+
+
+def safer_associate_user_by_social_auth_record(  # pylint: disable=unused-argument
+    request, backend, details, response, *args, user=None, **kwargs,
+):
+    """Pipeline to retrieve user if possible matching uid with the if endswith with user.social_auth.uid
+    records if possible.
+    Returns:
+        dict: Dict with user if matches once, if match multiple or not match return None.
+    """
+    if user:
+        return None
+
+    user_match = match_user_using_uid_query(backend, response, user_query="social_auth__uid__endswith")
+
+    if not user_match:
+        return None
+
+    return {
+        "user": user_match,
+        "is_new": False,
+    }
+
+
+def disallow_staff_superuser_users(  # pylint: disable=unused-argument
+    request, backend, details, response, *args, user=None, **kwargs,
+):
+    """Pipeline that forbids staff or superusers
+
+    Return:
+        HttpResponseForbidden: If someone tries to have staff or superuser permission using tpa.
+    """
+    if not user:
+        return None
+
+    if user.is_staff or user.is_superuser:
         return HttpResponseForbidden(
             edxmako.shortcuts.render_to_string(
                 "static_templates/server-error.html",
@@ -110,7 +142,4 @@ def safer_associate_username_by_uid(  # pylint: disable=unused-argument
                 request=request,
             )
         )
-    return {
-        "user": user_match,
-        "is_new": False,
-    }
+    return {}

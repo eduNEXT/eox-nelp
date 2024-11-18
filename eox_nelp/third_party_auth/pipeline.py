@@ -4,6 +4,8 @@ functions:
     social_details: Allows to map response fields to user standard fields.
     invalidate_current_user: Sets to None the current user.
 """
+import logging
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponseForbidden
@@ -14,6 +16,8 @@ from social_core.pipeline.social_auth import social_details as social_core_detai
 
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
 from eox_nelp.third_party_auth.utils import match_user_using_uid_query
+
+logger = logging.getLogger(__name__)
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -169,6 +173,11 @@ def validate_national_id_and_associate_user(request, backend, uid, *args, user=N
     if national_id and uid.endswith(national_id):
         return associate_user(backend, uid, user, social, *args, **kwargs)
 
+    logger.warning(
+        "User association failed: UID does not end with the user's national ID. UID: %s, National ID: %s",
+        uid,
+        national_id,
+    )
     logout(request)
 
     return redirect("/register")

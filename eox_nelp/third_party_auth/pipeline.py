@@ -4,14 +4,20 @@ functions:
     social_details: Allows to map response fields to user standard fields.
     invalidate_current_user: Sets to None the current user.
 """
+import logging
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from social_core.pipeline.social_auth import associate_user
 from social_core.pipeline.social_auth import social_details as social_core_details
 
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
 from eox_nelp.third_party_auth.utils import match_user_using_uid_query
+
+logger = logging.getLogger(__name__)
 
 
 def social_details(backend, details, response, *args, **kwargs):
@@ -143,3 +149,35 @@ def disallow_staff_superuser_users(  # pylint: disable=unused-argument
             )
         )
     return {}
+
+
+def validate_national_id_and_associate_user(request, backend, uid, *args, user=None, social=None, **kwargs):
+    """
+    Validates the user's national ID against the provided SAML UID before associating
+    a SAML identity with a Django user. If validation fails, the session is ended, and
+    the user is redirected to registration.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        backend: The authentication backend used, such as SAML.
+        uid (str): Unique identifier from SAML (e.g., user ID).
+        user (User, optional): Django user instance, if found.
+        social (optional): Existing social authentication data, if found.
+
+    Returns:
+        If the UID validation succeeds, proceeds to associate the user with social auth.
+        Otherwise, logs out the current session and redirects to the registration page.
+    """
+    national_id = user.extrainfo.national_id if user and hasattr(user, "extrainfo") else ""
+
+    if national_id and uid.endswith(national_id):
+        return associate_user(backend, uid, user, social, *args, **kwargs)
+
+    logger.warning(
+        "User association failed: UID does not end with the user's national ID. UID: %s, National ID: %s",
+        uid,
+        national_id,
+    )
+    logout(request)
+
+    return redirect("/register")

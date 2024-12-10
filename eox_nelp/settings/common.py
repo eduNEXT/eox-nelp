@@ -26,6 +26,7 @@ DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = (
 
 JSON_API_REST_FRAMEWORK = 'rest_framework_json_api'
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
+EOX_NELP_MODEL_APP = 'eox_nelp.apps.EoxNelpConfig'
 
 
 def plugin_settings(settings):
@@ -67,7 +68,6 @@ def plugin_settings(settings):
         settings.INSTALLED_APPS.append(JSON_API_REST_FRAMEWORK)
     if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in settings.INSTALLED_APPS:
         settings.INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)
-
     try:
         payments_notifications_context = (
             'eox_nelp.payment_notifications.context_processor.payments_notifications_context'
@@ -82,3 +82,7 @@ def plugin_settings(settings):
     except AttributeError:
         # We must find a way to register this error
         pass
+    # Ensure EOX_NELP is the last plugin installed app for ready run.
+    if EOX_NELP_MODEL_APP in settings.INSTALLED_APPS and settings.INSTALLED_APPS[-1] != EOX_NELP_MODEL_APP:
+        settings.INSTALLED_APPS.remove(EOX_NELP_MODEL_APP)
+        settings.INSTALLED_APPS.append(EOX_NELP_MODEL_APP)

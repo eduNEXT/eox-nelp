@@ -18,6 +18,7 @@ from eox_nelp.edxapp_wrapper.edxmako import edxmako
 from eox_nelp.third_party_auth.utils import match_user_using_uid_query
 
 logger = logging.getLogger(__name__)
+## This is a change
 
 
 def social_details(backend, details, response, *args, **kwargs):

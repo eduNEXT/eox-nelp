@@ -278,6 +278,7 @@ class CustomFormForceSyncTestCase(SetUpPipeMixin, TestCase):
         """
         fields = {"arabic_name": "", "other_field": ""}
         custom_form = Mock(fields=fields)
+        custom_form.Meta.model.objects.update_or_create.return_value = (Mock(), False)
         mock_get_registration_extension_form.return_value = custom_form
         user, _ = User.objects.get_or_create(username=user_details["username"])
         strategy = self.backend.strategy

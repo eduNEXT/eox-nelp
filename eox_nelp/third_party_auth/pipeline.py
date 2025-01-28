@@ -219,9 +219,11 @@ def custom_form_force_sync(strategy, details, *args, user=None, **kwargs):  # py
             custom_form_model = custom_form.Meta.model
             defaults = {key: value for key, value in details.items() if key in custom_form.fields.keys()}
 
-            custom_form_model.objects.update_or_create(
+            obj, created = custom_form_model.objects.update_or_create(
                 user=user,
                 defaults=defaults,
             )
+            action = "created" if created else "updated"
+            logger.info("Custom form object with id %s has been successfully %s", obj.id, action)
         except MultipleObjectsReturned:
             logger.error("Invalid custom form synchronization, multiple objects returned, for user with id %s", user.id)

@@ -8,8 +8,9 @@ from django.test import TestCase
 from mock import Mock, patch
 from rest_framework import status
 
-from eox_nelp.third_party_auth import utils
+from eox_nelp.third_party_auth import pipeline, utils
 from eox_nelp.third_party_auth.pipeline import (
+    custom_form_force_sync,
     disallow_staff_superuser_users,
     safer_associate_user_by_national_id,
     safer_associate_user_by_social_auth_record,
@@ -257,3 +258,66 @@ class ValidateNationalIdAndAssociateUserTestCase(SetUpPipeMixin, TestCase):
         mock_logout.assert_called_once_with(self.request)
         self.assertEqual(pipe_output.status_code, 302)
         self.assertEqual(pipe_output.url, "/register")
+
+
+@ddt
+class CustomFormForceSyncTestCase(SetUpPipeMixin, TestCase):
+    """Test class for the `custom_form_force_sync` pipeline."""
+
+    @data(
+        {"username": "testuser1", "arabic_name": "امتحان"},
+        {"username": "testuser2", "arabic_name": "امتحان", "other_field": "123456"},
+    )
+    @patch("eox_nelp.third_party_auth.pipeline.get_registration_extension_form")
+    def test_custom_form_sync_successful(self, user_details, mock_get_registration_extension_form):
+        """Test the pipeline successfully synchronizes the custom form data.
+
+        Expected behavior:
+            - The custom form is retrieved once through the `get_registration_extension_form` mock.
+            - The `update_or_create` method is called once with the correct parameters.
+        """
+        fields = {"arabic_name": "", "other_field": ""}
+        custom_form = Mock(fields=fields)
+        mock_get_registration_extension_form.return_value = custom_form
+        user, _ = User.objects.get_or_create(username=user_details["username"])
+        strategy = self.backend.strategy
+
+        custom_form_force_sync(strategy, user_details, user=user)
+
+        mock_get_registration_extension_form.assert_called_once()
+        custom_form.Meta.model.objects.update_or_create.assert_called_once_with(
+            user=user,
+            defaults={key: value for key, value in user_details.items() if key in fields},
+        )
+
+    @patch("eox_nelp.third_party_auth.pipeline.get_registration_extension_form")
+    def test_multiple_objects_returned_error(self, mock_get_registration_extension_form):
+        """Test the pipeline raises an error when multiple objects are returned.
+
+        Expected behavior:
+            - Logs an error message indicating multiple objects were returned.
+        """
+        user, _ = User.objects.get_or_create(username="testuser", email="test@example.com")
+        strategy = self.backend.strategy
+        details = {"username": "testuser", "email": "test@example.com"}
+        custom_form = mock_get_registration_extension_form.return_value
+        custom_form.Meta.model.objects.update_or_create.side_effect = MultipleObjectsReturned
+
+        with self.assertLogs(pipeline.__name__, level="ERROR") as log:
+            custom_form_force_sync(strategy, details, user=user)
+            self.assertIn("Invalid custom form synchronization, multiple objects returned", log.output[0])
+
+    @patch("eox_nelp.third_party_auth.pipeline.get_registration_extension_form", return_value=None)
+    def test_no_custom_form_available(self, mock_get_registration_extension_form):
+        """Test the pipeline when no custom form is available.
+
+        Expected behavior:
+            - The method calls `get_registration_extension_form` once.
+        """
+        strategy = self.backend.strategy
+        details = {"username": "testuser", "email": "test@example.com"}
+        user, _ = User.objects.get_or_create(username="testuser", email="test@example.com")
+
+        custom_form_force_sync(strategy, details, user=user)
+
+        mock_get_registration_extension_form.assert_called_once()

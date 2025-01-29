@@ -23,7 +23,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_COURSE_OVERVIEWS_BACKEND = 'eox_nelp.edxapp_wrapper.test_backends.course_overviews_m_v1'
     settings.EOX_NELP_SITE_CONFIGURATION = 'eox_nelp.edxapp_wrapper.test_backends.site_configuration_m_v1'
     settings.EOX_NELP_USER_API = 'eox_nelp.edxapp_wrapper.test_backends.user_api_m_v1'
-    settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.test_backends.user_authn_m_v1'
+    settings.EOX_NELP_USER_AUTHN = 'eox_nelp.edxapp_wrapper.test_backends.user_authn_r_v1'
     settings.EOX_NELP_MFE_CONFIG_VIEW = 'eox_nelp.edxapp_wrapper.test_backends.mfe_config_view_m_v1'
     settings.EOX_NELP_COURSE_API = 'eox_nelp.edxapp_wrapper.test_backends.course_api_m_v1'
     settings.EOX_NELP_XMODULE_MODULESTORE = 'eox_nelp.edxapp_wrapper.test_backends.modulestore_m_v1'
@@ -39,6 +39,7 @@ def plugin_settings(settings):  # pylint: disable=function-redefined
     settings.EOX_NELP_COURSEWARE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.courseware_m_v1"
     settings.EOX_NELP_INSTRUCTOR_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.instructor_m_v1"
     settings.EOX_NELP_COURSE_EXPERIENCE_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.course_experience_p_v1"
+    settings.EOX_NELP_THIRD_PARTY_AUTH_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.third_party_auth_r_v1"
 
     settings.FUTUREX_API_URL = 'https://testing.com'
     settings.FUTUREX_API_CLIENT_ID = 'my-test-client-id'

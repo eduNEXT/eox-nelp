@@ -8,6 +8,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import logout
+from django.core.exceptions import MultipleObjectsReturned
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +16,8 @@ from social_core.pipeline.social_auth import associate_user
 from social_core.pipeline.social_auth import social_details as social_core_details
 
 from eox_nelp.edxapp_wrapper.edxmako import edxmako
+from eox_nelp.edxapp_wrapper.third_party_auth import Registry
+from eox_nelp.edxapp_wrapper.user_authn import get_registration_extension_form
 from eox_nelp.third_party_auth.utils import match_user_using_uid_query
 
 logger = logging.getLogger(__name__)
@@ -181,3 +184,46 @@ def validate_national_id_and_associate_user(request, backend, uid, *args, user=N
     logout(request)
 
     return redirect("/register")
+
+
+def custom_form_force_sync(strategy, details, *args, user=None, **kwargs):  # pylint: disable=unused-argument
+    """
+    Synchronizes custom form data with the learner profile if the provider supports data synchronization.
+
+    This function retrieves the registration extension form and attempts to update or create
+    a corresponding model instance using the provided user and details. If multiple instances
+    are found, an error is logged.
+
+    Args:
+        strategy: The strategy used in the pipeline, containing context and request data.
+        details (dict): The data to synchronize with the custom form model.
+        user (User, optional): The user associated with the custom form synchronization. Defaults to None.
+        *args: Additional arguments passed to the function.
+        **kwargs: Additional keyword arguments passed to the function.
+
+    Raises:
+        None explicitly, but logs an error if multiple objects are returned during synchronization.
+
+    Expected behavior:
+        - Retrieves the current provider from the pipeline using the strategy's backend name.
+        - If the user, custom form, and provider are valid, and the provider supports learner profile
+          data synchronization:
+            - Updates or creates an instance of the custom form model with the provided user and details.
+            - Logs an error if multiple objects are returned during the operation.
+    """
+    current_provider = Registry.get_from_pipeline({'backend': strategy.request.backend.name, 'kwargs': kwargs})
+    custom_form = get_registration_extension_form()
+
+    if user and custom_form and current_provider and current_provider.sync_learner_profile_data:
+        try:
+            custom_form_model = custom_form.Meta.model
+            defaults = {key: value for key, value in details.items() if key in custom_form.fields.keys()}
+
+            obj, created = custom_form_model.objects.update_or_create(
+                user=user,
+                defaults=defaults,
+            )
+            action = "created" if created else "updated"
+            logger.info("Custom form object with id %s has been successfully %s", obj.id, action)
+        except MultipleObjectsReturned:
+            logger.error("Invalid custom form synchronization, multiple objects returned, for user with id %s", user.id)

@@ -10,12 +10,12 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import JsonResponse
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from nelc_api_clients.clients.sms_vendor import SMSVendorApiClient
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from eox_nelp.api_clients.sms_vendor import SMSVendorApiClient
 from eox_nelp.one_time_password.generators import generate_otp_code
 from eox_nelp.one_time_password.view_decorators import validate_otp
 

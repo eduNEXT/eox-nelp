@@ -6,9 +6,9 @@ Functions:
 """
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
 
-from eox_nelp.api_clients.pearson_engine import PearsonEngineApiClient
 from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
 from eox_nelp.pearson_vue.pipeline import audit_method, rename_function
 from eox_nelp.pearson_vue.rti_backend import (

@@ -6,9 +6,9 @@ Functions:
 """
 from celery import shared_task
 from django.contrib.auth import get_user_model
+from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
 
-from eox_nelp.api_clients.pearson_engine import PearsonEngineApiClient
 from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
 from eox_nelp.pearson_vue.pipeline import audit_method, rename_function
 from eox_nelp.pearson_vue.rti_backend import (
@@ -17,7 +17,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
-from eox_nelp.pearson_vue.utils import update_user_engines
+from eox_nelp.pearson_vue.utils import generate_action_parameters, update_user_engines
 
 User = get_user_model()
 
@@ -133,11 +133,8 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
         user = User.objects.get(id=user_id)
         update_user_engines(user, action_name, exam_id)
         action = getattr(PearsonEngineApiClient(), action_key)
-        response = action(
-            user=user,
-            exam_id=exam_id,
-            **kwargs
-        )
+        parameters = generate_action_parameters(user, exam_id)
+        response = action(**parameters, **kwargs)
 
         if response.get("error"):
             raise Exception(response.get("message", "Unknown error"))  # pylint: disable=broad-exception-raised

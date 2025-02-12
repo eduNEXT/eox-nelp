@@ -61,7 +61,7 @@ def _post_futurex_progress(data):
         data (dict): dict to send to futurex enrollment-progress path.
     """
     api_client = FuturexApiClient()
-    response = api_client.enrollment_progress(data)
+    response = api_client.enrollment_progress(data)  # pylint: disable=no-member
 
     logger.info(
         "send_futurex_progress --- The data %s was sent to the futurex service host %s. The response was: %s",

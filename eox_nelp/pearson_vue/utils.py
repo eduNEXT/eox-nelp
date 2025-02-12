@@ -5,6 +5,7 @@ This includes xml helpers:
 import re
 
 import xmltodict
+from django.conf import settings
 from pydantic.v1.utils import deep_update
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
@@ -67,3 +68,58 @@ def update_user_engines(user, action_type, course_id=None):
     pearson_engine.increment_trigger(action_type)
     if course_id:
         pearson_engine.increment_course_value(course_id)
+
+def _get_user_data(self, user):
+        """
+        Retrieve user data for the request payload.
+
+        Args:
+            user: The user object containing user data.
+
+        Returns:
+            dict: The user data formatted for the request.
+        """
+        user_data = {
+            "username": user.username,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "country": user.profile.country.code,
+            "city": user.profile.city,
+            "phone": user.profile.phone_number,
+            "address": user.profile.mailing_address,
+            "arabic_full_name": user.extrainfo.arabic_name,
+            "arabic_first_name": user.extrainfo.arabic_first_name,
+            "arabic_last_name": user.extrainfo.arabic_last_name,
+        }
+
+        if user.extrainfo.national_id:
+            user_data["national_id"] = user.extrainfo.national_id
+
+        return user_data
+
+def _get_platform_data(self):
+    """
+    Retrieve platform data for the request payload.
+
+    Returns:
+        dict: The platform data formatted for the request.
+    """
+    return {
+        "name": settings.PLATFORM_NAME,
+        "tenant": getattr(settings, "EDNX_TENANT_DOMAIN", None)
+    }
+
+def _get_exam_data(self, exam_id):
+    """
+    Retrieve exam data for the request payload.
+
+    Args:
+        exam_id: The external key for the exam.
+
+    Returns:
+        dict: The exam data formatted for the request.
+    """
+    return {
+        "external_key": exam_id,
+    }

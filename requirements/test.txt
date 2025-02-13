@@ -289,7 +289,7 @@ event-tracking==3.0.0
     # via
     #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
-external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@main
+external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@v0.1.0
     # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 fastavro==1.10.0
     # via

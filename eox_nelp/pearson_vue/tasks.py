@@ -17,12 +17,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     ExamAuthorizationDataImport,
     RealTimeImport,
 )
-from eox_nelp.pearson_vue.utils import (
-    _get_exam_data,
-    _get_platform_data, 
-    _get_user_data, 
-    update_user_engines
-)
+from eox_nelp.pearson_vue.utils import filter_action_parameters, update_user_engines
 
 User = get_user_model()
 
@@ -138,12 +133,8 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
         user = User.objects.get(id=user_id)
         update_user_engines(user, action_name, exam_id)
         action = getattr(PearsonEngineApiClient(), action_key)
-        response = action(
-            user_data= _get_user_data(user),
-            exam_data=_get_exam_data(exam_id),
-            platform_data=_get_platform_data(),
-            **kwargs
-        )
+        parameters = filter_action_parameters(action_name, user, exam_id)
+        response = action(**parameters, **kwargs)
 
         if response.get("error"):
             raise Exception(response.get("message", "Unknown error"))  # pylint: disable=broad-exception-raised

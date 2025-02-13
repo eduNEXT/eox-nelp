@@ -4,7 +4,7 @@ Classes:
     UpdatePayloadCddRequestTestCase: Tests cases for update_xml_with_dict using payload with cdd request tag cases.
     UpdatePayloadEadRequestTestCase: Test cased for update_xml_with_dict using payload with ead request tag cases.
 """
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import xmltodict
 from bs4 import BeautifulSoup
@@ -15,6 +15,7 @@ from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
 from eox_nelp.pearson_vue.models import PearsonEngine
 from eox_nelp.pearson_vue.utils import (
+    filter_action_parameters,
     generate_client_authorization_id,
     is_cp1252,
     update_user_engines,
@@ -564,3 +565,59 @@ class TestUpdateUserEngineCustomForm(TestCase):
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
         self.assertDictEqual(user.pearsonengine.courses, {})
+
+
+class TestFilterActionParameters(TestCase):
+    """Class to test the filter_action_parameters function."""
+    def setUp(self):
+        """Set up the test environment for the test cases."""
+
+        self.get_user_data_patcher = patch(
+            "eox_nelp.pearson_vue.utils.get_user_data",
+            return_value={"user_data": "mock"},
+        )
+        self.get_platform_data_patcher = patch(
+            "eox_nelp.pearson_vue.utils.get_platform_data",
+            return_value={"platform_data": "mock"},
+        )
+        self.get_exam_data_patcher = patch(
+            "eox_nelp.pearson_vue.utils.get_exam_data",
+            return_value={"exam_data": "mock"},
+        )
+
+        self.mock_get_user_data = self.get_user_data_patcher.start()
+        self.mock_get_platform_data = self.get_platform_data_patcher.start()
+        self.mock_get_exam_data = self.get_exam_data_patcher.start()
+
+    def tearDown(self):
+        """Restore the state of the mocks."""
+        self.get_user_data_patcher.stop()
+        self.get_platform_data_patcher.stop()
+        self.get_exam_data_patcher.stop()
+
+    def test_import_candidate_demographics_action_parameters(self):
+        """Test if the `filter_action_parameters` function returns the correct
+        parameters for the "cdd" action.
+        """
+        result = filter_action_parameters("cdd", user=MagicMock())
+        self.assertNotIn("exam_data", result)
+        self.assertIn("user_data", result)
+        self.assertIn("platform_data", result)
+
+    def test_import_exam_authorization_action_parameters(self):
+        """Test if the `filter_action_parameters` function returns the correct
+        parameters for the "ead" action.
+        """
+        result = filter_action_parameters("ead", user=MagicMock())
+        self.assertNotIn("platform_data", result)
+        self.assertIn("user_data", result)
+        self.assertIn("exam_data", result)
+
+    def test_real_time_import_action_parameters(self):
+        """Test if the `filter_action_parameters` function returns the correct
+        parameters for the "rti" action.
+        """
+        result = filter_action_parameters("rti", user=MagicMock())
+        self.assertIn("user_data", result)
+        self.assertIn("platform_data", result)
+        self.assertIn("exam_data", result)

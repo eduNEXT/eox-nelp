@@ -119,64 +119,97 @@ class TestRealTimeImportTaskV2(TestCase):
         self.kwargs = {"extra_info": "test"}
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
-    def test_real_time_import_rti(self, mock_api_client, update_user_engines_mock):
+    def test_real_time_import_rti(
+        self,
+        mock_api_client,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test real-time import action using the Pearson Engine API.
 
         Expected behavior:
             - update_user_engines is called with correct parameters.
             - The real_time_import method is called with the correct parameters.
         """
+        rti_parameters = {
+            "user_data": "test",
+            "platform_data": "test",
+            "exam_data": "test",
+        }
         mock_action = MagicMock()
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
+        filter_action_parameters_mock.return_value = rti_parameters
         action_name = "rti"
 
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**rti_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
-    def test_real_time_import_cdd(self, mock_api_client, update_user_engines_mock):
+    def test_real_time_import_cdd(
+        self,
+        mock_api_client,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test candidate demographics import action using the Pearson Engine API.
 
         Expected behavior:
             - update_user_engines is called with correct parameters.
             - The import_candidate_demographics method is called with the correct parameters.
         """
+        cdd_parameters = {"user_data": "test", "platform_data": "test"}
         mock_action = MagicMock()
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_candidate_demographics": mock_action})
+        filter_action_parameters_mock.return_value = cdd_parameters
         action_name = "cdd"
 
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**cdd_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
-    def test_real_time_import_ead(self, mock_api_client, update_user_engines_mock):
+    def test_real_time_import_ead(
+        self,
+        mock_api_client,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test exam authorization import action using the Pearson Engine API.
 
         Expected behavior:
             - update_user_engines is called with correct parameters.
             - The import_exam_authorization method is called with the correct parameters.
         """
+        ead_parameters = {"user_data": "test", "exam_data": "test"}
         mock_action = MagicMock()
         mock_action.return_value = {"error": False}
         mock_api_client.return_value = MagicMock(**{"import_exam_authorization": mock_action})
+        filter_action_parameters_mock.return_value = ead_parameters
         action_name = "ead"
 
         real_time_import_task_v2(self.user.id, exam_id=self.exam_id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, self.exam_id,)
-        mock_action.assert_called_once_with(user=self.user, exam_id=self.exam_id, **self.kwargs)
+        mock_action.assert_called_once_with(**ead_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    def test_real_time_import_invalid_action(self, update_user_engines_mock):
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
+    def test_real_time_import_invalid_action(
+        self,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test that a KeyError is raised for an invalid action name.
 
         Expected behavior:
@@ -186,10 +219,17 @@ class TestRealTimeImportTaskV2(TestCase):
         with self.assertRaises(KeyError):
             real_time_import_task_v2(self.user.id, action_name="invalid_action")
         update_user_engines_mock.assert_not_called()
+        filter_action_parameters_mock.assert_not_called()
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
     @patch('eox_nelp.pearson_vue.tasks.PearsonEngineApiClient')
-    def test_real_time_import_user_not_found(self, mock_api_client, update_user_engines_mock):
+    def test_real_time_import_user_not_found(
+        self,
+        mock_api_client,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test that a DoesNotExist is raised for an invalid user id.
 
         Expected behavior:
@@ -201,10 +241,17 @@ class TestRealTimeImportTaskV2(TestCase):
             real_time_import_task_v2(12345678, action_name="rti")
         mock_api_client.assert_not_called()
         update_user_engines_mock.assert_not_called()
+        filter_action_parameters_mock.assert_not_called()
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue.tasks.filter_action_parameters")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
-    def test_raise_exception_on_error_response(self, mock_api_client, update_user_engines_mock):
+    def test_raise_exception_on_error_response(
+        self,
+        mock_api_client,
+        filter_action_parameters_mock,
+        update_user_engines_mock
+    ):
         """Test that an exception is raised when the API response contains an Error.
 
         Expected behavior:
@@ -213,6 +260,11 @@ class TestRealTimeImportTaskV2(TestCase):
             - The action method is called with the correct parameters.
             - Exception contains the expected message.
         """
+        rti_parameters = {
+            "user_data": "test",
+            "platform_data": "test",
+            "exam_data": "test",
+        }
         mock_action = MagicMock()
         expected_message = "Timeout error"
         mock_action.return_value = {
@@ -221,10 +273,10 @@ class TestRealTimeImportTaskV2(TestCase):
         }
         action_name = "rti"
         mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
-
+        filter_action_parameters_mock.return_value = rti_parameters
         with self.assertRaises(Exception) as context:
             real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**rti_parameters, **self.kwargs)
         self.assertEqual(expected_message, str(context.exception))

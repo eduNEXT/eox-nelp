@@ -17,9 +17,9 @@ from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eventtracking import tracker
 from nelc_api_clients.clients.certificates import ExternalCertificatesApiClient
 from nelc_api_clients.clients.futurex import FuturexApiClient
+from nelc_api_clients.clients.mt import MinisterOfTourismApiClient
 from opaque_keys.edx.keys import UsageKey
 
-from eox_nelp.api_clients.mt import MinisterOfTourismApiClient
 from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory

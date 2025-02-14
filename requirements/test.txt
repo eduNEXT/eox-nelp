@@ -4,67 +4,70 @@
 #
 #    make upgrade
 #
-amqp==5.2.0
+amqp==5.3.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   kombu
-aniso8601==9.0.1
+aniso8601==10.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   tincan
 annotated-types==0.7.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   pydantic
 appdirs==1.4.4
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   fs
 asgiref==3.8.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django
     #   django-countries
     #   django-simple-history
-astroid==3.2.4
+astroid==3.3.8
     # via pylint
-attrs==24.2.0
+attrs==25.1.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   openedx-events
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.3
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   bs4
-billiard==4.2.0
+billiard==4.2.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
 bridgekeeper==0.9
-    # via -r requirements/base.txt
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 bs4==0.0.2
-    # via -r requirements/base.txt
+    # via
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   external-api-clients
 celery==5.4.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   eox-audit-model
     #   eox-core
     #   event-tracking
-certifi==2024.7.4
+certifi==2025.1.31
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   requests
-cffi==1.17.0
+cffi==1.17.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   cryptography
     #   pynacl
-charset-normalizer==3.3.2
+charset-normalizer==3.4.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   requests
-click==8.1.7
+click==8.1.8
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
     #   click-didyoumean
     #   click-plugins
@@ -74,42 +77,42 @@ click==8.1.7
     #   eox-core
 click-didyoumean==0.3.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
 click-plugins==1.1.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
 click-repl==0.3.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
-code-annotations==1.8.0
+code-annotations==1.8.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-toggles
-coverage==7.6.1
+coverage==7.6.12
     # via -r requirements/test.in
-cryptography==43.0.0
+cryptography==44.0.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   jwcrypto
     #   pyjwt
     #   requests-pkcs12
     #   social-auth-core
 ddt==1.7.2
     # via -r requirements/test.in
-defusedxml==0.8.0rc2
+defusedxml==0.7.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   python3-openid
     #   social-auth-core
-dill==0.3.8
+dill==0.3.9
     # via pylint
-django==3.2.25
+django==4.0.10
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-crum
     #   django-filter
     #   django-model-utils
@@ -127,6 +130,7 @@ django==3.2.25
     #   edx-proctoring
     #   edx-toggles
     #   edx-when
+    #   eox-audit-model
     #   eox-core
     #   eox-theming
     #   event-tracking
@@ -139,58 +143,60 @@ django-countries==7.6.1
     # via -r requirements/test.in
 django-crum==0.7.9
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-django-utils
     #   edx-proctoring
     #   edx-toggles
+    #   eox-audit-model
 django-fake-model==0.1.4
     # via -r requirements/test.in
 django-filter==21.1
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
 django-ipware==7.0.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
-django-model-utils==4.5.1
+    #   eox-audit-model
+django-model-utils==5.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
     #   edx-when
 django-oauth-toolkit==2.4.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
 django-oauth2-provider==0.2.6.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
 django-password-validators==1.7.3
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 django-simple-history==3.6.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
-django-waffle==4.1.0
+django-waffle==4.2.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-django-utils
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-toggles
     #   eox-core
-django-webpack-loader==3.1.0
+django-webpack-loader==3.1.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
 djangorestframework==3.12.4
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   djangorestframework-jsonapi
     #   drf-jwt
     #   drf-yasg
@@ -200,32 +206,32 @@ djangorestframework==3.12.4
     #   eox-core
 djangorestframework-jsonapi==5.0.0
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
-dnspython==2.6.1
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+dnspython==2.7.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   pymongo
 drf-jwt==1.19.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-drf-extensions
-drf-yasg==1.21.7
+drf-yasg==1.21.8
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-api-doc-tools
-edx-api-doc-tools==1.8.0
+edx-api-doc-tools==2.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
-edx-ccx-keys==1.3.0
+edx-ccx-keys==2.0.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   openedx-events
 edx-django-utils==5.2.0
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-drf-extensions
     #   edx-rest-api-client
     #   edx-toggles
@@ -234,106 +240,117 @@ edx-django-utils==5.2.0
     #   openedx-events
 edx-drf-extensions==8.0.0
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
     #   edx-when
     #   eox-core
-edx-i18n-tools==1.6.2
-    # via -r requirements/base.txt
-edx-opaque-keys[django]==2.10.0
+edx-i18n-tools==1.6.3
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+edx-opaque-keys[django]==2.11.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-ccx-keys
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-when
     #   eox-core
     #   openedx-events
-edx-proctoring==4.18.1
+edx-proctoring==5.1.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
-edx-rest-api-client==5.7.1
+edx-rest-api-client==6.1.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
 edx-toggles==5.2.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   event-tracking
-edx-when==2.5.0
+edx-when==2.5.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
-eox-core==10.5.1
-    # via -r requirements/base.txt
+eox-audit-model==5.1.0
+    # via
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   external-api-clients
+eox-core==11.1.0
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 eox-tenant==11.2.0
     # via
-    #   -c requirements/constraints.txt
-    #   -r requirements/base.txt
+    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-theming
-eox-theming==7.2.0
-    # via -r requirements/base.txt
+eox-theming==9.0.0
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 event-tracking==3.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
 external-api-clients @ git+ssh://git@github.com/nelc/external-api-clients.git@main
-    # via -r requirements/base.txt
-fastavro==1.9.5
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+fastavro==1.10.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   openedx-events
 flake8==7.1.1
     # via -r requirements/test.in
 fs==2.4.16
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   xblock
 future==1.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   pyjwkest
-idna==3.7
+idna==3.10
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   requests
 inflection==0.5.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   djangorestframework-jsonapi
     #   drf-yasg
-isort==5.13.2
+isort==6.0.0
     # via pylint
-jinja2==3.1.4
+jinja2==3.1.5
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   code-annotations
 jsonfield==3.1.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
+    #   eox-audit-model
 jwcrypto==1.5.6
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-oauth-toolkit
-kombu==5.4.0
+kombu==5.4.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
-lxml==5.3.0
+lxml[html-clean]==5.3.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-i18n-tools
+    #   external-api-clients
+    #   lxml-html-clean
     #   xblock
-mako==1.3.5
+lxml-html-clean==0.4.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   lxml
+mako==1.3.9
+    # via
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   xblock
-markupsafe==2.1.5
+markupsafe==3.0.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   jinja2
     #   mako
     #   xblock
@@ -344,54 +361,54 @@ mccabe==0.7.0
 mock==5.1.0
     # via -r requirements/test.in
 nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
-    # via -r requirements/base.txt
-newrelic==9.13.0
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+newrelic==10.6.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-django-utils
 oauthlib==3.2.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-oauth-toolkit
     #   requests-oauthlib
     #   social-auth-core
-openedx-events==9.11.0
+openedx-events==9.14.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
     #   event-tracking
 openedx-filters==1.9.0
-    # via -r requirements/base.txt
-packaging==24.1
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+packaging==24.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   drf-yasg
 path==16.16.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-i18n-tools
     #   path-py
 path-py==12.5.0
     # via -r requirements/test.in
-pbr==6.0.0
+pbr==6.1.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   stevedore
-phonenumbers==8.13.43
-    # via -r requirements/base.txt
-platformdirs==4.2.2
+phonenumbers==8.13.54
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+platformdirs==4.3.6
     # via pylint
 polib==1.2.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-i18n-tools
-prompt-toolkit==3.0.47
+prompt-toolkit==3.0.50
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   click-repl
-psutil==6.0.0
+psutil==6.1.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-django-utils
 pycodestyle==2.12.1
     # via
@@ -399,67 +416,66 @@ pycodestyle==2.12.1
     #   flake8
 pycparser==2.22
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   cffi
-pycryptodomex==3.20.0
+pycryptodomex==3.21.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
     #   pyjwkest
 pydantic==2.8.2
-    # via -r requirements/base.txt
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 pydantic-core==2.20.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   pydantic
 pyflakes==3.2.0
     # via flake8
 pyjwkest==1.4.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-drf-extensions
-pyjwt[crypto]==2.9.0
+pyjwt[crypto]==2.10.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   drf-jwt
     #   edx-drf-extensions
     #   edx-proctoring
     #   edx-rest-api-client
     #   social-auth-core
-pylint==3.2.6
+pylint==3.3.4
     # via -r requirements/test.in
 pymongo==4.4.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-opaque-keys
     #   event-tracking
 pynacl==1.5.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-django-utils
 python-dateutil==2.9.0.post0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
     #   edx-drf-extensions
     #   edx-proctoring
     #   xblock
 python-ipware==3.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-ipware
 python-slugify==8.0.4
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   code-annotations
 python3-openid==3.2.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   social-auth-core
-pytz==2024.1
+pytz==2025.1
     # via
-    #   -r requirements/base.txt
-    #   django
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-oauth-toolkit
     #   drf-yasg
     #   edx-proctoring
@@ -468,47 +484,50 @@ pytz==2024.1
     #   xblock
 pyyaml==6.0.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   code-annotations
     #   drf-yasg
     #   edx-i18n-tools
     #   xblock
 requests==2.32.3
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-oauth-toolkit
     #   edx-drf-extensions
     #   edx-rest-api-client
+    #   external-api-clients
     #   pyjwkest
     #   requests-oauthlib
     #   requests-pkcs12
-    #   slumber
     #   social-auth-core
 requests-oauthlib==2.0.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   external-api-clients
     #   social-auth-core
 requests-pkcs12==1.22
-    # via -r requirements/base.txt
-rules==3.4
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+    #   external-api-clients
+rules==3.5
+    # via
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-proctoring
 semantic-version==2.10.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-drf-extensions
 shortuuid==1.0.13
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django-oauth2-provider
-simplejson==3.19.2
+simplejson==3.19.3
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   xblock
-six==1.16.0
+six==1.17.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-ccx-keys
     #   edx-drf-extensions
     #   eox-core
@@ -517,28 +536,24 @@ six==1.16.0
     #   fs
     #   pyjwkest
     #   python-dateutil
-slumber==0.7.1
+social-auth-app-django==5.4.3
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+social-auth-core==4.5.6
     # via
-    #   -r requirements/base.txt
-    #   edx-rest-api-client
-social-auth-app-django==5.4.2
-    # via -r requirements/base.txt
-social-auth-core==4.5.4
-    # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   eox-core
     #   social-auth-app-django
 soupsieve==2.6
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   beautifulsoup4
-sqlparse==0.5.1
+sqlparse==0.5.3
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   django
-stevedore==5.2.0
+stevedore==5.4.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   code-annotations
     #   edx-django-utils
     #   edx-opaque-keys
@@ -546,60 +561,62 @@ testfixtures==8.3.0
     # via -r requirements/test.in
 text-unidecode==1.3
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   python-slugify
 tincan==1.0.0
-    # via -r requirements/base.txt
-tomli==2.0.1
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
+tomli==2.2.1
     # via pylint
 tomlkit==0.13.2
     # via pylint
 typing-extensions==4.12.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   asgiref
     #   astroid
+    #   beautifulsoup4
     #   django-countries
     #   edx-opaque-keys
     #   jwcrypto
     #   pydantic
     #   pydantic-core
-tzdata==2024.1
+tzdata==2025.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   celery
+    #   kombu
 uritemplate==4.1.1
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   drf-yasg
-urllib3==2.2.2
+urllib3==2.3.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   requests
 vine==5.1.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   amqp
     #   celery
     #   kombu
 wcwidth==0.2.13
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   prompt-toolkit
 web-fragments==2.2.0
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   xblock
-webob==1.8.8
+webob==1.8.9
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   xblock
-xblock==5.0.0
+xblock==5.1.2
     # via
-    #   -r requirements/base.txt
+    #   -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
     #   edx-when
 xmltodict==0.13.0
-    # via -r requirements/base.txt
+    # via -r /home/johanc/nelp/test/eox-nelp/requirements/base.txt
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

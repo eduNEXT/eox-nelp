@@ -31,8 +31,9 @@ class DueDateListFilter(DateFieldListFilter):
         3) Next seven days: Records from now until 7 days in the future.
         4) Next month: Records from now until 30 days in the future.
     """
+    # pylint: disable=too-many-arguments, too-many-positional-arguments
 
-    def __init__(self, field, request, params, model, model_admin, field_path):  # pylint: disable=too-many-arguments
+    def __init__(self, field, request, params, model, model_admin, field_path):
         """Custom init method to modify inherited options"""
         super().__init__(field, request, params, model, model_admin, field_path)
         today = timezone.now()

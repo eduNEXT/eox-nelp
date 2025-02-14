@@ -291,7 +291,7 @@ class XApiContextFilter(PipelineStep):
             updater = getattr(self, f"_update_{key}", None)
 
             if updater:
-                updater(result, value)
+                updater(result, value)   # pylint: disable=not-callable
             else:
                 setattr(result, key, value)
 

@@ -1,8 +1,9 @@
 """
 This module contains functions and classes for making asynchronous calls to Pearson VUE's RTI services.
 
-Functions:
-    real_time_import_task(data: dict) -> None: Performs an asynchronous call to the RTI service.
+Tasks:
+    real_time_import_task_v2(user_id: int, exam_id: str, action_name: str, **kwargs) -> None:
+        Performs an asynchronous call to the Pearson Engine API to execute a real-time import action.
 """
 from celery import shared_task
 from django.contrib.auth import get_user_model
@@ -10,96 +11,20 @@ from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
 
 from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
-from eox_nelp.pearson_vue.pipeline import audit_method, rename_function
-from eox_nelp.pearson_vue.rti_backend import (
-    CandidateDemographicsDataImport,
-    ErrorRealTimeImportHandler,
-    ExamAuthorizationDataImport,
-    RealTimeImport,
-)
 from eox_nelp.pearson_vue.utils import generate_action_parameters, update_user_engines
 
+try:
+    from eox_audit_model.decorators import audit_method, rename_function
+except ImportError:
+    def audit_method(action):  # pylint: disable=unused-argument
+        """Identity audit_method"""
+        return lambda x: x
+
+    def rename_function(name):  # pylint: disable=unused-argument
+        """Identity rename_function"""
+        return lambda x: x
+
 User = get_user_model()
-
-
-@shared_task(bind=True)
-def real_time_import_task(self, pipeline_index=0, **kwargs):
-    """
-    Performs an asynchronous call to Pearson VUE's RTI (Real Time Import) service.
-
-    This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
-
-    Args:
-        self: The Celery task instance.
-        pipeline_index (int): The index of the pipeline to be executed (default is 0).
-        **kwargs: Additional keyword arguments to configure the RTI service.
-    """
-    rti = RealTimeImport(pipeline_index=pipeline_index, **kwargs.copy())
-
-    try:
-        rti.run_pipeline()
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        self.retry(exc=exc, kwargs=rti.backend_data)
-
-
-@shared_task(bind=True)
-def ead_task(self, pipeline_index=0, **kwargs):
-    """
-    Performs an asynchronous call to Pearson VUE's EAD task (Exam Authorization Data) service.
-
-    This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
-
-    Args:
-        self: The Celery task instance.
-        pipeline_index (int): The index of the pipeline to be executed (default is 0).
-        **kwargs: Additional keyword arguments to configure the RTI service.
-    """
-    ead = ExamAuthorizationDataImport(pipeline_index=pipeline_index, **kwargs.copy())
-
-    try:
-        ead.run_pipeline()
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        self.retry(exc=exc, kwargs=ead.backend_data)
-
-
-@shared_task(bind=True)
-def cdd_task(self, pipeline_index=0, **kwargs):
-    """
-    Performs an asynchronous call to Pearson VUE's CDD task (Candidate Demographics Data) service.
-
-    This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
-
-    Args:
-        self: The Celery task instance.
-        pipeline_index (int): The index of the pipeline to be executed (default is 0).
-        **kwargs: Additional keyword arguments to configure the RTI service.
-    """
-    cdd = CandidateDemographicsDataImport(pipeline_index=pipeline_index, **kwargs.copy())
-
-    try:
-        cdd.run_pipeline()
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        self.retry(exc=exc, kwargs=cdd.backend_data)
-
-
-@shared_task(bind=True)
-def rti_error_handler_task(self, pipeline_index=0, **kwargs):
-    """
-    Performs an asynchronous call to manage Pearson validation error task.
-
-    This task initiates the real-time import process using the provided pipeline index and optional keyword arguments.
-
-    Args:
-        self: The Celery task instance.
-        pipeline_index (int): The index of the pipeline to be executed (default is 0).
-        **kwargs: Additional keyword arguments to configure the RTI service.
-    """
-    error_rti = ErrorRealTimeImportHandler(pipeline_index=pipeline_index, **kwargs.copy())
-
-    try:
-        error_rti.run_pipeline()
-    except Exception as exc:  # pylint: disable=broad-exception-caught
-        self.retry(exc=exc, kwargs=error_rti.backend_data)
 
 
 @shared_task(autoretry_for=(exceptions.Timeout, exceptions.ConnectionError), retry_backoff=5)

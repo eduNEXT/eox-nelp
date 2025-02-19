@@ -11,8 +11,7 @@ Classes:
 """
 import unittest
 
-from ddt import data, ddt
-from django.conf import settings
+from ddt import ddt
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.utils import timezone
@@ -704,90 +703,6 @@ class PearsonVueCompletionHandlerTestCase(unittest.TestCase):
     user_id = 5
     course_exam_configuration = [course_id]
 
-    @override_settings(PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration)
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_feature_flag(self, task_mock):
-        """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is False.
-
-        Expected behavior:
-            - real_time_import_task mock has not been called.
-        """
-        instance = Mock()
-        instance.user_id = self.user_id
-        instance.context_key = CourseKey.from_string(self.course_id)
-
-        pearson_vue_course_completion_handler(instance)
-
-        task_mock.delay.assert_not_called()
-
-    @data({}, [], ["exam_series_code"], ["key"], ["wrong_course_id"])
-    @override_settings(PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True)
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_course_configuration(self, wrong_course_config, task_mock):
-        """Test when the PEARSON_RTI_ACTIVATE_COMPLETION_GATE settings is True,
-        but invalid course  configuration for PEARSON_ENGINE_COURSES_ENABLED.
-        Expected behavior:
-            - real_time_import_task mock has not been called.
-        """
-        instance = Mock()
-        instance.user_id = self.user_id
-        instance.context_key = CourseKey.from_string(self.course_id)
-        setattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", wrong_course_config)
-
-        pearson_vue_course_completion_handler(instance)
-
-        task_mock.delay.assert_not_called()
-
-    @override_settings(
-        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
-        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
-    )
-    @data(  # is_complete and graded values respectively
-        (True, True),
-        (False, True),
-        (False, False),
-    )
-    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_course_state(self, invalid_state, task_mock, get_completed_and_graded_mock):
-        """Test when the course is graded or incomplete
-
-        Expected behavior:
-            - real_time_import_task mock has not been called.
-        """
-        instance = Mock()
-        instance.user_id = self.user_id
-        instance.context_key = CourseKey.from_string(self.course_id)
-        get_completed_and_graded_mock.return_value = invalid_state
-
-        pearson_vue_course_completion_handler(instance)
-
-        task_mock.delay.assert_not_called()
-
-    @override_settings(
-        PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
-        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
-    )
-    @patch("eox_nelp.signals.receivers.get_completed_and_graded")
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_call_async_task(self, task_mock, get_completed_and_graded_mock):
-        """Test that the async task is called with the right parameters
-
-        Expected behavior:
-            - delay method is called with the right values.
-        """
-        instance = Mock()
-        instance.user_id = self.user_id
-        instance.context_key = CourseKey.from_string(self.course_id)
-        get_completed_and_graded_mock.return_value = (True, False)  # is_complete and graded values respectively
-
-        pearson_vue_course_completion_handler(instance)
-
-        task_mock.delay.assert_called_with(
-            user_id=instance.user_id,
-            course_id=self.course_id,
-        )
-
     @override_settings(
         PEARSON_RTI_ACTIVATE_COMPLETION_GATE=True,
         USE_PEARSON_ENGINE_SERVICE=True,
@@ -820,56 +735,6 @@ class PearsonVueCoursePassedHandlerTestCase(unittest.TestCase):
     """Test class for mt_course_passed_handler function."""
     course_id = "course-v1:test+Cz105+2022_T4"
     course_exam_configuration = [course_id]
-
-    @override_settings(PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration)
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_feature_flag(self, task_mock):
-        """Test when the PEARSON_RTI_ACTIVATE_GRADED_GATE settings is False.
-
-        Expected behavior:
-            - real_time_import_task mock has not been called.
-        """
-        user_instance, _ = User.objects.get_or_create(username="Severus")
-
-        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(self.course_id))
-
-        task_mock.delay.assert_not_called()
-
-    @override_settings(PEARSON_RTI_ACTIVATE_GRADED_GATE=True)
-    @data({}, [], ["exam_series_code"], ["key"], ["wrong_course_id"])
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_invalid_course_configuration(self, wrong_course_config, task_mock):
-        """Test when the PEARSON_RTI_ACTIVATE_GRADED_GATE settings is True,
-        but invalid course configuration for PEARSON_ENGINE_COURSES_ENABLED
-
-        Expected behavior:
-            - real_time_import_task mock has not been called.
-        """
-        user_instance, _ = User.objects.get_or_create(username="Severus")
-        setattr(settings, "PEARSON_ENGINE_COURSES_ENABLED", wrong_course_config)
-        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(self.course_id))
-
-        task_mock.delay.assert_not_called()
-
-    @override_settings(
-        PEARSON_RTI_ACTIVATE_GRADED_GATE=True,
-        PEARSON_ENGINE_COURSES_ENABLED=course_exam_configuration,
-    )
-    @patch("eox_nelp.signals.receivers.real_time_import_task")
-    def test_call_async_task(self, task_mock):
-        """Test that the async task is called with the right parameters
-
-        Expected behavior:
-            - delay method is called with the right values.
-        """
-        user_instance, _ = User.objects.get_or_create(username="Severus")
-
-        pearson_vue_course_passed_handler(user_instance, CourseKey.from_string(self.course_id))
-
-        task_mock.delay.assert_called_with(
-            course_id=self.course_id,
-            user_id=user_instance.id,
-        )
 
     @override_settings(
         PEARSON_RTI_ACTIVATE_GRADED_GATE=True,

@@ -1,12 +1,6 @@
 """Utils that can be used for the pearson Vue integration.
-This includes xml helpers:
-    - update_xml_with_dict
 """
-import re
-
-import xmltodict
 from django.conf import settings
-from pydantic.v1.utils import deep_update
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
 from eox_nelp.pearson_vue.models import PearsonEngine

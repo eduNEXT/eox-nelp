@@ -9,22 +9,9 @@ in the Django admin interface.
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from eox_nelp.pearson_vue.models import PearsonEngine, PearsonRTENEvent
+from eox_nelp.pearson_vue.models import PearsonEngine
 
 User = get_user_model()
-
-
-class PearsonRTENEventAdmin(admin.ModelAdmin):
-    """
-    Admin class for the PearsonRTENEvent model.
-
-    Attributes:
-        list_display (list): List of fields to display in the admin list view.
-        readonly_fields (tuple): Tuple of fields that are read-only in the admin interface.
-    """
-    list_display = ("event_type", "candidate", "course", "created_at")
-    readonly_fields = ("created_at", "candidate", "course", "event_type")
-    list_filter = ["event_type"]
 
 
 class PearsonEngineAdmin(admin.ModelAdmin):
@@ -59,5 +46,4 @@ class PearsonEngineAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(PearsonRTENEvent, PearsonRTENEventAdmin)
 admin.site.register(PearsonEngine, PearsonEngineAdmin)

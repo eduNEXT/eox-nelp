@@ -70,7 +70,7 @@ defusedxml==0.7.1
     #   social-auth-core
 django==4.0.10
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   django-crum
     #   django-filter
@@ -106,7 +106,7 @@ django-crum==0.7.9
     #   eox-audit-model
 django-filter==21.1
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   eox-core
 django-ipware==7.0.1
@@ -123,7 +123,7 @@ django-oauth2-provider==0.2.6.1
     # via eox-core
 django-password-validators==1.7.3
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
 django-simple-history==3.6.0
     # via edx-proctoring
@@ -138,7 +138,7 @@ django-webpack-loader==3.1.1
     # via edx-proctoring
 djangorestframework==3.12.4
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   djangorestframework-jsonapi
     #   drf-jwt
@@ -149,7 +149,7 @@ djangorestframework==3.12.4
     #   eox-core
 djangorestframework-jsonapi==5.0.0
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
 dnspython==2.7.0
     # via pymongo
@@ -163,7 +163,7 @@ edx-ccx-keys==2.0.2
     # via openedx-events
 edx-django-utils==5.2.0
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   edx-drf-extensions
     #   edx-rest-api-client
@@ -173,7 +173,7 @@ edx-django-utils==5.2.0
     #   openedx-events
 edx-drf-extensions==8.0.0
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   edx-proctoring
     #   edx-when
@@ -193,7 +193,7 @@ edx-proctoring==5.1.2
     # via eox-core
 edx-rest-api-client==6.1.0
     # via edx-proctoring
-edx-toggles==5.2.0
+edx-toggles==5.3.0
     # via event-tracking
 edx-when==2.5.1
     # via edx-proctoring
@@ -203,7 +203,7 @@ eox-core==11.1.0
     # via -r requirements/base.in
 eox-tenant==11.2.0
     # via
-    #   -c /home/johanc/nelp/test/eox-nelp/requirements/constraints.txt
+    #   -c requirements/constraints.txt
     #   -r requirements/base.in
     #   eox-theming
 eox-theming==9.0.0
@@ -275,13 +275,13 @@ path==16.16.0
     # via edx-i18n-tools
 pbr==6.1.1
     # via stevedore
-phonenumbers==8.13.54
+phonenumbers==8.13.55
     # via -r requirements/base.in
 polib==1.2.0
     # via edx-i18n-tools
 prompt-toolkit==3.0.50
     # via click-repl
-psutil==6.1.1
+psutil==7.0.0
     # via edx-django-utils
 pycparser==2.22
     # via cffi
@@ -359,7 +359,7 @@ semantic-version==2.10.0
     # via edx-drf-extensions
 shortuuid==1.0.13
     # via django-oauth2-provider
-simplejson==3.19.3
+simplejson==3.20.1
     # via xblock
 six==1.17.0
     # via
@@ -381,7 +381,7 @@ soupsieve==2.6
     # via beautifulsoup4
 sqlparse==0.5.3
     # via django
-stevedore==5.4.0
+stevedore==5.4.1
     # via
     #   code-annotations
     #   edx-django-utils

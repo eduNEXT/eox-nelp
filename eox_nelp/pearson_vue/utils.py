@@ -81,6 +81,7 @@ def get_user_data(user):
     """
     user_data = {
         "username": user.username,
+        "full_name": user.profile.name,
         "first_name": user.first_name,
         "last_name": user.last_name,
         "email": user.email,

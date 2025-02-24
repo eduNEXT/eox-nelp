@@ -161,12 +161,12 @@ class PostFuturexProgressTestCase(unittest.TestCase):
             f"The response was: {service_response}"
         )
         futurex_api_client_mock().base_url = service_base_url
-        futurex_api_client_mock().enrollment_progress.return_value = service_response
+        futurex_api_client_mock().send_enrollment_progress.return_value = service_response
 
         with self.assertLogs(tasks.__name__, level="INFO") as logs:
             _post_futurex_progress(progress_enrollment_data)
 
-        futurex_api_client_mock().enrollment_progress.assert_called_with(progress_enrollment_data)
+        futurex_api_client_mock().send_enrollment_progress.assert_called_with(progress_enrollment_data)
         self.assertEqual(logs.output, [f"INFO:{tasks.__name__}:{log_post}"])
 
 

@@ -107,7 +107,7 @@ def get_platform_data():
     """
     return {
         "name": settings.PLATFORM_NAME,
-        "tenant": getattr(settings, "EDNX_TENANT_DOMAIN", None)
+        "tenant": getattr(settings, "EDNX_TENANT_DOMAIN", None),
     }
 
 
@@ -127,7 +127,7 @@ def generate_action_parameters(user, exam_id):
     action_parameters = {
         "user_data": get_user_data(user),
         "platform_data": get_platform_data(),
-        "exam_data": {"external_key": exam_id}
+        "exam_data": {"external_key": exam_id},
     }
 
     return action_parameters

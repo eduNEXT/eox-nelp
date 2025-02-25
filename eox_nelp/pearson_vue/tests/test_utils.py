@@ -579,13 +579,12 @@ class TestGetUserData(TestCase):
         """
         self.user = MagicMock(
             username="testuser",
-            full_name="Test User",
             first_name="Test",
             last_name="User",
             email="test@example.com",
             profile=MagicMock(
                 country=MagicMock(code="US"),
-
+                name="Test User",
                 city="Test City",
                 phone_number="123-456-7890",
                 mailing_address="123 Test St",
@@ -607,6 +606,7 @@ class TestGetUserData(TestCase):
         """
         expected_result = {
             "username": self.user.username,
+            "full_name": self.user.profile.name,
             "first_name": self.user.first_name,
             "last_name": self.user.last_name,
             "email": self.user.email,

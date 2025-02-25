@@ -4,18 +4,22 @@ Classes:
     UpdatePayloadCddRequestTestCase: Tests cases for update_xml_with_dict using payload with cdd request tag cases.
     UpdatePayloadEadRequestTestCase: Test cased for update_xml_with_dict using payload with ead request tag cases.
 """
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import xmltodict
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment
 from eox_nelp.pearson_vue.constants import PAYLOAD_CDD, PAYLOAD_EAD
 from eox_nelp.pearson_vue.models import PearsonEngine
 from eox_nelp.pearson_vue.utils import (
+    generate_action_parameters,
     generate_client_authorization_id,
+    get_platform_data,
+    get_user_data,
     is_cp1252,
     update_user_engines,
     update_xml_with_dict,
@@ -564,3 +568,139 @@ class TestUpdateUserEngineCustomForm(TestCase):
         self.assertEqual(user.pearsonengine.ead_triggers, 0)
         self.assertEqual(user.pearsonengine.rti_triggers, 0)
         self.assertDictEqual(user.pearsonengine.courses, {})
+
+
+class TestGetUserData(TestCase):
+    """Test case for get_user_data."""
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.user = MagicMock(
+            username="testuser",
+            full_name="Test User",
+            first_name="Test",
+            last_name="User",
+            email="test@example.com",
+            profile=MagicMock(
+                country=MagicMock(code="US"),
+
+                city="Test City",
+                phone_number="123-456-7890",
+                mailing_address="123 Test St",
+            ),
+            extrainfo=MagicMock(
+                arabic_name="اسم المستخدم",
+                arabic_first_name="الاسم الاول",
+                arabic_last_name="اسم العائلة",
+                national_id="123456789",
+            )
+        )
+
+    def test_get_user_data(self):
+        """
+        Test get_user_data function with all user data available, including national_id.
+
+        Expected behavior:
+            - The result is a dict with all user data.
+        """
+        expected_result = {
+            "username": self.user.username,
+            "first_name": self.user.first_name,
+            "last_name": self.user.last_name,
+            "email": self.user.email,
+            "country": self.user.profile.country.code,
+            "city": self.user.profile.city,
+            "phone": self.user.profile.phone_number,
+            "address": self.user.profile.mailing_address,
+            "arabic_full_name": self.user.extrainfo.arabic_name,
+            "arabic_first_name": self.user.extrainfo.arabic_first_name,
+            "arabic_last_name": self.user.extrainfo.arabic_last_name,
+            "national_id": self.user.extrainfo.national_id,
+        }
+
+        result = get_user_data(self.user)
+
+        self.assertEqual(result, expected_result)
+
+
+class TestGetPlatformData(TestCase):
+    """Test case for get_platform_data."""
+
+    @override_settings(PLATFORM_NAME="Test Platform", EDNX_TENANT_DOMAIN="test.example.com")
+    def test_get_platform_data_with_tenant(self):
+        """
+        Test get_platform_data function with PLATFORM_NAME and EDNX_TENANT_DOMAIN defined.
+
+        Expected behavior:
+            - The result is a dict with platform name and tenant domain.
+        """
+        expected_result = {
+            "name": settings.PLATFORM_NAME,
+            "tenant": settings.EDNX_TENANT_DOMAIN,
+        }
+
+        result = get_platform_data()
+
+        self.assertEqual(result, expected_result)
+
+    @override_settings(PLATFORM_NAME="Test Platform")
+    def test_get_platform_data_without_tenant(self):
+        """
+        Test get_platform_data function with only PLATFORM_NAME defined.
+
+        Expected behavior:
+            - The result is a dict with platform name and tenant is None.
+        """
+        expected_result = {
+            "name": settings.PLATFORM_NAME,
+            "tenant": None,
+        }
+
+        result = get_platform_data()
+
+        self.assertEqual(result, expected_result)
+
+
+class TestGenerateActionParameters(TestCase):
+    """Test case for generate_action_parameters."""
+
+    def setUp(self):
+        """
+        Set up the test environment.
+        """
+        self.mock_get_user_data = self.patch("eox_nelp.pearson_vue.utils.get_user_data")
+        self.mock_get_platform_data = self.patch("eox_nelp.pearson_vue.utils.get_platform_data")
+
+        self.mock_get_user_data.return_value = {"user_data": "mock"}
+        self.mock_get_platform_data.return_value = {"platform_data": "mock"}
+
+    def patch(self, target, **kwargs):
+        """Patch a target and return the mock"""
+        patcher = patch(target, **kwargs)
+        mock = patcher.start()
+        self.addCleanup(patcher.stop)
+        return mock
+
+    def test_generate_action_parameters(self):
+        """
+        Test generate_action_parameters function with exam_id.
+
+        Expected behavior:
+            - The result is a dict with user_data, platform_data, and exam_data.
+            - get_user_data, get_platform_data, and get_exam_data are called once.
+            - get_exam_data is called with exam_id.
+        """
+        user = MagicMock()
+        exam_id = "exam123"
+
+        result = generate_action_parameters(user, exam_id)
+
+        self.assertEqual(result, {
+            "user_data": {"user_data": "mock"},
+            "platform_data": {"platform_data": "mock"},
+            "exam_data": {"external_key": exam_id},
+        })
+        self.mock_get_user_data.assert_called_once_with(user)
+        self.mock_get_platform_data.assert_called_once()

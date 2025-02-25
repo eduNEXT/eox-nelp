@@ -117,6 +117,15 @@ class TestRealTimeImportTaskV2(TestCase):
         self.user, _ = User.objects.get_or_create(username="vader")
         self.exam_id = "exam123"
         self.kwargs = {"extra_info": "test"}
+        self.action_parameters = {
+            "user_data": "test",
+            "platform_data": "test",
+            "exam_data": "test",
+        }
+        self.generate_action_parameters_patcher = patch("eox_nelp.pearson_vue.tasks.generate_action_parameters")
+        self.generate_action_parameters_mock = self.generate_action_parameters_patcher.start()
+        self.generate_action_parameters_mock.return_value = self.action_parameters
+        self.addCleanup(self.generate_action_parameters_patcher.stop)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
@@ -135,7 +144,7 @@ class TestRealTimeImportTaskV2(TestCase):
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
@@ -154,7 +163,7 @@ class TestRealTimeImportTaskV2(TestCase):
         real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
@@ -173,7 +182,7 @@ class TestRealTimeImportTaskV2(TestCase):
         real_time_import_task_v2(self.user.id, exam_id=self.exam_id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, self.exam_id,)
-        mock_action.assert_called_once_with(user=self.user, exam_id=self.exam_id, **self.kwargs)
+        mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     def test_real_time_import_invalid_action(self, update_user_engines_mock):
@@ -182,10 +191,12 @@ class TestRealTimeImportTaskV2(TestCase):
         Expected behavior:
             - KeyError is raised when an invalid action name is provided.
             - update_user_engines is not called
+            - generate_action_parameters is not called
         """
         with self.assertRaises(KeyError):
             real_time_import_task_v2(self.user.id, action_name="invalid_action")
         update_user_engines_mock.assert_not_called()
+        self.generate_action_parameters_mock.assert_not_called()
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     @patch('eox_nelp.pearson_vue.tasks.PearsonEngineApiClient')
@@ -195,12 +206,14 @@ class TestRealTimeImportTaskV2(TestCase):
         Expected behavior:
             - update_user_engines is not called
             - PearsonEngineApiClient is not called
+            - generate_action_parameters is not called
             - DoesNotExist is raised when an invalid user id is provided.
         """
         with self.assertRaises(User.DoesNotExist):
             real_time_import_task_v2(12345678, action_name="rti")
         mock_api_client.assert_not_called()
         update_user_engines_mock.assert_not_called()
+        self.generate_action_parameters_mock.assert_not_called()
 
     @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
     @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
@@ -221,10 +234,9 @@ class TestRealTimeImportTaskV2(TestCase):
         }
         action_name = "rti"
         mock_api_client.return_value = MagicMock(**{"real_time_import": mock_action})
-
         with self.assertRaises(Exception) as context:
             real_time_import_task_v2(self.user.id, action_name=action_name, **self.kwargs)
 
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
-        mock_action.assert_called_once_with(user=self.user, exam_id=None, **self.kwargs)
+        mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
         self.assertEqual(expected_message, str(context.exception))

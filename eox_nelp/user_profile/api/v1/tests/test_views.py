@@ -1,8 +1,11 @@
-"""This file contains all the test for the user_profile API V1 views.py file.
-
-Classes:
-    UpdateUserDataTestCase: Class to test update_user_data view
 """
+This file contains all the tests for the user_profile API V1 views.py file.
+
+Test Cases:
+    - UpdateUserDataTestCase: Tests for update_user_data view.
+    - GetValidatedUserFieldsTestCase: Tests for get_validated_user_fields view.
+"""
+
 
 from unittest.mock import patch
 
@@ -174,3 +177,38 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertEqual(self.user.extrainfo.arabic_first_name, payload["arabic_first_name"])
         self.assertEqual(self.user.extrainfo.arabic_last_name, payload["arabic_last_name"])
         cdd_task_mock.delay.assert_called_with(user_id=self.user.id, action_name="cdd")
+
+
+class GetValidatedUserFieldsTestCase(APITestCase):
+    """Test case for get_validated_user_fields view."""
+
+    reverse_viewname = "user-profile-api:v1:validated-fields"
+
+    def setUp(self):
+        """Set up a test user and authenticate the client."""
+        self.user = User.objects.create(username="testuser")
+        self.client.force_authenticate(user=self.user)
+
+    @patch("eox_nelp.user_profile.api.v1.views.validate_required_user_fields")
+    def test_get_validated_user_fields_successfully(self, mock_validate_required_user_fields):
+        """
+        Test that the view returns the expected validated fields.
+
+        Expected behavior:
+            - The function should return a JSON response with validated fields.
+            - Status code 200.
+            - The function should call validate_required_user_fields with the correct user instance.
+        """
+        expected_response = {
+            "account": {"first_name": [], "last_name": []},
+            "profile": {"city": [], "country": [], "phone_number": ["Empty field"], "mailing_address": []},
+            "extra_info": {"arabic_name": [], "arabic_first_name": [], "arabic_last_name": []},
+        }
+        mock_validate_required_user_fields.return_value = expected_response
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.get(url_endpoint)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.json(), expected_response)
+        mock_validate_required_user_fields.assert_called_once_with(self.user)

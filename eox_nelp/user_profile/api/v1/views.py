@@ -1,10 +1,13 @@
-"""Generic views for NELP user's profile application.
+"""
+Views for the NELP user profile application.
 
-Function-views:
-  - generate_otp: generate and send via SMS the OTP related a user. Saved in cache.
-  - validate_otp: Compare and check if the proposed OTP match the User OTP saved in cache.
-    If match, updates the profile phone_number.
+This module provides API endpoints for managing and validating user profile data, including updating user information
+and retrieving validation errors for required fields.
 
+Available Views:
+  - update_user_data: Updates user profile fields, handling extra account and extra info fields where necessary.
+  - get_validated_user_fields: Returns a JSON response with validated user fields based on validation rules
+    defined in the REQUIRED_USER_FIELDS setting.
 """
 import logging
 
@@ -19,6 +22,7 @@ from rest_framework.response import Response
 from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
 from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
+from eox_nelp.user_profile.required_fields_validation import validate_required_user_fields
 from eox_nelp.utils import save_extrainfo_field
 
 logger = logging.getLogger(__name__)
@@ -92,3 +96,40 @@ def update_user_data(request):
         )
 
     return Response({"message": "User's fields has been updated successfully"}, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@authentication_classes((SessionAuthenticationAllowInactiveUser,))
+@permission_classes((IsAuthenticated,))
+def get_validated_user_fields(request):
+    """
+    View to retrieve validated fields for the authenticated user in JSON format.
+
+    ## Usage
+
+    ### **GET** /eox-nelp/api/user-profile/v1/validated-fields/
+
+    **Response Example**
+    ```json
+    {
+        "account": {
+            "first_name": [],
+            "last_name": []
+        },
+        "profile": {
+            "city": [],
+            "country": [],
+            "phone_number": ["Empty field"],
+            "mailing_address": []
+        },
+        "extra_info": {
+            "arabic_name": [],
+            "arabic_first_name": [],
+            "arabic_last_name": []
+        }
+    }
+    ```
+    """
+    validated_fields = validate_required_user_fields(request.user)
+
+    return Response(validated_fields, status=status.HTTP_200_OK)

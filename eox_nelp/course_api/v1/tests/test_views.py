@@ -22,7 +22,7 @@ User = get_user_model()
 class NelpCoursesApiViewsTestCase(APITestCase):
     """ Test Nelp Courses API views. """
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across experience test cases.
         """

@@ -28,7 +28,7 @@ def patch_user_gender_choices():
     """
     This overwrites the available gender choices in order to allow the Male and Female options.
     """
-    # pylint: disable=import-error, import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
     # This cannot be at the top of the file since this file is imported the plugin initialization
     # and therefore the settings has not been set yet
     from eox_nelp.edxapp_wrapper.student import UserProfile
@@ -41,7 +41,7 @@ def patch_user_gender_choices():
 
 def set_mako_templates():
     """This method adds the plugin templates to mako configuration."""
-    # pylint: disable=import-error, import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
     # This cannot be at the top of the file since this file is imported on the plugin initialization
     # and therefore the settings has not been set yet
     from eox_nelp import static as static_module
@@ -68,7 +68,7 @@ def register_xapi_transformers():
 
 def update_permissions():
     """This method just change permissions for bussiness cases"""
-    # pylint: disable=import-outside-toplevel,unsupported-binary-operation
+    # pylint: disable=import-outside-toplevel
     from bridgekeeper import perms
     from bridgekeeper.rules import is_staff
 
@@ -88,7 +88,7 @@ def patch_generate_password():
     """This method patch `generate_password` of edx_django_util package,
     with custom nelp `generate_password`.
     """
-    # pylint: disable=import-outside-toplevel, unused-import
+    # pylint: disable=import-outside-toplevel
     from eox_tenant.tenant_wise import set_as_proxy
 
     from eox_nelp.user_authn.utils import generate_password
@@ -109,7 +109,7 @@ def patch_registration_form_factory():
     """This method patches `RegistrationFormFactory` of user_auth.view.registration_form ,
     with custom nelp `NelpRegistrationFormFactory`.
     """
-    # pylint: disable=import-outside-toplevel, unused-import
+    # pylint: disable=import-outside-toplevel
     from eox_nelp.edxapp_wrapper.user_authn import views
     from eox_nelp.user_authn.views.registration_form import NelpRegistrationFormFactory
     views.registration_form.RegistrationFormFactory = NelpRegistrationFormFactory

@@ -174,7 +174,7 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
     """Test case for validate OTP view."""
     reverse_viewname = "one-time-password-api:v1:validate-otp"
 
-    def tearDown(self):  # pylint: disable=invalid-name
+    def tearDown(self):
         """Clear cache after or mocks each test case. Clean extrainfo values."""
         cache.clear()
         ExtraInfo.objects.all().delete()  # pylint: disable=no-member

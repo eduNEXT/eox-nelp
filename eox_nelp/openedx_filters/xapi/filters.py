@@ -223,7 +223,7 @@ class XApiContextFilter(PipelineStep):
         }
     """
 
-    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ
         """This allows to modify the statement context for any event, the allowed modifications are
         limited by the tincan library and it's not possible to changed or updated all of them, the
         supported fields are the following:
@@ -376,7 +376,7 @@ class XApiCertificateContextFilter(PipelineStep):
         }
     """
 
-    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ, unused-argument
+    def run_filter(self, transformer, result):  # pylint: disable=arguments-differ
         """This adds jws-certificate-location extension
 
         Arguments:

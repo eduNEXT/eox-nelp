@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """Class command to check course due dates and also notify the corresponding."""
-    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=too-many-statements
+    def handle(self, *args, **options):  # lint-amnesty
 
         logger.info('----Checking course due dates emails by command.-----')
         now = timezone.now()

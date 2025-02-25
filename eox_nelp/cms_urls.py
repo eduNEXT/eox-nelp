@@ -19,7 +19,7 @@ from eox_nelp import views
 
 app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
-urlpatterns = [  # pylint: disable=invalid-name
+urlpatterns = [
     path('eox-info/', views.info_view, name='eox-info'),
     path('api/', include('eox_nelp.cms.api.urls', namespace='cms-api')),
 

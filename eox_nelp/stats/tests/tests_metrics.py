@@ -184,7 +184,7 @@ class TestGetCoursesMetrics(unittest.TestCase):
 class TestGetCourseMetrics(unittest.TestCase):
     """Tests cases for get_courses_metrics function."""
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across metrics test cases.
         """

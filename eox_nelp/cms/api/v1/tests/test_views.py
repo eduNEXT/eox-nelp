@@ -41,7 +41,7 @@ class CMSCourseRunView(TestCase):
     """
     Test for cms Course Run  view.
     """
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across experience test cases.
         """

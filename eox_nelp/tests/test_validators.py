@@ -262,17 +262,14 @@ class ValidatePhoneTestCase(TestCase):
 
         self.assertTrue(result)
 
-    @patch("eox_nelp.validators.PhoneNumber.from_string")
-    @data("123456", "invalid_phone", "+1-abc-123456", "")
-    def test_validate_phone_invalid(self, value, mock_phone):
+    @data("123456", "invalid_phone", "+1-abc-123456", "573212658749", "")
+    def test_validate_phone_invalid(self, value):
         """
         Test that the function returns False for invalid phone numbers.
 
         Expected behavior:
             - The function should return False if the value is not a valid phone number.
         """
-        mock_phone.return_value.is_valid.return_value = False
-
         result = validate_phone(value)
 
         self.assertFalse(result)

@@ -22,6 +22,7 @@ Validation Functions:
 import re
 
 from phonenumber_field.phonenumber import PhoneNumber
+from phonenumbers.phonenumberutil import NumberParseException
 
 
 def validate_max_length(value, max_length):
@@ -172,7 +173,10 @@ def validate_phone(value):
     Returns:
         bool: True if valid, False otherwise.
     """
-    phone = PhoneNumber.from_string(value)
+    try:
+        phone = PhoneNumber.from_string(value)
+    except NumberParseException:
+        return False
 
     return phone.is_valid()
 

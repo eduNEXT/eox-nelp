@@ -10,7 +10,7 @@ function LaunchUserProfileForm() {
 
   return (
     <AppProvider>
-      <ProfileDataModal fields={fields}/>
+      <ProfileDataModal />
     </AppProvider>
   );
 }

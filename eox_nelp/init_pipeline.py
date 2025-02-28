@@ -77,7 +77,7 @@ def update_permissions():
 
     perms.pop(permissions.CAN_RESEARCH, None)
     perms[permissions.CAN_RESEARCH] = (
-        is_staff
+        is_staff  # pylint: disable=unsupported-binary-operation, useless-suppression
         | rules.HasRolesRule("data_researcher")
         | rules.HasAccessRule("staff")
         | rules.HasAccessRule("instructor")

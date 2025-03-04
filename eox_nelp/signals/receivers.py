@@ -26,7 +26,7 @@ from openedx_events.learning.data import CertificateData, CourseData, UserData, 
 
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
-from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
+from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     create_external_certificate,

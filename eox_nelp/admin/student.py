@@ -24,7 +24,7 @@ from django.contrib import admin
 
 from eox_nelp.admin.register_admin_model import register_admin_model as register
 from eox_nelp.edxapp_wrapper.student import CourseEnrollment, CourseEnrollmentAdmin
-from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
+from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 
 logger = logging.getLogger(__name__)
 

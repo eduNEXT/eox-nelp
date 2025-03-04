@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
+from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 
 User = get_user_model()
 
@@ -26,13 +26,13 @@ class TestRealTimeImportTaskV2(TestCase):
             "platform_data": "test",
             "exam_data": "test",
         }
-        self.generate_action_parameters_patcher = patch("eox_nelp.pearson_vue.tasks.generate_action_parameters")
+        self.generate_action_parameters_patcher = patch("eox_nelp.pearson_vue_engine.tasks.generate_action_parameters")
         self.generate_action_parameters_mock = self.generate_action_parameters_patcher.start()
         self.generate_action_parameters_mock.return_value = self.action_parameters
         self.addCleanup(self.generate_action_parameters_patcher.stop)
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue_engine.tasks.PearsonEngineApiClient")
     def test_real_time_import_rti(self, mock_api_client, update_user_engines_mock):
         """Test real-time import action using the Pearson Engine API.
 
@@ -50,8 +50,8 @@ class TestRealTimeImportTaskV2(TestCase):
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
         mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue_engine.tasks.PearsonEngineApiClient")
     def test_real_time_import_cdd(self, mock_api_client, update_user_engines_mock):
         """Test candidate demographics import action using the Pearson Engine API.
 
@@ -69,8 +69,8 @@ class TestRealTimeImportTaskV2(TestCase):
         update_user_engines_mock.assert_called_once_with(self.user, action_name, None)
         mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue_engine.tasks.PearsonEngineApiClient")
     def test_real_time_import_ead(self, mock_api_client, update_user_engines_mock):
         """Test exam authorization import action using the Pearson Engine API.
 
@@ -88,7 +88,7 @@ class TestRealTimeImportTaskV2(TestCase):
         update_user_engines_mock.assert_called_once_with(self.user, action_name, self.exam_id,)
         mock_action.assert_called_once_with(**self.action_parameters, **self.kwargs)
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
     def test_real_time_import_invalid_action(self, update_user_engines_mock):
         """Test that a KeyError is raised for an invalid action name.
 
@@ -102,8 +102,8 @@ class TestRealTimeImportTaskV2(TestCase):
         update_user_engines_mock.assert_not_called()
         self.generate_action_parameters_mock.assert_not_called()
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    @patch('eox_nelp.pearson_vue.tasks.PearsonEngineApiClient')
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
+    @patch('eox_nelp.pearson_vue_engine.tasks.PearsonEngineApiClient')
     def test_real_time_import_user_not_found(self, mock_api_client, update_user_engines_mock):
         """Test that a DoesNotExist is raised for an invalid user id.
 
@@ -119,8 +119,8 @@ class TestRealTimeImportTaskV2(TestCase):
         update_user_engines_mock.assert_not_called()
         self.generate_action_parameters_mock.assert_not_called()
 
-    @patch("eox_nelp.pearson_vue.tasks.update_user_engines")
-    @patch("eox_nelp.pearson_vue.tasks.PearsonEngineApiClient")
+    @patch("eox_nelp.pearson_vue_engine.tasks.update_user_engines")
+    @patch("eox_nelp.pearson_vue_engine.tasks.PearsonEngineApiClient")
     def test_raise_exception_on_error_response(self, mock_api_client, update_user_engines_mock):
         """Test that an exception is raised when the API response contains an Error.
 

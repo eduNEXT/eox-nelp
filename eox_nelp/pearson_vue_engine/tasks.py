@@ -10,8 +10,8 @@ from django.contrib.auth import get_user_model
 from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
 
-from eox_nelp.pearson_vue.constants import ALLOWED_RTI_ACTIONS
-from eox_nelp.pearson_vue.utils import generate_action_parameters, update_user_engines
+from eox_nelp.pearson_vue_engine.constants import ALLOWED_RTI_ACTIONS
+from eox_nelp.pearson_vue_engine.utils import generate_action_parameters, update_user_engines
 
 try:
     from eox_audit_model.decorators import audit_method, rename_function

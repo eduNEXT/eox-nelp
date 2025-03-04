@@ -6,8 +6,13 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 
-from eox_nelp.pearson_vue.models import PearsonEngine
-from eox_nelp.pearson_vue.utils import generate_action_parameters, get_platform_data, get_user_data, update_user_engines
+from eox_nelp.pearson_vue_engine.models import PearsonEngine
+from eox_nelp.pearson_vue_engine.utils import (
+    generate_action_parameters,
+    get_platform_data,
+    get_user_data,
+    update_user_engines,
+)
 
 User = get_user_model()
 
@@ -219,8 +224,8 @@ class TestGenerateActionParameters(TestCase):
         """
         Set up the test environment.
         """
-        self.mock_get_user_data = self.patch("eox_nelp.pearson_vue.utils.get_user_data")
-        self.mock_get_platform_data = self.patch("eox_nelp.pearson_vue.utils.get_platform_data")
+        self.mock_get_user_data = self.patch("eox_nelp.pearson_vue_engine.utils.get_user_data")
+        self.mock_get_platform_data = self.patch("eox_nelp.pearson_vue_engine.utils.get_platform_data")
 
         self.mock_get_user_data.return_value = {"user_data": "mock"}
         self.mock_get_platform_data.return_value = {"platform_data": "mock"}

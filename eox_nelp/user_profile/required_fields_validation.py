@@ -64,6 +64,7 @@ REQUIRED_USER_FIELDS = {
 """
 import logging
 
+from custom_reg_form.models import ExtraInfo
 from django.conf import settings
 
 from eox_nelp.validators import validate_char_type, validate_format, validate_max_length, validate_optional_values
@@ -164,7 +165,13 @@ def validate_extra_info_fields(user, extra_info_fields):
     Returns:
         dict: A dictionary with invalid extra_info fields and their errors.
     """
-    return validate_user_fields(getattr(user, "extrainfo", None), extra_info_fields)
+    # pylint: disable=no-member
+    try:
+        extra_info = ExtraInfo.objects.get(user=user)
+    except ExtraInfo.DoesNotExist:
+        return {field: ["Empty field"] for field in extra_info_fields.keys() if hasattr(ExtraInfo, field)}
+
+    return validate_user_fields(extra_info, extra_info_fields)
 
 
 def validate_user_fields(instance, fields):

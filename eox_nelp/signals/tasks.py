@@ -216,7 +216,11 @@ def update_mt_training_stage(course_id, national_id, stage_result):
         national_id (str): User identifier.
         stage_result (int): Representation of pass or fail result, 1 for pass  2 for fail.
     """
-    api_client = MinisterOfTourismApiClient()
+    api_client = MinisterOfTourismApiClient(
+        user=getattr(settings, "MINISTER_OF_TOURISM_USER"),
+        password=getattr(settings, "MINISTER_OF_TOURISM_PASSWORD"),
+        base_url=getattr(settings, "MINISTER_OF_TOURISM_API_URL"),
+    )
 
     api_client.update_training_stage(
         course_id=course_id,

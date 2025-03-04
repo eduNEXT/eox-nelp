@@ -43,6 +43,7 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertDictEqual(response.json(), {"detail": "missing phone_number in data."})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @override_settings(SMS_VENDOR_SEND_SMS_PATH="/test/sms/path")
     @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
     def test_generate_otp(self, sms_vendor_mock):
         """
@@ -82,8 +83,10 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         sms_vendor_mock().send_sms.assert_called_with(
             payload['phone_number'],
             f"Futurex Phone Validation Code: {otp_stored}",
+            "/test/sms/path"
         )
 
+    @override_settings(SMS_VENDOR_SEND_SMS_PATH="/test/sms/path")
     @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
     def test_generate_otp_fails_sms_vendor(self, sms_vendor_mock):
         """
@@ -116,12 +119,14 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         sms_vendor_mock().send_sms.assert_called_with(
             payload['phone_number'],
             f"Futurex Phone Validation Code: {otp_stored}",
+            "/test/sms/path"
         )
 
     @override_settings(
         PHONE_VALIDATION_OTP_LENGTH=20,
         PHONE_VALIDATION_OTP_CHARSET="01",
         PHONE_VALIDATION_OTP_TIMEOUT=1200,
+        SMS_VENDOR_SEND_SMS_PATH="/test/sms/path"
     )
     @patch("eox_nelp.one_time_password.api.v1.views.SMSVendorApiClient")
     def test_generate_otp_custom_settings(self, sms_vendor_mock):
@@ -166,6 +171,7 @@ class GenerateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         sms_vendor_mock().send_sms.assert_called_with(
             payload['phone_number'],
             f"Futurex Phone Validation Code: {otp_stored}",
+            "/test/sms/path"
         )
 
 

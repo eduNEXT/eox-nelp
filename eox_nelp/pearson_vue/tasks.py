@@ -18,6 +18,7 @@ from eox_nelp.pearson_vue.rti_backend import (
     RealTimeImport,
 )
 from eox_nelp.pearson_vue.utils import generate_action_parameters, update_user_engines
+from django.conf import settings
 
 User = get_user_model()
 
@@ -132,7 +133,12 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
     def audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs):
         user = User.objects.get(id=user_id)
         update_user_engines(user, action_name, exam_id)
-        action = getattr(PearsonEngineApiClient(), action_key)
+        client = PearsonEngineApiClient(
+            client_id=getattr(settings, "PEARSON_ENGINE_API_CLIENT_ID"),
+            client_secret=getattr(settings, "PEARSON_ENGINE_API_CLIENT_SECRET"),
+            base_url=getattr(settings, "PEARSON_ENGINE_API_URL")
+        )
+        action = getattr(client, action_key)
         parameters = generate_action_parameters(user, exam_id)
         response = action(**parameters, **kwargs)
 

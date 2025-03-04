@@ -2,7 +2,7 @@
 """
 from django.conf import settings
 
-from eox_nelp.pearson_vue_engine.models import PearsonEngine  # pylint: disable=import-outside-toplevel
+from eox_nelp.pearson_vue_engine.models import PearsonEngine
 
 
 def update_user_engines(user, action_type, course_id=None):

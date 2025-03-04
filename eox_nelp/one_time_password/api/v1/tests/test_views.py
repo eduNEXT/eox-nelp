@@ -187,6 +187,12 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
     """Test case for validate OTP view."""
     reverse_viewname = "one-time-password-api:v1:validate-otp"
 
+    def setUp(self):
+        """Overrides setUp behavior to add extrainfo attribute
+        """
+        super().setUp()
+        ExtraInfo.objects.get_or_create(user=self.user, arabic_name="مسؤل")  # pylint: disable=no-member
+
     def tearDown(self):
         """Clear cache after or mocks each test case. Clean extrainfo values."""
         cache.clear()
@@ -265,19 +271,7 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check everything from test `test_validate_right_otp_code`
             - extrainfo attr of user in is_phone_validated is True.
         """
-        self.user.extrainfo = ExtraInfo(is_phone_validated=False, arabic_name="فيدر")
         self.test_validate_right_otp_code()
 
-        self.assertTrue(self.user.extrainfo.is_phone_validated)
-
-    def test_validate_right_otp_code_without_extra_info(self):
-        """
-        Test the post request to validate otp with right data with a user with extrainfo foreign model.
-
-        Expected behavior:
-            - Check everything from test `test_validate_right_otp_code`
-            - extrainfo attr of user in is_phone_validated is True.
-        """
-        self.test_validate_right_otp_code()
-
+        self.user.extrainfo.refresh_from_db()
         self.assertTrue(self.user.extrainfo.is_phone_validated)

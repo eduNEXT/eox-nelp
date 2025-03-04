@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.http import HttpResponseForbidden, JsonResponse
 from rest_framework import status
 
-from eox_nelp.utils import save_extrainfo_field
+from eox_nelp.utils import save_extrainfo
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ def validate_otp(func):
             if not proposed_user_otp == cache.get(user_otp_key):
                 return HttpResponseForbidden(reason="Forbidden - wrong code")
 
-            save_extrainfo_field(request.user, "is_phone_validated", True)
+            save_extrainfo(request.user, {"is_phone_validated": True})
             cache.delete(user_otp_key)
 
         return func(request)

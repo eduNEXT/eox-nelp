@@ -8,6 +8,7 @@ Classes:
 """
 import unittest
 
+from custom_reg_form.models import ExtraInfo
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -32,7 +33,6 @@ from eox_nelp.signals.tasks import (
 )
 from eox_nelp.signals.utils import get_completion_summary
 from eox_nelp.tests.utils import generate_list_mock_data
-from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 FALSY_ACTIVATION_VALUES = [0, "", None, [], False, {}, ()]
@@ -626,7 +626,11 @@ class CourseCompletionMtUpdaterTestCase(TestCase):
             - mock validations pass
         """
         user_instance, _ = User.objects.get_or_create(username="Minerva")
-        save_extrainfo_field(user_instance, "national_id", "1234567890")
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=user_instance,
+            arabic_name="مسؤل",
+            national_id="12345445522",
+        )
         completion_summary_mock.return_value = {"incomplete_count": 0}
         self.descriptor.grading_policy = {"GRADER": test_data[0]}
 

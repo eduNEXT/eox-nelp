@@ -2,6 +2,9 @@
 import re
 from copy import copy
 
+from custom_reg_form.forms import ExtraInfoForm
+from custom_reg_form.models import ExtraInfo
+from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.edxapp_wrapper.course_overviews import get_course_overviews
@@ -156,21 +159,26 @@ def camel_to_snake(string):
     return re.sub(r'(?<!^)(?=[A-Z])', '_', string).lower()
 
 
-def save_extrainfo_field(user, field, value):
-    """Given a user save in extrainfo a value in the desired field.
+def save_extrainfo(user, data):
+    """Given a user save in extrainfo a value or values in desired fields.
     If the extrainfo doesnt exist, the extrainfo model is created
 
     Args:
         user (User): user instace
-        field (string): extrainfo field to change
-        value (any): value set in extrainfo field
+        data (dict): extra info data in dict format
     """
-    from custom_reg_form.models import ExtraInfo  # pylint: disable=import-outside-toplevel
-    if not hasattr(ExtraInfo, field):
+    validated_data = {field: value for field, value in data.items() if hasattr(ExtraInfo, field)}
+
+    if not validated_data:
         return
 
-    if extra_info := getattr(user, "extrainfo", None):
-        setattr(extra_info, field, value)
-        extra_info.save()
+    extra_info, _ = ExtraInfo.objects.get_or_create(user=user)  # pylint: disable=no-member
+    form_data = extra_info.__dict__
+    form_data.update(validated_data)
+
+    form = ExtraInfoForm(form_data, instance=extra_info)
+
+    if form.is_valid():
+        form.save()
     else:
-        ExtraInfo.objects.create(user=user, **{field: value})  # pylint: disable=no-member
+        raise ValidationError(form.errors)

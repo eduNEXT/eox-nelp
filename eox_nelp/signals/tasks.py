@@ -60,7 +60,11 @@ def _post_futurex_progress(data):
     Args:
         data (dict): dict to send to futurex enrollment-progress path.
     """
-    api_client = FuturexApiClient()
+    api_client = FuturexApiClient(
+        client_id=getattr(settings, "FUTUREX_CLIENT_ID"),
+        client_secret=getattr(settings, "FUTUREX_CLIENT_SECRET"),
+        base_url=getattr(settings, "FUTUREX_API_URL"),
+    )
     response = api_client.send_enrollment_progress(data)
 
     logger.info(

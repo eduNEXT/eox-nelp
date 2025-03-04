@@ -5,6 +5,7 @@ Functions:
     real_time_import_task(data: dict) -> None: Performs an asynchronous call to the RTI service.
 """
 from celery import shared_task
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
@@ -18,7 +19,6 @@ from eox_nelp.pearson_vue.rti_backend import (
     RealTimeImport,
 )
 from eox_nelp.pearson_vue.utils import generate_action_parameters, update_user_engines
-from django.conf import settings
 
 User = get_user_model()
 

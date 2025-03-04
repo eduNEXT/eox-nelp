@@ -138,7 +138,12 @@ def create_external_certificate(external_certificate_data):
             https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
             and will provide of the user certificate data.
     """
-    api_client = ExternalCertificatesApiClient()
+    api_client = ExternalCertificatesApiClient(
+        user=getattr(settings, "EXTERNAL_CERTIFICATES_USER"),
+        password=getattr(settings, "EXTERNAL_CERTIFICATES_PASSWORD"),
+        base_url=getattr(settings, "EXTERNAL_CERTIFICATES_API_URL"),
+        extra_headers=getattr(settings, "EXTERNAL_CERTIFICATES_EXTRA_HEADERS", {}),
+    )
     response = api_client.create_external_certificate(external_certificate_data)
 
     logger.info(

@@ -4,8 +4,9 @@ Classes:
     ExtractCourseIdFromStringTestCase: Tests cases for the extract_course_id_from_string method.
     GetCourseFromIdTestCase: Tests cases for the get_course_from_id method.
 """
-from ddt import data, ddt, unpack
+from ddt import data, ddt
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
@@ -15,7 +16,7 @@ from eox_nelp.utils import (
     extract_course_id_from_string,
     get_course_from_id,
     get_item_label,
-    save_extrainfo_field,
+    save_extrainfo,
 )
 
 User = get_user_model()
@@ -233,41 +234,56 @@ class CamelToSnakeTestCase(TestCase):
         self.assertRaises(TypeError, camel_to_snake, input_value)
 
 
-@ddt
-class SaveExtraInfoFieldTestCase(TestCase):
-    """Test class for the save_extrainfo_field method."""
-    @data(
-        {"field": "arabic_name", "value": "أناكين سكاي ووكر"},
-        {"field": "is_phone_validated", "value": True},
-        {"field": "arabic_first_name", "value": " أناكين"},
-        {"field": "arabic_last_name", "value": "سكاي ووكر"},
-    )
-    @unpack
-    def test_save_extrainfo_field(self, field, value):
+class SaveExtraInfoTestCase(TestCase):
+    """Test class for the save_extrainfo method."""
+
+    def test_save_extrainfo(self):
         """ Test right functionality.
 
         Expected behavior:
             - Extrainfo related objed has  the expected value.
         """
         user, _ = User.objects.get_or_create(username="vader1798")
+        extrainfo_data = {
+            "arabic_name": "أناكين سكاي ووكر",
+            "is_phone_validated": True,
+            "arabic_first_name": "أناكين",
+            "arabic_last_name": "سكاي ووكر",
+        }
 
-        save_extrainfo_field(user, field, value)
+        save_extrainfo(user, extrainfo_data)
 
-        self.assertEqual(getattr(user.extrainfo, field), value)
+        self.assertEqual(
+            {field: value for field, value in user.extrainfo.__dict__.items() if field in extrainfo_data},
+            extrainfo_data,
+        )
 
-    @data(
-        {"field": "arabic_name2", "value": "loool"},
-        {"field": "otp-crazy", "value": True},
-    )
-    @unpack
-    def test_wrong_extra_info_field(self, field, value):
+    def test_wrong_extra_info_field(self):
         """ Test when the input is not a extra info field.
 
         Expected behavior:
             - The user has no extra info model.
         """
         user, _ = User.objects.get_or_create(username="vader19")
+        extrainfo_data = {
+            "arabic_name2": "loool",
+            "otp-crazy": True,
+        }
 
-        save_extrainfo_field(user, field, value)
+        save_extrainfo(user, extrainfo_data)
 
         self.assertFalse(hasattr(user, "extrainfo"))
+
+    def test_invalid_extra_info_field(self):
+        """ Test when the input is a valid field but the value is wrong.
+
+        Expected behavior:
+            - A ValidationError is thrown.
+        """
+        user, _ = User.objects.get_or_create(username="vader19")
+        extrainfo_data = {
+            "arabic_name": "english_name",
+        }
+
+        with self.assertRaises(ValidationError):
+            save_extrainfo(user, extrainfo_data)

@@ -144,11 +144,12 @@ def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=u
             certificate.user.pii.username,
             certificate.course.course_key,
         )
-        create_external_certificate.delay(
+        create_external_certificate(
             external_certificate_data=_generate_external_certificate_data(
                 time=metadata.time,
                 certificate_data=certificate,
-            )
+            ),
+            user_id=certificate.user.id,
         )
     else:
         LOGGER.info(
@@ -214,11 +215,12 @@ def enrollment_publisher(instance, **kwargs):  # pylint: disable=unused-argument
             name='',
         )
 
-        create_external_certificate.delay(
+        create_external_certificate(
             external_certificate_data=_generate_external_certificate_data(
                 time=time,
                 certificate_data=certificate,
-            )
+            ),
+            user_id=user.id,
         )
     else:
         LOGGER.info(

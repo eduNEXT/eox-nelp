@@ -134,9 +134,9 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
         user = User.objects.get(id=user_id)
         update_user_engines(user, action_name, exam_id)
         client = PearsonEngineApiClient(
-            client_id=getattr(settings, "PEARSON_ENGINE_API_CLIENT_ID"),
-            client_secret=getattr(settings, "PEARSON_ENGINE_API_CLIENT_SECRET"),
-            base_url=getattr(settings, "PEARSON_ENGINE_API_URL")
+            client_id=settings.PEARSON_ENGINE_API_CLIENT_ID,
+            client_secret=settings.PEARSON_ENGINE_API_CLIENT_SECRET,
+            base_url=settings.PEARSON_ENGINE_API_URL,
         )
         action = getattr(client, action_key)
         parameters = generate_action_parameters(user, exam_id)

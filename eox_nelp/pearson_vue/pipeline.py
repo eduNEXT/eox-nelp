@@ -128,9 +128,9 @@ def check_service_availability(**kwargs):  # pylint: disable=unused-argument
         Exception: If the Pearson VUE RTI service is not available.
     """
     api_client = PearsonRTIApiClient(
-        cert=getattr(settings, "PEARSON_RTI_CERT"),
-        passphrase=getattr(settings, "PEARSON_RTI_PASSPHRASE"),
-        base_url=getattr(settings, "PEARSON_RTI_WSDL_URL"),
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
     )
     payload = {
         "soapenv:Envelope": {
@@ -170,9 +170,9 @@ def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unu
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
     api_client = PearsonRTIApiClient(
-        cert=getattr(settings, "PEARSON_RTI_CERT"),
-        passphrase=getattr(settings, "PEARSON_RTI_PASSPHRASE"),
-        base_url=getattr(settings, "PEARSON_RTI_WSDL_URL"),
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
     )
     payload = {
         "soapenv:Envelope": {
@@ -224,9 +224,9 @@ def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
     api_client = PearsonRTIApiClient(
-        cert=getattr(settings, "PEARSON_RTI_CERT"),
-        passphrase=getattr(settings, "PEARSON_RTI_PASSPHRASE"),
-        base_url=getattr(settings, "PEARSON_RTI_WSDL_URL"),
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
     )
     payload = {
         "soapenv:Envelope": {

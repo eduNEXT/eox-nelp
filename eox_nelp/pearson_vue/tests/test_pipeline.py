@@ -159,6 +159,7 @@ class TestCheckServiceAvailability(unittest.TestCase):
     Unit tests for the check_service_availability function.
     """
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_check_service_availability_success(self, mock_update_xml_with_dict, mock_api_client):
@@ -193,6 +194,7 @@ class TestCheckServiceAvailability(unittest.TestCase):
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_PING_DATABASE, expected_payload)
         mock_api_client.return_value.ping.assert_called_once_with(mock_update_xml_with_dict())
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_check_service_availability_failure(self, mock_update_xml_with_dict, mock_api_client):
@@ -241,6 +243,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
         """
         self.cdd_request = CDD_REQUEST_SAMPLE
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_import_candidate_demographics_success(self, mock_update_xml_with_dict, mock_api_client):
@@ -279,6 +282,7 @@ class TestImportCandidateDemographics(unittest.TestCase):
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_CDD, expected_payload)
         mock_api_client.return_value.import_candidate_demographics.assert_called_once_with(mock_update_xml_with_dict())
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_import_candidate_demographics_failure(self, mock_update_xml_with_dict, mock_api_client):
@@ -338,6 +342,7 @@ class TestImportExamAuthorization(unittest.TestCase):
         """
         self.ead_request = EAD_REQUEST_SAMPLE
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_import_exam_authorization_success(self, mock_update_xml_with_dict, mock_api_client):
@@ -376,6 +381,7 @@ class TestImportExamAuthorization(unittest.TestCase):
         mock_update_xml_with_dict.assert_called_once_with(PAYLOAD_EAD, expected_payload)
         mock_api_client.return_value.import_exam_authorization.assert_called_once_with(mock_update_xml_with_dict())
 
+    @override_settings(PEARSON_RTI_CERT_RTI_PASSPHRASE="test")
     @patch("eox_nelp.pearson_vue.pipeline.PearsonRTIApiClient")
     @patch("eox_nelp.pearson_vue.pipeline.update_xml_with_dict")
     def test_import_exam_authorization_failure(self, mock_update_xml_with_dict, mock_api_client):

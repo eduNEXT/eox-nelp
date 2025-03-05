@@ -61,9 +61,9 @@ def _post_futurex_progress(data):
         data (dict): dict to send to futurex enrollment-progress path.
     """
     api_client = FuturexApiClient(
-        client_id=getattr(settings, "FUTUREX_CLIENT_ID"),
-        client_secret=getattr(settings, "FUTUREX_CLIENT_SECRET"),
-        base_url=getattr(settings, "FUTUREX_API_URL"),
+        client_id=settings.FUTUREX_CLIENT_ID,
+        client_secret=settings.FUTUREX_CLIENT_SECRET,
+        base_url=settings.FUTUREX_API_URL,
     )
     response = api_client.send_enrollment_progress(data)
 
@@ -143,10 +143,10 @@ def create_external_certificate(external_certificate_data):
             and will provide of the user certificate data.
     """
     api_client = ExternalCertificatesApiClient(
-        user=getattr(settings, "EXTERNAL_CERTIFICATES_USER"),
-        password=getattr(settings, "EXTERNAL_CERTIFICATES_PASSWORD"),
-        base_url=getattr(settings, "EXTERNAL_CERTIFICATES_API_URL"),
-        extra_headers=getattr(settings, "EXTERNAL_CERTIFICATES_EXTRA_HEADERS", {}),
+        user=settings.EXTERNAL_CERTIFICATES_USER,
+        password=settings.EXTERNAL_CERTIFICATES_PASSWORD,
+        base_url=settings.EXTERNAL_CERTIFICATES_API_URL,
+        extra_headers=settings.EXTERNAL_CERTIFICATES_EXTRA_HEADERS,
     )
     response = api_client.create_external_certificate(external_certificate_data)
 
@@ -217,9 +217,9 @@ def update_mt_training_stage(course_id, national_id, stage_result):
         stage_result (int): Representation of pass or fail result, 1 for pass  2 for fail.
     """
     api_client = MinisterOfTourismApiClient(
-        user=getattr(settings, "MINISTER_OF_TOURISM_USER"),
-        password=getattr(settings, "MINISTER_OF_TOURISM_PASSWORD"),
-        base_url=getattr(settings, "MINISTER_OF_TOURISM_API_URL"),
+        user=settings.MINISTER_OF_TOURISM_USER,
+        password=settings.MINISTER_OF_TOURISM_PASSWORD,
+        base_url=settings.MINISTER_OF_TOURISM_API_URL,
     )
 
     api_client.update_training_stage(

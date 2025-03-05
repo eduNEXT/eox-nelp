@@ -362,6 +362,7 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
 class CreateExternalCertificateTestCase(unittest.TestCase):
     """Test class for create_external_certificate function"""
 
+    @override_settings(EXTERNAL_CERTIFICATES_EXTRA_HEADERS={"Authorization": "Bearer test-token"})
     @patch("eox_nelp.signals.tasks.ExternalCertificatesApiClient")
     def test_certificate_creation(self, api_mock):
         """Test standard call with the required parameters.

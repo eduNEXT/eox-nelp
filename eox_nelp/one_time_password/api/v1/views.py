@@ -62,10 +62,10 @@ def generate_otp(request):
     logger.info("generating otp %s*****", user_otp_key[:-5])
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
     sms_client = SMSVendorApiClient(
-        user=getattr(settings, "SMS_VENDOR_USERNAME", ""),
-        password=getattr(settings, "SMS_VENDOR_PASSWORD", ""),
-        token_path=getattr(settings, "SMS_VENDOR_TOKEN_PATH", ""),
-        base_url=getattr(settings, "SMS_VENDOR_BASE_URL", "")
+        user=settings.SMS_VENDOR_USERNAME,
+        password=settings.SMS_VENDOR_PASSWORD,
+        token_path=settings.SMS_VENDOR_TOKEN_PATH,
+        base_url=settings.SMS_VENDOR_BASE_URL,
     )
 
     path = getattr(settings, "SMS_VENDOR_SEND_SMS_PATH", "")

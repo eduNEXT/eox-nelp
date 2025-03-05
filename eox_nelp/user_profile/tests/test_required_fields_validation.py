@@ -132,7 +132,7 @@ class ValidateExtraInfoFieldsTestCase(TestCase):
             - The function should return the result from validate_user_fields.
         """
         user = User.objects.create(username="testuser")
-        user.extrainfo = ExtraInfo(arabic_first_name="invalid-arabic-name")
+        ExtraInfo.objects.create(user=user, arabic_first_name="invalid-arabic-name")  # pylint: disable=no-member
         mock_validate_user_fields.return_value = {"arabic_first_name": ["invalid char_type"]}
 
         result = validate_extra_info_fields(user, {"arabic_first_name": {"char_type": "arabic"}})
@@ -142,6 +142,37 @@ class ValidateExtraInfoFieldsTestCase(TestCase):
             {"arabic_first_name": {"char_type": "arabic"}},
         )
         self.assertEqual(result, {"arabic_first_name": ["invalid char_type"]})
+
+    @patch("eox_nelp.user_profile.required_fields_validation.validate_user_fields")
+    def test_validate_without_extrainfo(self, mock_validate_user_fields):
+        """
+        Test that the function return all the model fields as empty when the user doesn't have
+        the extrainfo attribute.
+
+        Expected behavior:
+            - The function shouldn't call validate_user_fields.
+            - The function should return all required fields with empty field message.
+        """
+        user = User.objects.create(username="testuser")
+        expected_result = {
+            "arabic_name": ["Empty field"],
+            "arabic_first_name": ["Empty field"],
+            "arabic_last_name": ["Empty field"],
+            "national_id": ["Empty field"],
+        }
+
+        result = validate_extra_info_fields(
+            user,
+            {
+                "arabic_name": {"max_length": 20, "char_type": "arabic"},
+                "arabic_first_name": {"max_length": 20, "char_type": "arabic"},
+                "arabic_last_name": {"max_length": 50, "char_type": "arabic"},
+                "national_id": {"max_length": 50, "char_type": "latin", "format": "numeric"},
+            },
+        )
+
+        mock_validate_user_fields.assert_not_called()
+        self.assertEqual(result, expected_result)
 
 
 class ValidateUserFieldsTestCase(TestCase):

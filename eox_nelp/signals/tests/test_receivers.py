@@ -139,7 +139,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
         """
         certificate_publisher(self.certificate_data, self.metadata)
 
-        create_external_certificate_mock.delay.assert_not_called()
+        create_external_certificate_mock.assert_not_called()
 
     @patch("eox_nelp.signals.receivers.create_external_certificate")
     def test_invalid_mode(self, create_external_certificate_mock):
@@ -178,7 +178,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
         with self.assertLogs(receivers.__name__, level="INFO") as logs:
             certificate_publisher(certificate_data, self.metadata)
 
-        create_external_certificate_mock.delay.assert_not_called()
+        create_external_certificate_mock.assert_not_called()
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
         ])
@@ -209,8 +209,9 @@ class CertificatePublisherTestCase(unittest.TestCase):
             time=self.metadata.time,
             certificate_data=self.certificate_data,
         )
-        create_external_certificate_mock.delay.assert_called_with(
-            external_certificate_data=generate_data_mock()
+        create_external_certificate_mock.assert_called_with(
+            external_certificate_data=generate_data_mock(),
+            user_id=self.certificate_data.user.id,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -260,8 +261,9 @@ class CertificatePublisherTestCase(unittest.TestCase):
             time=self.metadata.time,
             certificate_data=certificate_data,
         )
-        create_external_certificate_mock.delay.assert_called_with(
-            external_certificate_data=generate_data_mock()
+        create_external_certificate_mock.assert_called_with(
+            external_certificate_data=generate_data_mock(),
+            user_id=self.certificate_data.user.id,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -300,7 +302,7 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
         """
         enrollment_publisher(self.course_enrollment)
 
-        create_external_certificate_mock.delay.assert_not_called()
+        create_external_certificate_mock.assert_not_called()
 
     @patch("eox_nelp.signals.receivers.create_external_certificate")
     def test_invalid_mode(self, create_external_certificate_mock):
@@ -322,7 +324,7 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
         with self.assertLogs(receivers.__name__, level="INFO") as logs:
             enrollment_publisher(invalid_course_enrollment)
 
-        create_external_certificate_mock.delay.assert_not_called()
+        create_external_certificate_mock.assert_not_called()
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
         ])
@@ -376,8 +378,9 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
             time=self.course_enrollment.created,
             certificate_data=certificate_data,
         )
-        create_external_certificate_mock.delay.assert_called_with(
-            external_certificate_data=generate_data_mock()
+        create_external_certificate_mock.assert_called_with(
+            external_certificate_data=generate_data_mock(),
+            user_id=certificate_data.user.id
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -434,8 +437,9 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
             time=self.course_enrollment.created,
             certificate_data=certificate_data,
         )
-        create_external_certificate_mock.delay.assert_called_with(
-            external_certificate_data=generate_data_mock()
+        create_external_certificate_mock.assert_called_with(
+            external_certificate_data=generate_data_mock(),
+            user_id=certificate_data.user.id
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"

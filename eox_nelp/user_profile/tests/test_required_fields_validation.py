@@ -14,6 +14,7 @@ Test Classes:
     - ValidateExtraInfoFieldsTestCase: Tests validate_extra_info_fields function.
     - ValidateUserFieldsTestCase: Tests validate_user_fields function.
     - ValidateFieldTestCase: Tests validate_field function.
+    - ValidateDependentFieldTestCase : Tests validate_dependent_field function.
 """
 from unittest.mock import patch
 
@@ -24,6 +25,7 @@ from django.test import TestCase, override_settings
 from eox_nelp.user_profile import required_fields_validation
 from eox_nelp.user_profile.required_fields_validation import (
     validate_account_fields,
+    validate_dependent_field,
     validate_extra_info_fields,
     validate_field,
     validate_profile_fields,
@@ -93,7 +95,7 @@ class ValidateAccountFieldsTestCase(TestCase):
         mock_validate_user_fields.return_value = {"username": ["max_length exceeded"]}
         result = validate_account_fields(user, {"username": {"max_length": 10}})
 
-        mock_validate_user_fields.assert_called_once_with(user, {"username": {"max_length": 10}})
+        mock_validate_user_fields.assert_called_once_with(user, user, {"username": {"max_length": 10}})
         self.assertEqual(result, {"username": ["max_length exceeded"]})
 
 
@@ -115,7 +117,7 @@ class ValidateProfileFieldsTestCase(TestCase):
 
         result = validate_profile_fields(user, {"first_name": {"char_type": "latin"}})
 
-        mock_validate_user_fields.assert_called_once_with(user.profile, {"first_name": {"char_type": "latin"}})
+        mock_validate_user_fields.assert_called_once_with(user, user.profile, {"first_name": {"char_type": "latin"}})
         self.assertEqual(result, {"first_name": ["invalid char_type"]})
 
 
@@ -138,6 +140,7 @@ class ValidateExtraInfoFieldsTestCase(TestCase):
         result = validate_extra_info_fields(user, {"arabic_first_name": {"char_type": "arabic"}})
 
         mock_validate_user_fields.assert_called_once_with(
+            user,
             user.extrainfo,
             {"arabic_first_name": {"char_type": "arabic"}},
         )
@@ -187,6 +190,7 @@ class ValidateUserFieldsTestCase(TestCase):
             - The function should call validate_field for each field in fields.
             - The function should return a dictionary with invalid fields and their errors.
         """
+        user = User.objects.create(username="testuser")
         instance = type("UserMock", (), {"username": "testuser", "email": "invalid_email"})()
         fields = {
             "username": {"max_length": 10},
@@ -194,7 +198,7 @@ class ValidateUserFieldsTestCase(TestCase):
         }
         mock_validate_field.side_effect = [[], ["invalid format"]]
 
-        result = validate_user_fields(instance, fields)
+        result = validate_user_fields(user, instance, fields)
 
         self.assertEqual(mock_validate_field.call_count, 2)
         self.assertEqual(result, {"username": [], "email": ["invalid format"]})
@@ -206,7 +210,9 @@ class ValidateUserFieldsTestCase(TestCase):
         Expected behavior:
             - The function should return an empty dictionary.
         """
-        result = validate_user_fields(None, {"username": {"max_length": 10}})
+        user = User.objects.create(username="testuser")
+
+        result = validate_user_fields(user, None, {"username": {"max_length": 10}})
 
         self.assertEqual(result, {})
 
@@ -218,10 +224,11 @@ class ValidateUserFieldsTestCase(TestCase):
             - A warning is logged with the right message.
             - The function should return an empty dictionary.
         """
+        user = User.objects.create(username="testuser")
         instance = type("UserMock", (), {"username": ""})()
 
         with self.assertLogs(required_fields_validation.__name__, level="WARNING") as logs:
-            result = validate_user_fields(instance, {"invalid": {"max_length": 10}})
+            result = validate_user_fields(user, instance, {"invalid": {"max_length": 10}})
 
         self.assertEqual(logs.output, [
             f"WARNING:{required_fields_validation.__name__}:Invalid configuration for invalid field",
@@ -334,3 +341,83 @@ class ValidateFieldTestCase(TestCase):
         result = validate_field(None, {"max_length": 10, "allow_empty": True, "format": "email"})
 
         self.assertEqual(result, ["format with argument email failed"])
+
+
+class ValidateDependentFieldTestCase(TestCase):
+    """Test case for validate_dependent_field function."""
+
+    def test_validate_dependent_field_valid_values(self):
+        """
+        Test that the function returns an empty list if the dependent field has a valid value.
+
+        Expected behavior:
+            - The function should return an empty list when the value matches the expected conditions.
+        """
+        user_mock = type("UserMock", (), {"gender": "Male"})()
+        value = "Google"
+        rules = {"gender": {"Male": ["Google", "Microsoft"]}}
+
+        result = validate_dependent_field(user_mock, value, rules)
+
+        self.assertEqual(result, [])
+
+    def test_validate_dependent_field_invalid_value_list(self):
+        """
+        Test that the function returns an error if the value is not in the allowed list.
+
+        Expected behavior:
+            - The function should return an error message indicating the invalid value.
+        """
+        user_mock = type("UserMock", (), {"gender": "Male"})()
+        value = "Facebook"
+        rules = {"gender": {"Male": ["Google", "Microsoft"]}}
+
+        result = validate_dependent_field(user_mock, value, rules)
+
+        self.assertEqual(result, ["Facebook is not a valid option from ['Google', 'Microsoft']"])
+
+    def test_validate_dependent_field_invalid_value_str(self):
+        """
+        Test that the function returns an error if the value does not match the expected string.
+
+        Expected behavior:
+            - The function should return an error message indicating the mismatch.
+        """
+        user_mock = type("UserMock", (), {"gender": "Other"})()
+        value = "Freelancer"
+        rules = {"gender": {"Other": "Self-Employed"}}
+
+        result = validate_dependent_field(user_mock, value, rules)
+
+        self.assertEqual(result, ["Freelancer is different from Self-Employed"])
+
+    def test_validate_dependent_field_nested_attribute(self):
+        """
+        Test that the function correctly retrieves nested attributes.
+
+        Expected behavior:
+            - The function should correctly access nested attributes and validate the value accordingly.
+        """
+        profile_mock = type("ProfileMock", (), {"country": "CO"})()
+        user_mock = type("UserMock", (), {"profile": profile_mock})()
+        value = "Bogota"
+        rules = {"profile.country": {"CO": ["Bogota", "Medellin"]}}
+
+        result = validate_dependent_field(user_mock, value, rules)
+
+        self.assertEqual(result, [])
+
+    def test_validate_dependent_field_no_matching_condition(self):
+        """
+        Test that the function returns an empty list if there is no matching condition.
+
+        Expected behavior:
+            - The function should return an empty list when no rule applies.
+        """
+        user_mock = type("UserMock", (), {"gender": "Female"})()
+        value = "Google"
+        rules = {"gender": {"Male": ["Google", "Microsoft"]}}
+
+        result = validate_dependent_field(user_mock, value, rules)
+
+        self.assertEqual(result, [])

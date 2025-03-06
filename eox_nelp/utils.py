@@ -4,10 +4,11 @@ from copy import copy
 
 from custom_reg_form.forms import ExtraInfoForm
 from custom_reg_form.models import ExtraInfo
-from django.core.exceptions import ValidationError
+from django.forms.models import model_to_dict
 from opaque_keys.edx.keys import CourseKey
 
 from eox_nelp.edxapp_wrapper.course_overviews import get_course_overviews
+from eox_nelp.edxapp_wrapper.user_api import errors
 
 NATIONAL_ID_REGEX = r"^[1-2]\d{9}$"
 COURSE_ID_REGEX = r'(course-v1:[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
@@ -173,7 +174,7 @@ def save_extrainfo(user, data):
         return
 
     extra_info, _ = ExtraInfo.objects.get_or_create(user=user)  # pylint: disable=no-member
-    form_data = extra_info.__dict__
+    form_data = model_to_dict(extra_info)
     form_data.update(validated_data)
 
     form = ExtraInfoForm(form_data, instance=extra_info)
@@ -181,4 +182,4 @@ def save_extrainfo(user, data):
     if form.is_valid():
         form.save()
     else:
-        raise ValidationError(form.errors)
+        raise errors.AccountValidationError(form.errors)

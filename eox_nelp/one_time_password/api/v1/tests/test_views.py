@@ -195,6 +195,7 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
             user=self.user,
             arabic_name="مسؤل",
             national_id="123457896",
+            occupation="student",
         )
 
     def tearDown(self):

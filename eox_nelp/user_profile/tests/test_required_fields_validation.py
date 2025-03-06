@@ -210,19 +210,6 @@ class ValidateUserFieldsTestCase(TestCase):
 
         self.assertEqual(result, {})
 
-    def test_validate_user_fields_with_empty_value(self):
-        """
-        Test that the function returns the right message when the attribute is empty.
-
-        Expected behavior:
-            - The function should return a dictionary with expected error.
-        """
-        instance = type("UserMock", (), {"username": ""})()
-
-        result = validate_user_fields(instance, {"username": {"max_length": 10}})
-
-        self.assertEqual(result, {"username": ["Empty field"]})
-
     def test_validate_user_fields_with_invalid_field(self):
         """
         Test that the function returns an empty dictionary when an invlaid field has been set.
@@ -325,3 +312,25 @@ class ValidateFieldTestCase(TestCase):
         result = validate_field(value, rules)
 
         self.assertEqual(result, ["max_length with argument 10 failed", "format with argument email failed"])
+
+    def test_validate_field_with_empty_value(self):
+        """
+        Test that the function returns the right message when the attribute is empty.
+
+        Expected behavior:
+            - The function should return the expected error.
+        """
+        result = validate_field("", {"max_length": 10, "allow_empty": False})
+
+        self.assertEqual(result, ["Empty field"])
+
+    def test_validate_field_with_allow_empty(self):
+        """
+        Test that the function returns the expected validation error when the value is None and the allow_empty is True.
+
+        Expected behavior:
+            - The function should return the expected error.
+        """
+        result = validate_field(None, {"max_length": 10, "allow_empty": True, "format": "email"})
+
+        self.assertEqual(result, ["format with argument email failed"])

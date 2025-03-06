@@ -38,6 +38,8 @@ Additional Field Attributes
     considered invalid.
 - optional_values: Specifies a predefined list of allowed values for a field. Any value outside this list will be
     rejected.
+- allow_empty: Indicates whether an empty value is allowed. If set to `False`, an empty value will be considered
+    invalid.
 
 Field Category Mapping
 
@@ -196,12 +198,7 @@ def validate_user_fields(instance, fields):
             continue
 
         value = getattr(instance, field)
-
-        if not value:
-            errors = ["Empty field"]
-        else:
-            errors = validate_field(value, rules)
-
+        errors = validate_field(value, rules)
         result[field] = errors
 
     return result
@@ -218,6 +215,13 @@ def validate_field(value, rules):
     Returns:
         list: A list of validation error messages. Empty if valid.
     """
+    if not value and not rules.get("allow_empty", False):
+        return ["Empty field"]
+
+    if not value:
+        # This is required since validation supports str fields and None value are not allowed
+        value = ""
+
     errors = []
 
     validators = {

@@ -251,6 +251,7 @@ class SaveExtraInfoTestCase(TestCase):
             "arabic_first_name": "أناكين",
             "arabic_last_name": "سكاي ووكر",
             "national_id": "1234512347",
+            "occupation": "student",
         }
 
         save_extrainfo(user, extrainfo_data)

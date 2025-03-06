@@ -6,11 +6,12 @@ Classes:
 """
 from ddt import data, ddt
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.forms.models import model_to_dict
 from django.test import TestCase
 from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 
+from eox_nelp.edxapp_wrapper.user_api import errors
 from eox_nelp.utils import (
     camel_to_snake,
     extract_course_id_from_string,
@@ -249,12 +250,13 @@ class SaveExtraInfoTestCase(TestCase):
             "is_phone_validated": True,
             "arabic_first_name": "أناكين",
             "arabic_last_name": "سكاي ووكر",
+            "national_id": "1234512347",
         }
 
         save_extrainfo(user, extrainfo_data)
 
         self.assertEqual(
-            {field: value for field, value in user.extrainfo.__dict__.items() if field in extrainfo_data},
+            {field: value for field, value in model_to_dict(user.extrainfo).items() if field in extrainfo_data},
             extrainfo_data,
         )
 
@@ -285,5 +287,5 @@ class SaveExtraInfoTestCase(TestCase):
             "arabic_name": "english_name",
         }
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(errors.AccountValidationError):
             save_extrainfo(user, extrainfo_data)

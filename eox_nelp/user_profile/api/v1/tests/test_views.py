@@ -147,7 +147,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
 
     @override_settings(
         ENABLE_OTP_VALIDATION=False,
-        USER_PROFILE_API_EXTRA_INFO_FIELDS=["arabic_name", "arabic_first_name", "arabic_last_name"],
+        USER_PROFILE_API_EXTRA_INFO_FIELDS=["arabic_name", "arabic_first_name", "arabic_last_name", "national_id"],
         USE_PEARSON_ENGINE_SERVICE=True,
     )
     @patch("eox_nelp.user_profile.api.v1.views.real_time_import_task_v2")
@@ -166,7 +166,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             "arabic_name": "سكاي ووكر أناكين",
             "arabic_first_name": "أناكين",
             "arabic_last_name": "سكاي ووكر",
-            "one_time_password": "correct26",
+            "national_id": "1234512345",
         }
         url_endpoint = reverse(self.reverse_viewname)
 

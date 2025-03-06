@@ -178,7 +178,11 @@ class ValidateOTPTestCase(POSTAuthenticatedTestMixin, APITestCase):
         """Overrides setUp behavior to add extrainfo attribute
         """
         super().setUp()
-        ExtraInfo.objects.get_or_create(user=self.user, arabic_name="مسؤل")  # pylint: disable=no-member
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=self.user,
+            arabic_name="مسؤل",
+            national_id="123457896",
+        )
 
     def tearDown(self):  # pylint: disable=invalid-name
         """Clear cache after or mocks each test case. Clean extrainfo values."""

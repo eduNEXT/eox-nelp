@@ -358,7 +358,7 @@ mccabe==0.7.0
     #   pylint
 mock==5.1.0
     # via -r requirements/test.in
-nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
+nelp-custom-registration-fields @ git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@and/add_occupation_sector_fields
     # via -r requirements/base.txt
 newrelic==10.6.0
     # via

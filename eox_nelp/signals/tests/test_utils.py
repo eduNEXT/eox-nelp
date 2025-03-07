@@ -5,6 +5,7 @@ Classes:
 """
 import unittest
 
+from custom_reg_form.models import ExtraInfo
 from ddt import data, ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,7 +16,6 @@ from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
 from eox_nelp.signals.utils import _generate_external_certificate_data, _user_has_passing_grade
-from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 
@@ -70,7 +70,11 @@ class GenerateExternalCertificateDataTestCase(TestCase):
             download_url="",
             name="",
         )
-        save_extrainfo_field(self.user, "national_id", "1234567890")
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=self.user,
+            arabic_name="مسؤل",
+            national_id="1234567890",
+        )
 
     @override_settings(EXTERNAL_CERTIFICATES_GROUP_CODES={"course-v1:test+Cx105+2022_T4": "ABC123"})
     @patch("eox_nelp.signals.utils._user_has_passing_grade")
@@ -95,7 +99,7 @@ class GenerateExternalCertificateDataTestCase(TestCase):
             "user": {
                 "national_id": self.user.extrainfo.national_id,
                 "english_name": self.certificate_data.user.pii.name,
-                "arabic_name": "",
+                "arabic_name": "مسؤل",
             }
         }
 
@@ -135,7 +139,11 @@ class GenerateExternalCertificateDataTestCase(TestCase):
         wrong_user, _ = User.objects.get_or_create(
             username="Albus",
         )
-        save_extrainfo_field(wrong_user, "national_id", wrong_national_id)
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=wrong_user,
+            arabic_name="مسؤل",
+            national_id=wrong_national_id,
+        )
         certificate_data = CertificateData(
             user=UserData(
                 pii=UserPersonalData(
@@ -188,7 +196,11 @@ class GenerateExternalCertificateDataTestCase(TestCase):
         saml_association_user, _ = User.objects.get_or_create(
             username="Severus",
         )
-        save_extrainfo_field(saml_association_user, "national_id", saml_extra_association)
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=saml_association_user,
+            arabic_name="مسؤل",
+            national_id=saml_extra_association,
+        )
         certificate_data = CertificateData(
             user=UserData(
                 pii=UserPersonalData(
@@ -220,7 +232,7 @@ class GenerateExternalCertificateDataTestCase(TestCase):
             "user": {
                 "national_id": national_id,
                 "english_name": certificate_data.user.pii.name,
-                "arabic_name": "",
+                "arabic_name": "مسؤل",
             }
         }
 

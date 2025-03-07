@@ -2,7 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from eox_nelp.pearson_vue.models import PearsonEngine
+from eox_nelp.pearson_vue_engine.models import PearsonEngine
 
 User = get_user_model()
 

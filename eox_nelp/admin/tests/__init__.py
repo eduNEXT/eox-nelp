@@ -120,7 +120,7 @@ class TestPearsonAction(TestCase):
         mocks_call_kwargs = self._prepare_call_kwargs(queryset, call_args, extra_call_kwargs)
 
         # Call the admin action
-        with patch("eox_nelp.pearson_vue.tasks.real_time_import_task_v2.delay") as mocked_task:
+        with patch("eox_nelp.pearson_vue_engine.tasks.real_time_import_task_v2.delay") as mocked_task:
             admin_action(MagicMock(), self.request, queryset)
             self._assert_mocked_task_calls(mocked_task, mocks_call_kwargs)
 

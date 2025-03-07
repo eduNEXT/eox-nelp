@@ -7,6 +7,6 @@ from eox_nelp.payment_notifications.views import PaymentNotificationsView
 
 app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
-urlpatterns = [  # pylint: disable=invalid-name
+urlpatterns = [
     path("", PaymentNotificationsView.as_view(), name="payment-notifications"),
 ]

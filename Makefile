@@ -49,7 +49,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 
 quality: clean install-test-reqs## check coding style with pycodestyle and pylint
 	$(TOX) pycodestyle ./eox_nelp
-	$(TOX) pylint ./eox_nelp --rcfile=./setup.cfg
+	$(TOX) pylint ./eox_nelp --rcfile=./setup.cfg --fail-on=I0021
 	$(TOX) isort --check-only --diff ./eox_nelp
 
 python-test: clean install-test-reqs## Run test suite.

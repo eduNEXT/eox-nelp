@@ -9,7 +9,7 @@ from django.conf import settings
 from pydantic.v1.utils import deep_update
 
 from eox_nelp.edxapp_wrapper.student import AnonymousUserId, CourseEnrollment, anonymous_id_for_user
-from eox_nelp.pearson_vue.models import PearsonEngine  # pylint: disable=import-outside-toplevel
+from eox_nelp.pearson_vue.models import PearsonEngine
 
 
 def update_xml_with_dict(xml: str, update_dict: dict) -> str:

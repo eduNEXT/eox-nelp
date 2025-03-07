@@ -112,7 +112,7 @@ class TestGetUserData(unittest.TestCase):
         setattr(User, "profile", self.profile)
         setattr(User, "extrainfo", self.extrainfo)
 
-    def tearDown(self):  # pylint: disable=invalid-name
+    def tearDown(self):
         """Reset mocks"""
         anonymous_id_for_user.reset_mock()
         delattr(User, "extrainfo")

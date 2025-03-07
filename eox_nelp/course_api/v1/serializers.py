@@ -9,7 +9,7 @@ from eox_nelp.edxapp_wrapper.course_api import CourseDetailSerializer
 from eox_nelp.edxapp_wrapper.course_experience import course_home_url as retrieve_course_home_url
 
 
-class NelpCourseDetailSerializer(CourseDetailSerializer):  # pylint: disable=abstract-method
+class NelpCourseDetailSerializer(CourseDetailSerializer):
     """
     Serializer for Course objects providing additional details about the
     course.

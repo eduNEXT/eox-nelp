@@ -15,7 +15,7 @@ from eox_nelp.stats.views import STATS_QUERY_PARAMS
 class GetTenantStatsTestCase(TestCase):
     """ Test get_tenant_stats function based view."""
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across experience test cases.
         """

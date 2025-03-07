@@ -19,7 +19,7 @@ class CheckNotifyCourseDueDateTestCase(TestCase):
     """ Test `check notify_course_due_dates` command. """
     # pylint: disable=no-member
 
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across UpcomingCourseDueDate test cases.
         """

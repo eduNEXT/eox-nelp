@@ -30,7 +30,7 @@ from rest_framework_json_api.metadata import JSONAPIMetadata
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 from rest_framework_json_api.parsers import JSONParser
 from rest_framework_json_api.renderers import BrowsableAPIRenderer, JSONRenderer
-from rest_framework_json_api.schemas.openapi import AutoSchema  # pylint: disable=no-name-in-module,syntax-error
+from rest_framework_json_api.schemas.openapi import AutoSchema
 from rest_framework_json_api.views import ModelViewSet, ReadOnlyModelViewSet
 
 from eox_nelp.course_experience.models import (

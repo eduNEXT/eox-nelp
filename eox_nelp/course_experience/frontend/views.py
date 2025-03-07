@@ -17,6 +17,6 @@ class FeedbackCoursesTemplate(View):
     General feedback courses template.
     """
 
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Render start html"""
         return edxmako.shortcuts.render_to_response("feedback_carousel/index.html", {}, "main", request)

@@ -27,7 +27,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
     """Test case for update user data view."""
     reverse_viewname = "user-profile-api:v1:update-user-data"
 
-    def tearDown(self):  # pylint: disable=invalid-name
+    def tearDown(self):
         """Reset Mocks"""
         accounts.reset_mock()
         accounts.api.update_account_settings.side_effect = None

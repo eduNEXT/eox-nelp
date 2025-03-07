@@ -40,6 +40,26 @@ Additional Field Attributes
     rejected.
 - allow_empty: Indicates whether an empty value is allowed. If set to `False`, an empty value will be considered
     invalid.
+- dependent_fields: Specifies conditions where the validity of a field depends on the value of another field.
+    This is useful for cases where a field's allowed values change based on another related field.
+
+### `dependent_fields` Usage
+
+The `dependent_fields` attribute is used when a field's valid values are conditional on another field’s value.
+For example, the `city` field in the `profile` category may depend on the `country` field:
+
+"profile": {
+    "city": {
+        "max_length": 32,
+        "char_type": "latin",
+        "dependent_fields": {
+            "profile.country": {
+                "CO": ["Bogota", "Medellin", "Cali"],
+                "US": "Florida"
+            }
+        }
+    },
+}
 
 Field Category Mapping
 
@@ -52,18 +72,31 @@ REQUIRED_USER_FIELDS = {
         "last_name": {"max_length": 50, "char_type": "latin"},
     },
     "profile": {
-        "city": {"max_length": 32, "char_type": "latin"},
+        "city": {
+            "max_length": 32,
+            "char_type": "latin",
+            "dependent_fields": {
+                "profile.gender": {
+                    "Male": ["Bogota", "Medellin", "Cali"],
+                    "Female": "Florida",
+                },
+                "profile.country": {
+                    "CO": ["Bogota", "Medellin", "Cali"],
+                    "US": "Florida"
+                }
+            }
+        },
         "country": {"max_length": 2, "optional_values": ["US", "CA", "MX", "BR"]},
         "phone_number": {"max_length": 15, "format": "phone"},
         "mailing_address": {"max_length": 40},
     },
     "extra_info": {
         "arabic_name": {"max_length": 20, "char_type": "arabic"},
-        "arabic_first_name": {"max_length": 20, "char_type": "arabic"},
+        "arabic_first_name": {"max_length": 20, "char_type": "arabic", "allow_empty": True},
         "arabic_last_name": {"max_length": 50, "char_type": "arabic"},
     },
-}
 """
+import functools
 import logging
 
 from custom_reg_form.models import ExtraInfo
@@ -139,7 +172,7 @@ def validate_account_fields(user, account_fields):
     Returns:
         dict: A dictionary with invalid account fields and their errors.
     """
-    return validate_user_fields(user, account_fields)
+    return validate_user_fields(user, user, account_fields)
 
 
 def validate_profile_fields(user, profile_fields):
@@ -153,7 +186,7 @@ def validate_profile_fields(user, profile_fields):
     Returns:
         dict: A dictionary with invalid profile fields and their errors.
     """
-    return validate_user_fields(getattr(user, "profile", None), profile_fields)
+    return validate_user_fields(user, getattr(user, "profile", None), profile_fields)
 
 
 def validate_extra_info_fields(user, extra_info_fields):
@@ -173,10 +206,10 @@ def validate_extra_info_fields(user, extra_info_fields):
     except ExtraInfo.DoesNotExist:
         return {field: ["Empty field"] for field in extra_info_fields.keys() if hasattr(ExtraInfo, field)}
 
-    return validate_user_fields(extra_info, extra_info_fields)
+    return validate_user_fields(user, extra_info, extra_info_fields)
 
 
-def validate_user_fields(instance, fields):
+def validate_user_fields(user, instance, fields):
     """
     Generic function to validate fields for a given user instance.
 
@@ -199,6 +232,7 @@ def validate_user_fields(instance, fields):
 
         value = getattr(instance, field)
         errors = validate_field(value, rules)
+        errors += validate_dependent_field(user, value, rules.get("dependent_fields", {}))
         result[field] = errors
 
     return result
@@ -236,5 +270,82 @@ def validate_field(value, rules):
 
         if validator and not validator(value, argument):
             errors.append(f"{rule} with argument {argument} failed")
+
+    return errors
+
+
+def validate_dependent_field(user, value, arguments):
+    """
+    Validates a field based on dependencies with other fields in the user model.
+
+    This function checks whether a field's value is valid based on the values of other related fields
+    defined in the `dependent_fields` attribute. If the related field's value is not listed in the
+    dependency mapping, the validation passes by default.
+
+    Args:
+        user (User): The user instance whose related fields will be checked.
+        value (str): The value of the field being validated.
+        arguments (dict): A dictionary defining the dependent fields and their valid value mappings.
+
+    Returns:
+        list: A list of validation error messages. Returns an empty list if valid.
+
+    Example:
+        Given the following dependency settings:
+
+        ```python
+        "city": {
+            "dependent_fields": {
+                "profile.gender": {
+                    "Male": ["Google", "Microsoft", "Amazon"],
+                    "Female": ["Facebook", "Apple", "Netflix"],
+                },
+                "profile.country": {
+                    "CO": ["Bogota", "Medellin", "Cali"],
+                    "US": "Florida"
+                }
+            }
+        }
+        ```
+
+        - If `profile.gender` is "Male", valid values for `city` are "Google", "Microsoft", or "Amazon".
+        - If `profile.gender` is "Female", valid values for `city` are "Facebook", "Apple", or "Netflix".
+        - If `profile.country` is "CO", valid values for `city` are "Bogota", "Medellin", or "Cali".
+        - If `profile.country` is "US", the only valid value for `city` is "Florida".
+
+        If a mismatch is found, an error message is returned.
+    """
+    def get_attr(instance, attr):
+        """
+        Recursively retrieves an attribute from a nested object.
+
+        Args:
+            instance (object): The root object (e.g., user, user.profile, user.extrainfo).
+            attr (str): The attribute path, supporting dot notation (e.g., "profile.country").
+
+        Returns:
+            str: The attribute value as a string. If the attribute does not exist, an empty string is returned.
+        """
+        def _getattr(obj, attr):
+            return getattr(obj, attr, "")
+
+        return str(functools.reduce(_getattr, [instance] + attr.split(".")))
+
+    errors = []
+
+    if not arguments or not isinstance(arguments, dict):
+        return errors
+
+    for argument_field, argument in arguments.items():
+        argument_value = get_attr(user, argument_field)
+        conditions = argument.get(argument_value)
+
+        if not conditions:
+            continue
+
+        if isinstance(conditions, list) and value not in conditions:
+            errors.append(f"{value} is not a valid option from {conditions}")
+        elif isinstance(conditions, str) and value != conditions:
+            errors.append(f"{value} is different from {conditions}")
 
     return errors

@@ -127,7 +127,11 @@ def check_service_availability(**kwargs):  # pylint: disable=unused-argument
     Raises:
         Exception: If the Pearson VUE RTI service is not available.
     """
-    api_client = PearsonRTIApiClient()
+    api_client = PearsonRTIApiClient(
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
+    )
     payload = {
         "soapenv:Envelope": {
             "soapenv:Header": {
@@ -165,7 +169,11 @@ def import_candidate_demographics(cdd_request, **kwargs):  # pylint: disable=unu
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
-    api_client = PearsonRTIApiClient()
+    api_client = PearsonRTIApiClient(
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
+    )
     payload = {
         "soapenv:Envelope": {
             "soapenv:Header": {
@@ -215,7 +223,11 @@ def import_exam_authorization(ead_request, **kwargs):  # pylint: disable=unused-
     Raises:
         Exception: If the Pearson VUE RTI service does not accept the import request.
     """
-    api_client = PearsonRTIApiClient()
+    api_client = PearsonRTIApiClient(
+        cert=settings.PEARSON_RTI_CERT,
+        passphrase=settings.PEARSON_RTI_CERT_RTI_PASSPHRASE,
+        base_url=settings.PEARSON_RTI_WSDL_URL,
+    )
     payload = {
         "soapenv:Envelope": {
             "soapenv:Header": {

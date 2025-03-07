@@ -61,7 +61,16 @@ def generate_otp(request):
     user_otp_key = f"{request.user.username}-{user_phone_number}"
     logger.info("generating otp %s*****", user_otp_key[:-5])
     cache.set(user_otp_key, otp, timeout=getattr(settings, "PHONE_VALIDATION_OTP_TIMEOUT", 600))
-    sms_vendor_response = SMSVendorApiClient().send_sms(user_phone_number, f"Futurex Phone Validation Code: {otp}")
+    sms_client = SMSVendorApiClient(
+        user=settings.SMS_VENDOR_USERNAME,
+        password=settings.SMS_VENDOR_PASSWORD,
+        token_path=settings.SMS_VENDOR_TOKEN_PATH,
+        base_url=settings.SMS_VENDOR_BASE_URL,
+    )
+
+    path = getattr(settings, "SMS_VENDOR_SEND_SMS_PATH", "")
+    otp_message = f"Futurex Phone Validation Code: {otp}"
+    sms_vendor_response = sms_client.send_sms(user_phone_number, otp_message, path)
 
     if "error" in sms_vendor_response:
         return JsonResponse(

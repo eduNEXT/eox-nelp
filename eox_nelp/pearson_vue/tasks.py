@@ -5,6 +5,7 @@ Functions:
     real_time_import_task(data: dict) -> None: Performs an asynchronous call to the RTI service.
 """
 from celery import shared_task
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from nelc_api_clients.clients.pearson_engine import PearsonEngineApiClient
 from requests import exceptions
@@ -132,7 +133,12 @@ def real_time_import_task_v2(user_id, exam_id=None, action_name="rti", **kwargs)
     def audit_pearson_engine_action(user_id, exam_id, action_key, **kwargs):
         user = User.objects.get(id=user_id)
         update_user_engines(user, action_name, exam_id)
-        action = getattr(PearsonEngineApiClient(), action_key)
+        client = PearsonEngineApiClient(
+            client_id=settings.PEARSON_ENGINE_API_CLIENT_ID,
+            client_secret=settings.PEARSON_ENGINE_API_CLIENT_SECRET,
+            base_url=settings.PEARSON_ENGINE_API_URL,
+        )
+        action = getattr(client, action_key)
         parameters = generate_action_parameters(user, exam_id)
         response = action(**parameters, **kwargs)
 

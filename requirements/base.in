@@ -28,4 +28,4 @@ social-auth-app-django
 tincan
 xmltodict==0.13.0
 git+ssh://git@github.com/nelc/nelp-custom-registration-fields.git@main
-git+ssh://git@github.com/nelc/external-api-clients.git@v0.1.0
+git+ssh://git@github.com/nelc/external-api-clients.git@v1.0.0

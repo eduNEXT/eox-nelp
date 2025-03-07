@@ -14,7 +14,7 @@ from openedx_events.learning.data import CertificateData, CourseData, UserData, 
 
 from eox_nelp.admin.register_admin_model import register_admin_model as register
 from eox_nelp.edxapp_wrapper.certificates import GeneratedCertificateAdmin
-from eox_nelp.signals.tasks import create_external_certificate
+from eox_nelp.external_certificates.tasks import create_external_certificate
 from eox_nelp.signals.utils import _generate_external_certificate_data
 
 GeneratedCertificate = get_generated_certificate()

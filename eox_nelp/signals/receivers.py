@@ -24,12 +24,12 @@ from eox_tenant.tenant_wise.proxies import TenantSiteConfigProxy
 from eventtracking import tracker
 from openedx_events.learning.data import CertificateData, CourseData, UserData, UserPersonalData
 
+from eox_nelp.external_certificates.tasks import create_external_certificate
 from eox_nelp.notifications.tasks import create_course_notifications as create_course_notifications_task
 from eox_nelp.payment_notifications.models import PaymentNotification
 from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
-    create_external_certificate,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
     update_mt_training_stage,

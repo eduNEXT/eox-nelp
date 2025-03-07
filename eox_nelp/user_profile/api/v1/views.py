@@ -133,3 +133,63 @@ def get_validated_user_fields(request):
     validated_fields = validate_required_user_fields(request.user)
 
     return Response(validated_fields, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@authentication_classes((SessionAuthenticationAllowInactiveUser,))
+@permission_classes((IsAuthenticated,))
+def get_conditional_user_fields(request):  # pylint: disable=unused-argument
+    """
+    Retrieves the conditional user field configuration.
+
+    This API endpoint returns the `CONDITIONAL_USER_FIELDS` setting, which defines
+    the dynamic field dependencies for user input forms. The structure outlines how
+    certain fields depend on the values of other fields, helping front-end applications
+    dynamically adjust form fields based on user selections.
+
+    ## Usage
+
+    ### **GET** /eox-nelp/api/user-profile/v1/conditional-fields/
+
+    Example Response:
+    ```json
+    {
+        "occupation": {
+            "type": "choices",
+            "options": ["employee", "student", "unemployed"],
+            "dependent_fields": {
+                "employee": {
+                    "sector": {
+                        "type": "choices",
+                        "options": ["public", "private", "non_profit"],
+                        "dependent_fields": {
+                            "public": {
+                                "type": "choices",
+                                "options": ["Government", "Education", "Healthcare"]
+                            },
+                            "private": {
+                                "type": "text",
+                                "placeholder": "Enter specific private sector"
+                            },
+                            "non_profit": {
+                                "type": "text",
+                                "placeholder": "Enter specific non-profit sector"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+    Authentication:
+        - Requires an authenticated user session.
+
+    Returns:
+        JsonResponse: A JSON object containing the `CONDITIONAL_USER_FIELDS` settings.
+
+    HTTP Status Codes:
+        - 200 OK: The request was successful, and the conditional field data is returned.
+    """
+    return Response(getattr(settings, "CONDITIONAL_USER_FIELDS", {}), status=status.HTTP_200_OK)

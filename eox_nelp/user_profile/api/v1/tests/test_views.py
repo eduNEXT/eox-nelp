@@ -212,3 +212,105 @@ class GetValidatedUserFieldsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.json(), expected_response)
         mock_validate_required_user_fields.assert_called_once_with(self.user)
+
+
+class GetConditionalUserFieldsTestCase(APITestCase):
+    """Test case for get_conditional_user_fields view."""
+
+    reverse_viewname = "user-profile-api:v1:conditional-fields"
+
+    def setUp(self):
+        """Set up a test user and authenticate the client."""
+        self.user = User.objects.create(username="testuser")
+        self.client.force_authenticate(user=self.user)
+
+    @override_settings(
+        CONDITIONAL_USER_FIELDS={
+            "occupation": {
+                "type": "choices",
+                "options": ["employee", "student", "unemployed"],
+                "dependent_fields": {
+                    "employee": {
+                        "sector": {
+                            "type": "choices",
+                            "options": ["public", "private", "non_profit"],
+                            "dependent_fields": {
+                                "public": {
+                                    "type": "choices",
+                                    "options": ["Government", "Education", "Healthcare"]
+                                },
+                                "private": {
+                                    "type": "text",
+                                    "placeholder": "Enter specific private sector"
+                                },
+                                "non_profit": {
+                                    "type": "text",
+                                    "placeholder": "Enter specific non-profit sector"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
+    def test_get_conditional_user_fields_successfully(self):
+        """
+        Test that the view returns the expected conditional fields.
+
+        Expected behavior:
+            - The function should return a JSON response with the configured conditional fields.
+            - Status code 200.
+            - The response should match the settings value for CONDITIONAL_USER_FIELDS.
+        """
+        expected_response = {
+            "occupation": {
+                "type": "choices",
+                "options": ["employee", "student", "unemployed"],
+                "dependent_fields": {
+                    "employee": {
+                        "sector": {
+                            "type": "choices",
+                            "options": ["public", "private", "non_profit"],
+                            "dependent_fields": {
+                                "public": {
+                                    "type": "choices",
+                                    "options": ["Government", "Education", "Healthcare"]
+                                },
+                                "private": {
+                                    "type": "text",
+                                    "placeholder": "Enter specific private sector"
+                                },
+                                "non_profit": {
+                                    "type": "text",
+                                    "placeholder": "Enter specific non-profit sector"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.get(url_endpoint)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.json(), expected_response)
+
+    @override_settings(CONDITIONAL_USER_FIELDS={})
+    def test_get_conditional_user_fields_empty(self):
+        """
+        Test that the view returns an empty response when CONDITIONAL_USER_FIELDS is not set.
+
+        Expected behavior:
+            - The function should return an empty JSON response.
+            - Status code 200.
+        """
+        expected_response = {}
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.get(url_endpoint)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.json(), expected_response)

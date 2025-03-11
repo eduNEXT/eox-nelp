@@ -60,7 +60,11 @@ def _post_futurex_progress(data):
     Args:
         data (dict): dict to send to futurex enrollment-progress path.
     """
-    api_client = FuturexApiClient()
+    api_client = FuturexApiClient(
+        client_id=settings.FUTUREX_CLIENT_ID,
+        client_secret=settings.FUTUREX_CLIENT_SECRET,
+        base_url=settings.FUTUREX_API_URL,
+    )
     response = api_client.send_enrollment_progress(data)
 
     logger.info(
@@ -138,7 +142,12 @@ def create_external_certificate(external_certificate_data):
             https://github.com/eduNEXT/openedx-events/blob/main/openedx_events/learning/data.py#L100
             and will provide of the user certificate data.
     """
-    api_client = ExternalCertificatesApiClient()
+    api_client = ExternalCertificatesApiClient(
+        user=settings.EXTERNAL_CERTIFICATES_USER,
+        password=settings.EXTERNAL_CERTIFICATES_PASSWORD,
+        base_url=settings.EXTERNAL_CERTIFICATES_API_URL,
+        extra_headers=settings.EXTERNAL_CERTIFICATES_EXTRA_HEADERS,
+    )
     response = api_client.create_external_certificate(external_certificate_data)
 
     logger.info(
@@ -207,7 +216,11 @@ def update_mt_training_stage(course_id, national_id, stage_result):
         national_id (str): User identifier.
         stage_result (int): Representation of pass or fail result, 1 for pass  2 for fail.
     """
-    api_client = MinisterOfTourismApiClient()
+    api_client = MinisterOfTourismApiClient(
+        user=settings.MINISTER_OF_TOURISM_USER,
+        password=settings.MINISTER_OF_TOURISM_PASSWORD,
+        base_url=settings.MINISTER_OF_TOURISM_API_URL,
+    )
 
     api_client.update_training_stage(
         course_id=course_id,

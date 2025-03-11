@@ -21,7 +21,7 @@ from rest_framework.response import Response
 
 from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
-from eox_nelp.pearson_vue.tasks import real_time_import_task_v2
+from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 from eox_nelp.user_profile.required_fields_validation import validate_required_user_fields
 from eox_nelp.utils import save_extrainfo_field
 

@@ -11,7 +11,7 @@ from eox_nelp.admin.student import *  # noqa: F401
 from eox_nelp.course_experience.admin import *  # noqa: F401
 from eox_nelp.notifications.admin import *  # noqa: F401
 from eox_nelp.payment_notifications.admin import *  # noqa: F401
-from eox_nelp.pearson_vue.admin import *  # noqa: F401
+from eox_nelp.pearson_vue_engine.admin import *  # noqa: F401
 
 if (
     find_spec("eox_support")

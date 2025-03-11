@@ -139,7 +139,7 @@ class PostFuturexProgressTestCase(unittest.TestCase):
         FUTUREX_CLIENT_ID="test-client-id",
         FUTUREX_CLIENT_SECRET="test-client-secret",
         FUTUREX_TOKEN_URL="test-token-url",
-        FUTUREX_API_BASE_URL="test-api-base-url"
+        FUTUREX_API_BASE_URL="test-api-base-url",
     )
     def test_dispatch_futurex_progress(self, futurex_api_client_mock):
         """Test when `_post_futurex_progress` is called

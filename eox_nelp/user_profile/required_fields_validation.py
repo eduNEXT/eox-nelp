@@ -172,7 +172,7 @@ def validate_account_fields(user, account_fields):
     Returns:
         dict: A dictionary with invalid account fields and their errors.
     """
-    return validate_user_fields(user, user, account_fields)
+    return validate_user_fields(user=user, instance=user, fields=account_fields)
 
 
 def validate_profile_fields(user, profile_fields):
@@ -297,8 +297,8 @@ def validate_dependent_field(user, value, arguments):
         "city": {
             "dependent_fields": {
                 "profile.gender": {
-                    "Male": ["Google", "Microsoft", "Amazon"],
-                    "Female": ["Facebook", "Apple", "Netflix"],
+                    "Male": ["Pereira", "Tunja", "Cartagena"],
+                    "Female": ["Manizales", "Barranquilla", "Armenia"],
                 },
                 "profile.country": {
                     "CO": ["Bogota", "Medellin", "Cali"],

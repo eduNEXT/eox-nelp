@@ -95,7 +95,11 @@ class ValidateAccountFieldsTestCase(TestCase):
         mock_validate_user_fields.return_value = {"username": ["max_length exceeded"]}
         result = validate_account_fields(user, {"username": {"max_length": 10}})
 
-        mock_validate_user_fields.assert_called_once_with(user, user, {"username": {"max_length": 10}})
+        mock_validate_user_fields.assert_called_once_with(
+            user=user,
+            instance=user,
+            fields={"username": {"max_length": 10}},
+        )
         self.assertEqual(result, {"username": ["max_length exceeded"]})
 
 

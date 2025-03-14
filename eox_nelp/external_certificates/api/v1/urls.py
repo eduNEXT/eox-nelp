@@ -2,10 +2,10 @@
 """eox_nelp external_certificates_manager.api v1 urls"""
 from django.urls import path
 
-from eox_nelp.external_certificates.api.v1.views import upsert_external_certificate
+from eox_nelp.external_certificates.api.v1.views import UpsertExternalCertificateView
 
 app_name = 'eox_nelp'  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path("upsert/", upsert_external_certificate, name="upsert-external-certificate"),
+    path("upsert/", UpsertExternalCertificateView.as_view(), name="upsert-external-certificate"),
 ]

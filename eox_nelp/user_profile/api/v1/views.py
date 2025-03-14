@@ -23,7 +23,7 @@ from eox_nelp.edxapp_wrapper.user_api import accounts, errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
 from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
 from eox_nelp.user_profile.required_fields_validation import validate_required_user_fields
-from eox_nelp.utils import save_extrainfo_field
+from eox_nelp.utils import save_extrainfo
 
 logger = logging.getLogger(__name__)
 
@@ -71,10 +71,12 @@ def update_user_data(request):
             # Also some fields related ExtraInfo are not editable too  in the standard implementation. So we need
             # save_extrainfo_field method with the desired settings.
             required_user_extra_info_fields = getattr(settings, 'USER_PROFILE_API_EXTRA_INFO_FIELDS', [])
+            extra_info_data = {
+                field: request.data[field] for field in required_user_extra_info_fields if field in request.data
+            }
 
-            for field in required_user_extra_info_fields:
-                if value := request.data.get(field):
-                    save_extrainfo_field(request.user, field, value)
+            if extra_info_data:
+                save_extrainfo(request.user, extra_info_data)
 
     except errors.AccountValidationError as err:
         return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)

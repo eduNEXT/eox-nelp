@@ -11,6 +11,7 @@ Classes:
 """
 import unittest
 
+from custom_reg_form.models import ExtraInfo
 from ddt import ddt
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
@@ -41,7 +42,6 @@ from eox_nelp.signals.receivers import (
     update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
-from eox_nelp.utils import save_extrainfo_field
 
 User = get_user_model()
 UserSignupSource = get_user_signup_source()
@@ -647,7 +647,11 @@ class MtCoursePassedHandlerTestCase(TestCase):
         """
         course_id = "course-v1:test+Cx105+2022_T4"
         user_instance, _ = User.objects.get_or_create(username="Severus")
-        save_extrainfo_field(user_instance, "national_id", "1234567890")
+        ExtraInfo.objects.get_or_create(  # pylint: disable=no-member
+            user=user_instance,
+            arabic_name="مسؤل",
+            national_id="12345445522",
+        )
 
         mt_course_passed_handler(user_instance, CourseKey.from_string(course_id))
 

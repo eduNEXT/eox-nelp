@@ -5,8 +5,8 @@ Test classes:
 """
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from edx_rest_framework_extensions.permissions import JwtHasScope
 from mock import patch
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -26,7 +26,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
         self.client.force_authenticate(self.user)
         self.url = reverse("external-certificates-api:v1:upsert-external-certificate")
 
-    @patch.object(TokenHasReadWriteScope, 'has_permission', return_value=True)
+    @patch.object(JwtHasScope, 'has_permission', return_value=True)
     def test_upsert_external_certificate_success(self, _):
         """Test successful creation/update of an external certificate.
         Expected behavior:
@@ -61,7 +61,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
             if key != "created_at":
                 self.assertEqual(response.json()[key], value)
 
-    @patch.object(TokenHasReadWriteScope, 'has_permission', return_value=False)
+    @patch.object(JwtHasScope, 'has_permission', return_value=False)
     def test_upsert_external_certificate_wrong_permission(self, _):
         """Test successful creation/update of an external certificate.
         Expected behavior:
@@ -80,14 +80,14 @@ class UpsertExternalCertificateViewTests(APITestCase):
                 },
             },
         }
-        expected_response_data = {"detail": "You do not have permission to perform this action."}
+        expected_response_data = {'detail': 'JWT missing required scopes.'}
 
         response = self.client.post(self.url, data=request_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertDictEqual(response.json(), expected_response_data)
 
-    @patch.object(TokenHasReadWriteScope, 'has_permission', return_value=True)
+    @patch.object(JwtHasScope, 'has_permission', return_value=True)
     def test_upsert_external_certificate_missing_user_id(self, _):
         """Test missing required fields. user_id and result_notification_id are missing.
         Expected behavior:
@@ -102,7 +102,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertDictEqual(response.json(), expected_response_data)
 
-    @patch.object(TokenHasReadWriteScope, 'has_permission', return_value=True)
+    @patch.object(JwtHasScope, 'has_permission', return_value=True)
     def test_upsert_external_certificate_invalid_user_id(self, _):
         """Test invalid user_id.
         Expected behavior:
@@ -128,7 +128,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertDictEqual(response.json(), expected_response_data)
 
-    @patch.object(TokenHasReadWriteScope, 'has_permission', return_value=True)
+    @patch.object(JwtHasScope, 'has_permission', return_value=True)
     def test_upsert_external_certificate_wrong_certificate_response(self, _):
         """Test successful creation/update of an external certificate.
         Expected behavior:

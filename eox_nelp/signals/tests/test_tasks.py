@@ -413,7 +413,7 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
             "UserId": {"StringValue": self.user_id, "DataType": "String"},
             "TriggerDomain": {
                 "StringValue": getattr(settings, "LMS_BASE", None),
-                "DataType": "String"
+                "DataType": "String",
             },
         }
 
@@ -432,14 +432,14 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
                 f"External certificate triggered with  MessageId {sqs_response['MessageId']} "
                 f"created successfully for user_id {self.user_id}."
             ),
-            log.output[0]
+            log.output[0],
         )
 
     @override_settings(
         SQS_CERTIFICATES_URL="https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
         SQS_AWS_ACCESS_KEY_ID="test_key_id",
         SQS_AWS_SECRET_ACCESS_KEY="test_secret_key",
-        LMS_BASE="test.tenant.com"
+        LMS_BASE="test.tenant.com",
     )
     @patch.object(SQSClient, "send_message")
     def test_trigger_sqs_certificate_failure(self, mock_sqs_send_message):
@@ -467,14 +467,14 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
 
         mock_sqs_send_message.assert_called_once_with(
             message_body=json.dumps(self.certificate_data),
-            message_attributes=message_attributes
+            message_attributes=message_attributes,
         )
         self.assertIn(
             (
                 f"Failed to trigger external certificate for user_id {self.user_id}. "
                 f"Response: {sqs_response}"
             ),
-            log.output[0]
+            log.output[0],
         )
 
     @patch("eox_nelp.signals.tasks.create_external_certificate_directly")

@@ -363,15 +363,65 @@ class GenerateProgressEnrollmentDataTestCase(unittest.TestCase):
         self.assertDictEqual(expected_data, progress_data)
 
 
-class CreateExternalCertificateTestCase(unittest.TestCase):
-    """Test class for create_external_certificate function"""
-    def setUp(self):
+class ExternalCertificatesMixin:
+    """Mock to reuse for external certificates test cases"""
+
+    def setUp(self):  # pylint: disable=invalid-name
         """Setup for external certificates tasks"""
         self.certificate_data = {
             "this": "is_a_test",
         }
         self.user_id = "1"
         self.course_id = "course-v1:test+CS304+2025_T3"
+
+
+class CreateExternalCertificateTestCase(ExternalCertificatesMixin, unittest.TestCase):
+    """Test class for create_external_certificate function"""
+
+    @patch("eox_nelp.signals.tasks.create_external_certificate_directly")
+    @patch("eox_nelp.signals.tasks.trigger_external_certificate_sqs")
+    def test_certificate_creation_directly_way(self, certificate_sqs_mock, certificate_directly_mock):
+        """Test certificate creation directly on method `create_external_certificate`.
+
+        Expected behavior:
+            - certificate_directly_mock is called with desired parameters.
+            - certificate_sqs_mock is not called.
+        """
+        create_external_certificate(
+            external_certificate_data=self.certificate_data,
+            user_id=self.user_id,
+            course_id=self.course_id,
+        )
+
+        certificate_directly_mock.delay.assert_called_once_with(external_certificate_data=self.certificate_data)
+        certificate_sqs_mock.delay.assert_not_called()
+
+    @override_settings(USE_SQS_FLOW_FOR_EXTERNAL_CERTIFICATES=True)
+    @patch("eox_nelp.signals.tasks.create_external_certificate_directly")
+    @patch("eox_nelp.signals.tasks.trigger_external_certificate_sqs")
+    def test_certificate_creation_sqs_way(self, trigger_certificate_sqs_mock, certificate_directly_mock):
+        """Test sqs way on method `create_external_certificate`.
+
+        Expected behavior:
+            - certificate_directly_mock is not called.
+            - certificate_sqs_mock  is called with desired parameters.
+        """
+        create_external_certificate(
+            external_certificate_data=self.certificate_data,
+            user_id=self.user_id,
+            course_id=self.course_id,
+        )
+
+        certificate_directly_mock.delay.assert_not_called()
+        trigger_certificate_sqs_mock.delay.assert_called_once_with(
+            external_certificate_data=self.certificate_data,
+            user_id=self.user_id,
+            course_id=self.course_id,
+        )
+
+
+class CreateExternalCertificateDirectlyTestCase(ExternalCertificatesMixin, unittest.TestCase):
+    """Test class for create_external_certificate_directly task"""
 
     @override_settings(EXTERNAL_CERTIFICATES_EXTRA_HEADERS={"Authorization": "Bearer test-token"})
     @patch("eox_nelp.signals.tasks.ExternalCertificatesApiClient")
@@ -386,15 +436,17 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
         create_external_certificate_directly(self.certificate_data)
 
         api_mock.assert_called_once()
-        api_mock.return_value.create_external_certificate.assert_called_once_with(
-            self.certificate_data
-        )
+        api_mock.return_value.create_external_certificate.assert_called_once_with(self.certificate_data)
+
+
+class TriggerExternalCertificateSQSTestCase(ExternalCertificatesMixin, unittest.TestCase):
+    """Test class for trigger_external_certificate_sqs task"""
 
     @override_settings(
         SQS_CERTIFICATES_URL="https://sqs.us-east-1.amazonaws.com/123456789012/test-queue",
         SQS_AWS_ACCESS_KEY_ID="test_key_id",
         SQS_AWS_SECRET_ACCESS_KEY="test_secret_key",
-        LMS_BASE="test.tenant.com"
+        LMS_BASE="test.tenant.com",
     )
     @patch.object(SQSClient, "send_message")
     def test_trigger_sqs_certificate_success(self, mock_sqs_send_message):
@@ -459,7 +511,7 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
             "CourseId": {"StringValue": self.course_id, "DataType": "String"},
             "TriggerDomain": {
                 "StringValue": getattr(settings, "LMS_BASE", None),
-                "DataType": "String"
+                "DataType": "String",
             },
         }
 
@@ -480,47 +532,6 @@ class CreateExternalCertificateTestCase(unittest.TestCase):
                 f"Response: {sqs_response}"
             ),
             log.output[0],
-        )
-
-    @patch("eox_nelp.signals.tasks.create_external_certificate_directly")
-    @patch("eox_nelp.signals.tasks.trigger_external_certificate_sqs")
-    def test_certificate_creation_directly_way(self, certificate_sqs_mock, certificate_directly_mock):
-        """Test certificate creation directly on method `create_external_certificate`.
-
-        Expected behavior:
-            - certificate_directly_mock is called with desired parameters.
-            - certificate_sqs_mock is not called.
-        """
-        create_external_certificate(
-            external_certificate_data=self.certificate_data,
-            user_id=self.user_id,
-            course_id=self.course_id
-        )
-
-        certificate_directly_mock.delay.assert_called_once_with(external_certificate_data=self.certificate_data)
-        certificate_sqs_mock.delay.assert_not_called()
-
-    @override_settings(USE_SQS_FLOW_FOR_EXTERNAL_CERTIFICATES=True)
-    @patch("eox_nelp.signals.tasks.create_external_certificate_directly")
-    @patch("eox_nelp.signals.tasks.trigger_external_certificate_sqs")
-    def test_certificate_creation_sqs_way(self, trigger_certificate_sqs_mock, certificate_directly_mock):
-        """Test sqs way on method `create_external_certificate`.
-
-        Expected behavior:
-            - certificate_directly_mock is not called.
-            - certificate_sqs_mock  is called with desired parameters.
-        """
-        create_external_certificate(
-            external_certificate_data=self.certificate_data,
-            user_id=self.user_id,
-            course_id=self.course_id,
-        )
-
-        certificate_directly_mock.delay.assert_not_called()
-        trigger_certificate_sqs_mock.delay.assert_called_once_with(
-            external_certificate_data=self.certificate_data,
-            user_id=self.user_id,
-            course_id=self.course_id,
         )
 
 

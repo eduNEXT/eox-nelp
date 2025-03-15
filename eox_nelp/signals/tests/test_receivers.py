@@ -212,6 +212,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
         create_external_certificate_mock.assert_called_with(
             external_certificate_data=generate_data_mock(),
             user_id=self.certificate_data.user.id,
+            course_id=self.course_key,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -264,6 +265,7 @@ class CertificatePublisherTestCase(unittest.TestCase):
         create_external_certificate_mock.assert_called_with(
             external_certificate_data=generate_data_mock(),
             user_id=self.certificate_data.user.id,
+            course_id=self.course_key,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -380,7 +382,8 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
         )
         create_external_certificate_mock.assert_called_with(
             external_certificate_data=generate_data_mock(),
-            user_id=certificate_data.user.id
+            user_id=certificate_data.user.id,
+            course_id=self.course_key,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"
@@ -439,7 +442,8 @@ class EnrollmentPublisherTestCase(unittest.TestCase):
         )
         create_external_certificate_mock.assert_called_with(
             external_certificate_data=generate_data_mock(),
-            user_id=certificate_data.user.id
+            user_id=certificate_data.user.id,
+            course_id=self.course_key,
         )
         self.assertEqual(logs.output, [
             f"INFO:{receivers.__name__}:{log_info}"

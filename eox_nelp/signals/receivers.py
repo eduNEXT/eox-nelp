@@ -150,6 +150,7 @@ def certificate_publisher(certificate, metadata, **kwargs):  # pylint: disable=u
                 certificate_data=certificate,
             ),
             user_id=certificate.user.id,
+            course_id=certificate.course.course_key,
         )
     else:
         LOGGER.info(
@@ -221,6 +222,7 @@ def enrollment_publisher(instance, **kwargs):  # pylint: disable=unused-argument
                 certificate_data=certificate,
             ),
             user_id=user.id,
+            course_id=instance.course_id,
         )
     else:
         LOGGER.info(

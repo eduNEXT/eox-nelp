@@ -62,6 +62,7 @@ def create_external_certificate_action(modeladmin, request, queryset):  # pylint
                     certificate_data=certificate_data,
                 ),
                 user_id=certificate.user.id,
+                course_id=certificate.course_id,
             )
         except Exception as exc:  # pylint: disable=broad-exception-caught
             if exc.__class__.__name__ in errors:

@@ -12,10 +12,11 @@ from eox_nelp.course_experience.admin import *  # noqa: F401
 from eox_nelp.notifications.admin import *  # noqa: F401
 from eox_nelp.payment_notifications.admin import *  # noqa: F401
 from eox_nelp.pearson_vue_engine.admin import *  # noqa: F401
+from eox_nelp.settings.common import CUSTOM_REG_FORM_APP, EOX_SUPPORT_APP
 
 if (
     find_spec("eox_support")
-    and "eox_support.apps.EoxSupportConfig" in settings.INSTALLED_APPS
-    and "custom_reg_form" in settings.INSTALLED_APPS
+    and EOX_SUPPORT_APP in settings.INSTALLED_APPS
+    and CUSTOM_REG_FORM_APP in settings.INSTALLED_APPS
 ):
     from eox_nelp.admin.user import *  # noqa: F401

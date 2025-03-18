@@ -17,15 +17,17 @@ INSTALLED_APPS = [
     'eventtracking.django.apps.EventTrackingConfig',
 ]
 
-COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
 DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE = (
     "[Futurex platform] Notification due date(left {subsection_delta.days} days) "
     "of subsection {subsection_title} "
     "from course {course_title}"
 )
-
+#  APP Labels
+COURSE_CREATOR_APP = 'cms.djangoapps.course_creators'
 JSON_API_REST_FRAMEWORK = 'rest_framework_json_api'
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
+EOX_SUPPORT_APP = 'eox_support.apps.EoxSupportConfig'
+CUSTOM_REG_FORM_APP = 'custom_reg_form.apps.CustomRegFormConfig'
 
 
 def plugin_settings(settings):

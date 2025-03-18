@@ -199,7 +199,7 @@ def trigger_external_certificate_sqs(external_certificate_data, user_id, course_
         "CourseId": {"StringValue": course_id, "DataType": "String"},
         "TriggerDomain": {
             "StringValue": getattr(settings, "LMS_BASE", None) or getattr(settings, "SITE_NAME", None),
-            "DataType": "String"
+            "DataType": "String",
         },
     }
 

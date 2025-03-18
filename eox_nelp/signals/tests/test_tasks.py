@@ -432,7 +432,6 @@ class CreateExternalCertificateDirectlyTestCase(ExternalCertificatesMixin, unitt
             - api_mock was called once.
             - create_external_certificate method from api client was called with the right parameters.
         """
-
         create_external_certificate_directly(self.certificate_data)
 
         api_mock.assert_called_once()
@@ -451,7 +450,8 @@ class TriggerExternalCertificateSQSTestCase(ExternalCertificatesMixin, unittest.
     @patch.object(SQSClient, "send_message")
     def test_trigger_sqs_certificate_success(self, mock_sqs_send_message):
         """
-        Test success sqs flow of task `trigger_external_certificate_sqs`.        Expected behavior:
+        Test success sqs flow of task `trigger_external_certificate_sqs`.
+                Expected behavior:
             - The SQSClient send_message method should be called with the correct data.
             - The success log message should be generated.
         """
@@ -515,7 +515,7 @@ class TriggerExternalCertificateSQSTestCase(ExternalCertificatesMixin, unittest.
             },
         }
 
-        with self.assertLogs("eox_nelp.signals.tasks", level="INFO") as log:
+        with self.assertLogs("eox_nelp.signals.tasks", level="ERROR") as log:
             trigger_external_certificate_sqs(
                 external_certificate_data=self.certificate_data,
                 user_id=self.user_id,

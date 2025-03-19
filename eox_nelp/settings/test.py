@@ -143,8 +143,8 @@ if find_spec('eox_audit_model') and EOX_AUDIT_MODEL_APP not in INSTALLED_APPS:  
     INSTALLED_APPS.append(EOX_AUDIT_MODEL_APP)  # noqa: F405
 
 # ------------custom reg form config for tests------------------------------
-if 'custom_reg_form' not in INSTALLED_APPS:  # noqa: F405
-    INSTALLED_APPS.append('custom_reg_form')  # noqa: F405
+if CUSTOM_REG_FORM_APP not in INSTALLED_APPS:  # noqa: F405
+    INSTALLED_APPS.append(CUSTOM_REG_FORM_APP)  # noqa: F405
 
 ALLOW_EOX_AUDIT_MODEL = False
 CELERY_TASK_ALWAYS_EAGER = True

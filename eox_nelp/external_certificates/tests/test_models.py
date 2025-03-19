@@ -59,7 +59,6 @@ class ExternalCertificateTest(TestCase):
                 "en": "https://test.com/storage/pdf/60218/SREI24JEQMGYRLQ3-en-1733337702.pdf",
                 "ar": "https://test.com/storage/pdf/60218/SREI24JEQMGYRLQ3-ar-1733337702.pdf",
             },
-            "group_code": "3423"
         }
 
         with self.assertLogs("eox_nelp.external_certificates.models", level="INFO") as log:
@@ -93,10 +92,9 @@ class ExternalCertificateTest(TestCase):
         certificate_response = {
             "error": True,
             "message": "Not allowed certificate",
-
         }
 
-        with self.assertLogs("eox_nelp.external_certificates.models", level="INFO") as log:
+        with self.assertLogs("eox_nelp.external_certificates.models", level="ERROR") as log:
             external_certificate = ExternalCertificate.create_external_certificate_from_certificate_response(
                 certificate_response=certificate_response,
                 user=self.user,

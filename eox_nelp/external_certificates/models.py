@@ -76,7 +76,7 @@ class ExternalCertificate(models.Model):
         Returns:
             ExternalCertificate: The created external certificate instance or None
         """
-        if certificate_response.get("error"):
+        if "error" in certificate_response:
             logger.error(
                 "Failed to create external certificate for user %s and course %s. certificate_response: %s",
                 user,

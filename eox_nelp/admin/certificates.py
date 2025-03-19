@@ -56,11 +56,13 @@ def create_external_certificate_action(modeladmin, request, queryset):  # pylint
             )
             time = certificate.modified_date.astimezone(timezone.utc)
 
-            create_external_certificate.delay(
+            create_external_certificate(
                 external_certificate_data=_generate_external_certificate_data(
                     time=time,
                     certificate_data=certificate_data,
-                )
+                ),
+                user_id=certificate.user.id,
+                course_id=certificate.course_id,
             )
         except Exception as exc:  # pylint: disable=broad-exception-caught
             if exc.__class__.__name__ in errors:

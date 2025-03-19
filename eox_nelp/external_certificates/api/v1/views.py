@@ -13,6 +13,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.external_certificates.api.v1.serializers import ExternalCertificateSerializer
 from eox_nelp.external_certificates.models import ExternalCertificate
 
@@ -23,7 +24,7 @@ class UpsertExternalCertificateView(APIView):
     """Class to upsert external certificates"""
     authentication_classes = [JwtAuthentication]
     permission_classes = [JwtHasScope]
-    required_scopes = ["external-certificates:write"]
+    required_scopes = ["external_certificates:write"]
 
     def post(self, request, *args, **kwargs):  # pylint: disable=unused-argument
         """Upsert external certificate.
@@ -36,9 +37,9 @@ class UpsertExternalCertificateView(APIView):
         ```json
         {
             "user_id": "2",
+            "course_id": "course-v1:test+CS304+2025_T3",
             "certificate_response": {
                 "message": "Certificate created successfully",
-                "group_code": "32424",
                 "certificate_id": "TEST25YO59VV76QL",
                 "certificate_urls": {
                     "en": "https://ce.nelc.gov.sa/storage/pdf/OTT-lms/TEST25YO59VV76QL-en-1740573557.pdf",
@@ -50,6 +51,8 @@ class UpsertExternalCertificateView(APIView):
         **Response Example**
         ```json
         {
+            "user": "1",
+            "course_overview": "course-v1:test+CS304+2025_T3",
             "certificate_id": "TEST25YO59VV76QL",
             "certificate_url_en": "https://ce.nelc.gov.sa/storage/pdf/OTT-lms/TEST25YO59VV76QL-en-1740573557.pdf",
             "certificate_url_ar": "https://ce.nelc.gov.sa/storage/pdf/OTT-lms/TEST25YO59VV76QL-ar-1740573555.pdf",
@@ -57,7 +60,7 @@ class UpsertExternalCertificateView(APIView):
         }
         ```
         """
-        required_keys = ["certificate_response", "user_id"]
+        required_keys = ["certificate_response", "user_id", "course_id"]
         missing_keys = [key for key in required_keys if not request.data.get(key)]
 
         if missing_keys:
@@ -67,17 +70,24 @@ class UpsertExternalCertificateView(APIView):
             )
 
         try:
-            user = User.objects.get(
-                id=request.data["user_id"],
-            )
+            user = User.objects.get(id=request.data["user_id"])
+            course_overview = CourseOverview.objects.get(id=request.data["course_id"])
             external_certificate = ExternalCertificate.create_external_certificate_from_certificate_response(
                 certificate_response=request.data["certificate_response"],
                 user=user,
+                course_overview=course_overview,
             )
         except User.DoesNotExist:
             return Response(
                 {
-                    "error": f'user_id={request.data["user_id"]} does not match for the certificate'
+                    "error": f'user_id={request.data["user_id"]} User object with that id doesnt exists'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except CourseOverview.DoesNotExist:
+            return Response(
+                {
+                    "error": f'course_id={request.data["course_id"]} CourseOverview object with that id doesnt exists'
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -85,12 +95,13 @@ class UpsertExternalCertificateView(APIView):
         if not external_certificate:
             return Response(
                 {
-                    "error": f'External Certificate could not be created for user_id {request.data["user_id"]}'
-                             f'with certificate_response {request.data["certificate_response"]}'
+                    "error":
+                        f'External Certificate could not be created for user_id {request.data["user_id"]} '
+                        f'and course_id {request.data["course_id"]} '
+                        f'with certificate_response {request.data["certificate_response"]}'
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         return Response(
             ExternalCertificateSerializer(external_certificate).data,
             status=status.HTTP_201_CREATED,

@@ -10,6 +10,8 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
+from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
+
 User = get_user_model()
 
 
@@ -17,12 +19,14 @@ class UpsertExternalCertificateViewTests(APITestCase):
     """
     Test case for the upsert_external_certificate view.
     """
-    def setUp(self):  # pylint: disable=invalid-name
+    def setUp(self):
         """
         Set base variables and objects across experience test cases.
         """
         self.client = APIClient()
         self.user, _ = User.objects.get_or_create(username="vader", email="test@mail.com")
+        self.course_id = "course-v1:TEST+POWER+2024_T4"
+        self.course_overview, _ = CourseOverview.objects.get_or_create(id=self.course_id)
         self.client.force_authenticate(self.user)
         self.url = reverse("external-certificates-api:v1:upsert-external-certificate")
 
@@ -35,9 +39,9 @@ class UpsertExternalCertificateViewTests(APITestCase):
         """
         request_data = {
             "user_id": self.user.id,
+            "course_id": self.course_id,
             "certificate_response": {
                 "message": "Certificate created successfully",
-                "group_code": "algo123",
                 "certificate_id": "TEST25YO59VV76QL",
                 "certificate_urls": {
                     "en": "https://example.com/certificate-en.pdf",
@@ -47,14 +51,16 @@ class UpsertExternalCertificateViewTests(APITestCase):
         }
         expected_response_data = {
             'id': 1,
-            'group_code': 'algo123',
             'certificate_id': 'TEST25YO59VV76QL',
             'certificate_url_en': 'https://example.com/certificate-en.pdf',
             'certificate_url_ar': 'https://example.com/certificate-ar.pdf',
             'created_at': '2025-03-12T12:24:33.759224',
-            'user': 1,
+            'user': str(self.user.id),
+            'course_overview': self.course_id,
         }
-        response = self.client.post(self.url, data=request_data, format="json")
+
+        with self.assertLogs("eox_nelp.external_certificates.models", level="INFO"):
+            response = self.client.post(self.url, data=request_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         for key, value in expected_response_data.items():
@@ -70,9 +76,9 @@ class UpsertExternalCertificateViewTests(APITestCase):
         """
         request_data = {
             "user_id": self.user.id,
+            "course_id": self.course_id,
             "certificate_response": {
                 "message": "Certificate created successfully",
-                "group_code": "algo123",
                 "certificate_id": "TEST25YO59VV76QL",
                 "certificate_urls": {
                     "en": "https://example.com/certificate-en.pdf",
@@ -95,8 +101,9 @@ class UpsertExternalCertificateViewTests(APITestCase):
             - Expected error response json.
         """
         request_data = {}
-        missing_keys = ["certificate_response", "user_id"]
+        missing_keys = ["certificate_response", "user_id", "course_id"]
         expected_response_data = {"error": f"Missing required keys: {missing_keys}"}
+
         response = self.client.post(self.url, data=request_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -109,9 +116,10 @@ class UpsertExternalCertificateViewTests(APITestCase):
             - The view should return a 400 BAD REQUEST response.
             - Expected error response json.
         """
-        invalid_user_id = 999
+        invalid_user_id = 999  # Non-existent ID,
         request_data = {
-            "user_id": 999,  # Non-existent ID
+            "user_id": invalid_user_id,
+            "course_id": self.course_id,
             "certificate_response": {
                 "message": "Certificate created successfully",
                 "certificate_id": "TEST25YO59VV76QL",
@@ -121,7 +129,38 @@ class UpsertExternalCertificateViewTests(APITestCase):
                 },
             },
         }
-        expected_response_data = {"error": f'user_id={invalid_user_id} does not match for the certificate'}
+        expected_response_data = {
+            "error": f'user_id={invalid_user_id} User object with that id doesnt exists'
+        }
+
+        response = self.client.post(self.url, data=request_data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(response.json(), expected_response_data)
+
+    @patch.object(JwtHasScope, 'has_permission', return_value=True)
+    def test_upsert_external_certificate_invalid_course_id(self, _):
+        """Test invalid course_id.
+        Expected behavior:
+            - The view should return a 400 BAD REQUEST response.
+            - Expected error response json.
+        """
+        invalid_course_id = "course-v1:INVALID+L3+2025"  # Non-existent ID,
+        request_data = {
+            "user_id": self.user.id,
+            "course_id": invalid_course_id,
+            "certificate_response": {
+                "message": "Certificate created successfully",
+                "certificate_id": "TEST25YO59VV76QL",
+                "certificate_urls": {
+                    "en": "https://example.com/certificate-en.pdf",
+                    "ar": "https://example.com/certificate-ar.pdf",
+                },
+            },
+        }
+        expected_response_data = {
+            "error": f'course_id={invalid_course_id} CourseOverview object with that id doesnt exists'
+        }
 
         response = self.client.post(self.url, data=request_data, format="json")
 
@@ -137,17 +176,21 @@ class UpsertExternalCertificateViewTests(APITestCase):
         """
         request_data = {
             "user_id": self.user.id,
+            "course_id": self.course_id,
             "certificate_response": {
                 "error": True,
                 "message": "wrong data error",
             },
         }
         expected_response = {
-            "error": f'External Certificate could not be created for user_id {request_data["user_id"]}'
-                     f'with certificate_response {request_data["certificate_response"]}'
+            "error":
+                f'External Certificate could not be created for user_id {request_data["user_id"]} '
+                f'and course_id {request_data["course_id"]} '
+                f'with certificate_response {request_data["certificate_response"]}'
         }
 
-        response = self.client.post(self.url, data=request_data, format="json")
+        with self.assertLogs("eox_nelp.external_certificates.models", level="ERROR"):
+            response = self.client.post(self.url, data=request_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertDictEqual(response.json(), expected_response)

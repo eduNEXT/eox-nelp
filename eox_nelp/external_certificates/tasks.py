@@ -22,12 +22,13 @@ def create_external_certificate(external_certificate_data, user_id=None, course_
     Args:
         external_certificate_data (dict): The data to be sent to the external certificate service.
         user_id(str or int): The id of the user to create the external_certificate.
+        course_id(str or CourseOpaquekey): The id of the course to create the external_certificate.
     """
     if getattr(settings, "USE_SQS_FLOW_FOR_EXTERNAL_CERTIFICATES", False) and user_id:
         trigger_external_certificate_sqs.delay(
             external_certificate_data=external_certificate_data,
             user_id=user_id,
-            course_id=course_id,
+            course_id=str(course_id),
         )
         return
     create_external_certificate_directly.delay(external_certificate_data=external_certificate_data)

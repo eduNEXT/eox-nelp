@@ -3,6 +3,7 @@ Module for testing the external certificates manager API views.
 Test classes:
 - UpsertExternalCertificateViewTests: Test case for the upsert_external_certificate view.
 """
+from ddt import data, ddt
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from edx_rest_framework_extensions.permissions import JwtHasScope
@@ -15,6 +16,7 @@ from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 User = get_user_model()
 
 
+@ddt
 class UpsertExternalCertificateViewTests(APITestCase):
     """
     Test case for the upsert_external_certificate view.
@@ -72,7 +74,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
         """Test successful creation/update of an external certificate.
         Expected behavior:
             - The view should return a 403 bad permissions response.
-            - - Expected error response json.
+            - Expected error response json.
         """
         request_data = {
             "user_id": self.user.id,
@@ -93,16 +95,32 @@ class UpsertExternalCertificateViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertDictEqual(response.json(), expected_response_data)
 
+    @data("user_id", "course_id", "certificate_response")
     @patch.object(JwtHasScope, 'has_permission', return_value=True)
-    def test_upsert_external_certificate_missing_user_id(self, _):
+    def test_upsert_external_certificate_missing_user_id(self, missing_key, _):
         """Test missing required fields. user_id and result_notification_id are missing.
         Expected behavior:
             - The view should return a 400 BAD REQUEST response.
             - Expected error response json.
         """
-        request_data = {}
-        missing_keys = ["certificate_response", "user_id", "course_id"]
-        expected_response_data = {"error": f"Missing required keys: {missing_keys}"}
+        request_data = {
+            "user_id": self.user.id,
+            "course_id": self.course_id,
+            "certificate_response": {
+                "message": "Certificate created successfully",
+                "certificate_id": "TEST25YO59VV76QL",
+                "certificate_urls": {
+                    "en": "https://example.com/certificate-en.pdf",
+                    "ar": "https://example.com/certificate-ar.pdf",
+                },
+            },
+        }
+        request_data.pop(missing_key)
+        expected_response_data = {
+            "errors": {
+                missing_key: ['This field is required.'],
+            }
+        }
 
         response = self.client.post(self.url, data=request_data, format="json")
 
@@ -169,7 +187,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
 
     @patch.object(JwtHasScope, 'has_permission', return_value=True)
     def test_upsert_external_certificate_wrong_certificate_response(self, _):
-        """Test successful creation/update of an external certificate.
+        """Test unsuccesful upsert of an external certificate due error in cert response.
         Expected behavior:
             - The view should return a 400 BAD REQUEST response.
             - Expected error response json.
@@ -178,8 +196,13 @@ class UpsertExternalCertificateViewTests(APITestCase):
             "user_id": self.user.id,
             "course_id": self.course_id,
             "certificate_response": {
+                "message": "error certificate",
                 "error": True,
-                "message": "wrong data error",
+                "certificate_id": "TEST25YO59VV76QL",
+                "certificate_urls": {
+                    "en": "https://example.com/certificate-en.pdf",
+                    "ar": "https://example.com/certificate-ar.pdf",
+                },
             },
         }
         expected_response = {

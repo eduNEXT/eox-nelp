@@ -14,7 +14,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
-from eox_nelp.external_certificates.api.v1.serializers import ExternalCertificateSerializer
+from eox_nelp.external_certificates.api.v1.serializers import (
+    ExternalCertificateSerializer,
+    UpsertExternalCertificateSerializer,
+)
 from eox_nelp.external_certificates.models import ExternalCertificate
 
 User = get_user_model()
@@ -60,15 +63,12 @@ class UpsertExternalCertificateView(APIView):
         }
         ```
         """
-        required_keys = ["certificate_response", "user_id", "course_id"]
-        missing_keys = [key for key in required_keys if not request.data.get(key)]
-
-        if missing_keys:
+        upsert_data_serializer = UpsertExternalCertificateSerializer(data=request.data)
+        if not upsert_data_serializer.is_valid():
             return Response(
-                {"error": f"Missing required keys: {missing_keys}"},
+                {"errors": upsert_data_serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
         try:
             user = User.objects.get(id=request.data["user_id"])
             course_overview = CourseOverview.objects.get(id=request.data["course_id"])

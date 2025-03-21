@@ -27,3 +27,23 @@ class ExternalCertificateSerializer(serializers.ModelSerializer):
         """
         model = ExternalCertificate
         fields = '__all__'
+
+
+class UpsertCertificateUrlsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """Serializer for the certificate URLs.(upsert)"""
+    en = serializers.URLField()
+    ar = serializers.URLField()
+
+
+class UpsertCertificateResponseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """Serializer for the certificate response.(upsert)"""
+    message = serializers.CharField()
+    certificate_id = serializers.CharField()
+    certificate_urls = UpsertCertificateUrlsSerializer()
+
+
+class UpsertExternalCertificateSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    """Serializer for the result notification.(upsert)"""
+    user_id = serializers.CharField()
+    course_id = serializers.CharField()
+    certificate_response = UpsertCertificateResponseSerializer()

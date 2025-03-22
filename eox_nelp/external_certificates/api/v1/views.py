@@ -92,16 +92,6 @@ class UpsertExternalCertificateView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not external_certificate:
-            return Response(
-                {
-                    "error":
-                        f'External Certificate could not be created for user_id {request.data["user_id"]} '
-                        f'and course_id {request.data["course_id"]} '
-                        f'with certificate_response {request.data["certificate_response"]}'
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         return Response(
             ExternalCertificateSerializer(external_certificate).data,
             status=status.HTTP_201_CREATED,

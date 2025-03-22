@@ -206,14 +206,10 @@ class UpsertExternalCertificateViewTests(APITestCase):
             },
         }
         expected_response = {
-            "error":
-                f'External Certificate could not be created for user_id {request_data["user_id"]} '
-                f'and course_id {request_data["course_id"]} '
-                f'with certificate_response {request_data["certificate_response"]}'
+            "errors": {"non_field_errors": ["The 'error' key is not allowed in certificate_response."]},
         }
 
-        with self.assertLogs("eox_nelp.external_certificates.models", level="ERROR"):
-            response = self.client.post(self.url, data=request_data, format="json")
+        response = self.client.post(self.url, data=request_data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertDictEqual(response.json(), expected_response)

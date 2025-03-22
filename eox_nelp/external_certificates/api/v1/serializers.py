@@ -3,6 +3,7 @@ Serializers for the external_certificates.
 
 """
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from eox_nelp.external_certificates.models import ExternalCertificate
 
@@ -47,3 +48,9 @@ class UpsertExternalCertificateSerializer(serializers.Serializer):  # pylint: di
     user_id = serializers.CharField()
     course_id = serializers.CharField()
     certificate_response = UpsertCertificateResponseSerializer()
+
+    def validate(self, attrs):
+        """Validate the certificate_response field."""
+        if "error" in self.initial_data["certificate_response"]:
+            raise ValidationError("The 'error' key is not allowed in certificate_response.")
+        return super().validate(attrs)

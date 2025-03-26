@@ -63,12 +63,7 @@ class UpsertExternalCertificateView(APIView):
         }
         ```
         """
-        upsert_data_serializer = UpsertExternalCertificateSerializer(data=request.data)
-        if not upsert_data_serializer.is_valid():
-            return Response(
-                {"errors": upsert_data_serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        UpsertExternalCertificateSerializer(data=request.data).is_valid(raise_exception=True)
         try:
             user = User.objects.get(id=request.data["user_id"])
             course_overview = CourseOverview.objects.get(id=request.data["course_id"])

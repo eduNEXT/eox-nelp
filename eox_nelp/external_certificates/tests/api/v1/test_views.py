@@ -117,9 +117,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
         }
         request_data.pop(missing_key)
         expected_response_data = {
-            "errors": {
-                missing_key: ['This field is required.'],
-            }
+            missing_key: ['This field is required.'],
         }
 
         response = self.client.post(self.url, data=request_data, format="json")
@@ -206,7 +204,7 @@ class UpsertExternalCertificateViewTests(APITestCase):
             },
         }
         expected_response = {
-            "errors": {"non_field_errors": ["The 'error' key is not allowed in certificate_response."]},
+            "non_field_errors": ["The 'error' key is not allowed in certificate_response."],
         }
 
         response = self.client.post(self.url, data=request_data, format="json")

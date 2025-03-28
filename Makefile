@@ -4,6 +4,10 @@
 #
 ###############################################
 
+intl_imports = ./node_modules/.bin/intl-imports.js
+OPENEDX_ATLAS_PULL=true
+ATLAS_OPTIONS=--repository=nelc/futurex-translations --revision=open-release/redwood.master
+
 # Define PIP_COMPILE_OPTS=-v to get more information during make upgrade.
 PIP_COMPILE = pip-compile --rebuild --upgrade $(PIP_COMPILE_OPTS)
 
@@ -63,6 +67,10 @@ run-tests: python-test quality complexity## run all tests
 
 automation-run-tests: install-automation-reqs run-tests ## run all tests with tox
 
+build_react_apps: pull_react_translations
+	npm run build
+	git checkout -- eox_nelp/i18n/index.js
+
 ##-----------------------------Translations section-------------------------
 extract-translations: ## extract strings to be translated, outputting .mo files
 	./manage.py makemessages -l ar   -i manage -i setup -i "venv/*"
@@ -78,3 +86,16 @@ pull-translations: ## pull translations from Transifex
 
 push-translations: ## push source translation files (.po) from Transifex
 	tx push -s
+
+pull_react_translations:
+	rm -rf src/i18n/messages
+	mkdir -p src/i18n/messages
+	cd src/i18n/messages \
+	  && export PATH="$(shell pwd)/node_modules/.bin:$$PATH" && atlas pull $(ATLAS_OPTIONS) \
+	           translations/frontend-platform/src/i18n/messages:frontend-platform \
+	           translations/paragon/src/i18n/messages:paragon \
+	           translations/frontend-essentials/src/i18n/messages:frontend-essentials
+
+	$(intl_imports) frontend-platform paragon frontend-essentials
+	cp -r src/i18n/* eox_nelp/i18n/
+	rm -rf src

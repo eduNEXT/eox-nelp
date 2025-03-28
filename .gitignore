@@ -123,3 +123,6 @@ eox_nelp/static/*.svg
 eox_nelp/static/*.png
 eox_nelp/static/*/*.svg
 eox_nelp/static/*/*.png
+
+src
+eox_nelp/i18n/messages/

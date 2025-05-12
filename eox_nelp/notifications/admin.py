@@ -86,6 +86,7 @@ class UpcomingCourseDueDateAdmin(admin.ModelAdmin):
         actions: Bulk custom actions.
         list_filter: Allow filtering by these fields.
     """
+    raw_id_fields = ["course"]
     list_display = ("course", "location_id", "notification_date", "due_date", "sent")
     search_fields = ("course__id", "location_id")
     actions = [notify_due_dates]

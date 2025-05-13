@@ -31,6 +31,8 @@ class BaseAdmin(admin.ModelAdmin):
     methods:
         get_author_username: Returns username from User instance.
     """
+    raw_id_fields = ["author", "course_id"]
+
     @admin.display(ordering="author__username", description="Author")
     def get_author_username(self, obj: Type[User]) -> str:
         """Return username from User instance"""

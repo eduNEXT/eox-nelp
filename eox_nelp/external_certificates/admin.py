@@ -11,6 +11,7 @@ class ExternalCertificateAdmin(admin.ModelAdmin):
     """
     Admin class for managing ExternalCertificate models.
     """
+    raw_id_fields = ["user", "course_overview"]
     list_display = ("certificate_id", "user", "course_overview", "created_at")
     search_fields = ("certificate_id", "user__username")
     list_filter = ("created_at", "course_overview")

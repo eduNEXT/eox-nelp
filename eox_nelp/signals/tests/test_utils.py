@@ -92,7 +92,7 @@ class GenerateExternalCertificateDataTestCase(TestCase):
         expected_value = {
             'reference_id': f'{self.user.extrainfo.national_id}~course-v1:test+Cx105+2022_T4',
             "created_at": str(time.date()),
-            "expiration_date": None,
+            "expiration": None,
             "grade": self.certificate_data.grade * 100,
             "is_passing": True,
             "group_code": settings.EXTERNAL_CERTIFICATES_GROUP_CODES[str(self.certificate_data.course.course_key)],
@@ -225,7 +225,7 @@ class GenerateExternalCertificateDataTestCase(TestCase):
         expected_value = {
             'reference_id': f'{national_id}~course-v1:test+Cx105+2022_T4',
             "created_at": str(time.date()),
-            "expiration_date": None,
+            "expiration": None,
             "grade": certificate_data.grade * 100,
             "is_passing": True,
             "group_code": settings.EXTERNAL_CERTIFICATES_GROUP_CODES[str(self.certificate_data.course.course_key)],

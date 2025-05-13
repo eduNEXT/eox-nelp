@@ -51,7 +51,7 @@ def _generate_external_certificate_data(time, certificate_data):
     return {
         "reference_id": generate_reference_id(national_id, course_id),
         "created_at": str(time.date()),
-        "expiration_date": None,
+        "expiration": None,
         "grade": float(certificate_data.grade) * 100,
         "is_passing": _user_has_passing_grade(user, course_id),
         "group_code": group_codes[course_id],

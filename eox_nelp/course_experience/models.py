@@ -49,11 +49,11 @@ class BaseReport(models.Model):
 
     fields:
         author<Foreignkey>: Makes reference to the user record associated with the reason.
-        reason<CharField>: Store report reason as a code, e.g SC => Sexual Content.
+        reason<CharField>: Store report reason as a code, e.g IC => Inappropriate content.
         course_id<Foreignkey>: Reference to a specific course.
     """
     REPORT_REASONS = [
-        ("SC", "Sexual content"),
+        ("IC", "Inappropriate content"),
         ("GV", "Graphic violence"),
         ("HA", "Hateful or abusive content"),
         ("CI", "Copycat or impersonation"),

@@ -93,7 +93,7 @@ setup(
     install_requires=load_requirements('requirements/base.in'),
     extras_require={
         "eox-audit": load_requirements('requirements/eox-audit-model.in'),
-        "docs": load_requirements('requirements/docs.txt'),
+        "docs": load_requirements('requirements/docs.in'),
     },
     zip_safe=False,
     entry_points={

@@ -48,6 +48,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/base.txt requirements/base.in
 	$(PIP_COMPILE) -o requirements/test.txt requirements/test.in
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
+	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
 
 	grep -e "^django==" requirements/test.txt > requirements/django.txt
 
@@ -106,7 +107,7 @@ SPHINXBUILD   ?= sphinx-build
 SPHINXSOURCE  = docs/source
 SPHINXBUILD_DIR = docs/build
 
-.PHONY: help clean docs docs-html docs-dirhtml docs-singlehtml docs-pickle docs-json docs-htmlhelp docs-qthelp docs-devhelp docs-epub docs-latex docs-man docs-texinfo docs-text docs-changes docs-linkcheck docs-doctest docs-coverage docs-xml docs-pseudoxml docs-dummy install-docs-reqs docs-api
+.PHONY: help docs docs-html docs-dirhtml docs-singlehtml docs-pickle docs-json docs-htmlhelp docs-qthelp docs-devhelp docs-epub docs-latex docs-man docs-texinfo docs-text docs-changes docs-linkcheck docs-doctest docs-coverage docs-xml docs-pseudoxml docs-dummy install-docs-reqs docs-api
 
 install-docs-reqs: ## install documentation requirements
 	pip install -r requirements/docs.txt
@@ -184,9 +185,6 @@ docs-dummy:
 
 docs-clean:  ## Clean documentation build directory
 	rm -rf $(SPHINXBUILD_DIR)/*
-
-# Add docs-clean to the clean target if it exists
-clean: docs-clean
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

@@ -61,6 +61,8 @@ with open("README.rst", "r") as fh:
 
 VERSION = get_version('eox_nelp', '__init__.py')
 
+# Allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='eox-nelp',
@@ -91,6 +93,7 @@ setup(
     install_requires=load_requirements('requirements/base.in'),
     extras_require={
         "eox-audit": load_requirements('requirements/eox-audit-model.in'),
+        "docs": load_requirements('requirements/docs.txt'),
     },
     zip_safe=False,
     entry_points={
@@ -100,5 +103,15 @@ setup(
         "cms.djangoapp": [
             'eox_nelp = eox_nelp.apps:EoxNelpCMSConfig',
         ],
+    },
+    cmdclass={
+        'build_sphinx': 'sphinx.setup_command.BuildDoc',
+    },
+    command_options={
+        'build_sphinx': {
+            'source_dir': ('setup.py', 'docs/source'),
+            'build_dir': ('setup.py', 'docs/build'),
+            'all_files': ('setup.py', True),
+        },
     },
 )

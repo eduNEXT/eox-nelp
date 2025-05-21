@@ -48,6 +48,7 @@ upgrade: ## update the requirements/*.txt files with the latest packages satisfy
 	$(PIP_COMPILE) -o requirements/base.txt requirements/base.in
 	$(PIP_COMPILE) -o requirements/test.txt requirements/test.in
 	$(PIP_COMPILE) -o requirements/tox.txt requirements/tox.in
+	$(PIP_COMPILE) -o requirements/docs.txt requirements/docs.in
 
 	grep -e "^django==" requirements/test.txt > requirements/django.txt
 
@@ -99,3 +100,93 @@ pull_react_translations:
 	$(intl_imports) frontend-platform paragon frontend-essentials
 	cp -r src/i18n/* eox_nelp/i18n/
 	rm -rf src
+
+# Variables for documentation
+SPHINXOPTS    ?=
+SPHINXBUILD   ?= sphinx-build
+SPHINXSOURCE  = docs/source
+SPHINXBUILD_DIR = docs/build
+
+.PHONY: help docs docs-html docs-dirhtml docs-singlehtml docs-pickle docs-json docs-htmlhelp docs-qthelp docs-devhelp docs-epub docs-latex docs-man docs-texinfo docs-text docs-changes docs-linkcheck docs-doctest docs-coverage docs-xml docs-pseudoxml docs-dummy install-docs-reqs docs-api
+
+install-docs-reqs: ## install documentation requirements
+	pip install -r requirements/docs.txt
+
+docs-api: install-docs-reqs ## Generate API documentation
+	python $(SPHINXSOURCE)/api/autodoc.py
+
+# Documentation targets
+docs-help:
+	@$(SPHINXBUILD) -M help "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)" $(SPHINXOPTS) $(O)
+
+docs: install-docs-reqs docs-api docs-html  ## Build documentation in HTML format (installs requirements first)
+
+docs-html: ## Build documentation in HTML format
+	$(SPHINXBUILD) -b html "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/html" $(SPHINXOPTS)
+	@echo
+	@echo "Build finished. The HTML pages are in $(SPHINXBUILD_DIR)/html."
+
+docs-dirhtml:
+	$(SPHINXBUILD) -b dirhtml "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/dirhtml" $(SPHINXOPTS)
+
+docs-singlehtml:
+	$(SPHINXBUILD) -b singlehtml "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/singlehtml" $(SPHINXOPTS)
+
+docs-pickle:
+	$(SPHINXBUILD) -b pickle "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/pickle" $(SPHINXOPTS)
+
+docs-json:
+	$(SPHINXBUILD) -b json "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/json" $(SPHINXOPTS)
+
+docs-htmlhelp:
+	$(SPHINXBUILD) -b htmlhelp "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/htmlhelp" $(SPHINXOPTS)
+
+docs-qthelp:
+	$(SPHINXBUILD) -b qthelp "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/qthelp" $(SPHINXOPTS)
+
+docs-devhelp:
+	$(SPHINXBUILD) -b devhelp "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/devhelp" $(SPHINXOPTS)
+
+docs-epub:
+	$(SPHINXBUILD) -b epub "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/epub" $(SPHINXOPTS)
+
+docs-latex:
+	$(SPHINXBUILD) -b latex "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/latex" $(SPHINXOPTS)
+
+docs-man:
+	$(SPHINXBUILD) -b man "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/man" $(SPHINXOPTS)
+
+docs-texinfo:
+	$(SPHINXBUILD) -b texinfo "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/texinfo" $(SPHINXOPTS)
+
+docs-text:
+	$(SPHINXBUILD) -b text "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/text" $(SPHINXOPTS)
+
+docs-changes:
+	$(SPHINXBUILD) -b changes "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/changes" $(SPHINXOPTS)
+
+docs-linkcheck:
+	$(SPHINXBUILD) -b linkcheck "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/linkcheck" $(SPHINXOPTS)
+
+docs-doctest:
+	$(SPHINXBUILD) -b doctest "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/doctest" $(SPHINXOPTS)
+
+docs-coverage:
+	$(SPHINXBUILD) -b coverage "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/coverage" $(SPHINXOPTS)
+
+docs-xml:
+	$(SPHINXBUILD) -b xml "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/xml" $(SPHINXOPTS)
+
+docs-pseudoxml:
+	$(SPHINXBUILD) -b pseudoxml "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/pseudoxml" $(SPHINXOPTS)
+
+docs-dummy:
+	$(SPHINXBUILD) -b dummy "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)/dummy" $(SPHINXOPTS)
+
+docs-clean:  ## Clean documentation build directory
+	rm -rf $(SPHINXBUILD_DIR)/*
+
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+docs-%: Makefile
+	@$(SPHINXBUILD) -M $* "$(SPHINXSOURCE)" "$(SPHINXBUILD_DIR)" $(SPHINXOPTS) $(O)

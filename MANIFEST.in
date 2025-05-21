@@ -3,4 +3,5 @@ include LICENSE.txt
 include README.md
 include requirements/base.in
 include requirements/eox-audit-model.in
+include requirements/docs.in
 recursive-include eox_nelp *.html *.png *.gif *js *.css *jpg *jpeg *svg *py

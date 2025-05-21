@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.settings.common &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/eox_nelp.html">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eox_nelp.settings.common</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eox_nelp.settings.common</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Settings for eox-core</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_spec</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s1">&#39;a-not-to-be-trusted-secret-key&#39;</span>
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;django.contrib.admin&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.auth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.contenttypes&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.sites&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;django.contrib.sessions&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;social_django&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;eventtracking.django.apps.EventTrackingConfig&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;[Futurex platform] Notification due date(left </span><span class="si">{subsection_delta.days}</span><span class="s2"> days) &quot;</span>
+    <span class="s2">&quot;of subsection </span><span class="si">{subsection_title}</span><span class="s2"> &quot;</span>
+    <span class="s2">&quot;from course </span><span class="si">{course_title}</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+<span class="c1">#  APP Labels</span>
+<span class="n">COURSE_CREATOR_APP</span> <span class="o">=</span> <span class="s1">&#39;cms.djangoapps.course_creators&#39;</span>
+<span class="n">JSON_API_REST_FRAMEWORK</span> <span class="o">=</span> <span class="s1">&#39;rest_framework_json_api&#39;</span>
+<span class="n">EOX_AUDIT_MODEL_APP</span> <span class="o">=</span> <span class="s1">&#39;eox_audit_model.apps.EoxAuditModelConfig&#39;</span>
+<span class="n">EOX_SUPPORT_APP</span> <span class="o">=</span> <span class="s1">&#39;eox_support.apps.EoxSupportConfig&#39;</span>
+<span class="n">CUSTOM_REG_FORM_APP</span> <span class="o">=</span> <span class="s1">&#39;custom_reg_form.apps.CustomRegFormConfig&#39;</span>
+
+
+<div class="viewcode-block" id="plugin_settings">
+<a class="viewcode-back" href="../../../api/eox_nelp.settings.common.html#eox_nelp.settings.common.plugin_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plugin_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Defines eox-nelp settings when app is used as a plugin to edx-platform.</span>
+<span class="sd">    See: https://github.com/edx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSE_CREATORS_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.course_creators_k_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSE_OVERVIEWS_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.course_overviews_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_SITE_CONFIGURATION</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.site_configuration_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_USER_API</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.user_api_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_USER_AUTHN</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.user_authn_r_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_MFE_CONFIG_VIEW</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.mfe_config_view_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSE_API</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.course_api_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_XMODULE_MODULESTORE</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.modulestore_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_BULK_EMAIL_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.bulk_email_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_STUDENT_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.student_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_EDXMAKO_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.edxmako_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_BRANDING_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.branding_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_CERTIFICATES_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.certificates_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_CMS_API_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.cms_api_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_EVENT_ROUTING_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.event_routing_backends_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_GRADES_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.grades_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSE_BLOCKS_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.course_blocks_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSEWARE_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.courseware_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_INSTRUCTOR_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.instructor_m_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_COURSE_EXPERIENCE_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.course_experience_p_v1&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">EOX_NELP_THIRD_PARTY_AUTH_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.backends.third_party_auth_r_v1&#39;</span>
+
+    <span class="n">settings</span><span class="o">.</span><span class="n">FUTUREX_API_URL</span> <span class="o">=</span> <span class="s1">&#39;https://testing-site.com&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">FUTUREX_API_CLIENT_ID</span> <span class="o">=</span> <span class="s1">&#39;my-test-client-id&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">FUTUREX_API_CLIENT_SECRET</span> <span class="o">=</span> <span class="s1">&#39;my-test-client-secret&#39;</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE</span> <span class="o">=</span> <span class="n">DEFAULT_FUTUREX_NOTIFY_SUBSECTION_SUBJECT_MESSAGE</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">BULK_EMAIL_DEFAULT_RETRY_DELAY</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">BULK_EMAIL_MAX_RETRIES</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">if</span> <span class="n">COURSE_CREATOR_APP</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">COURSE_CREATOR_APP</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">find_spec</span><span class="p">(</span><span class="n">JSON_API_REST_FRAMEWORK</span><span class="p">)</span> <span class="ow">and</span> <span class="n">JSON_API_REST_FRAMEWORK</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">JSON_API_REST_FRAMEWORK</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">find_spec</span><span class="p">(</span><span class="s1">&#39;eox_audit_model&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">EOX_AUDIT_MODEL_APP</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
+        <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EOX_AUDIT_MODEL_APP</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">payments_notifications_context</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;eox_nelp.payment_notifications.context_processor.payments_notifications_context&#39;</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">payments_notifications_context</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATES</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;OPTIONS&#39;</span><span class="p">][</span><span class="s1">&#39;context_processors&#39;</span><span class="p">]:</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATES</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;OPTIONS&#39;</span><span class="p">][</span><span class="s1">&#39;context_processors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payments_notifications_context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">payments_notifications_context</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATES</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;OPTIONS&#39;</span><span class="p">][</span><span class="s1">&#39;context_processors&#39;</span><span class="p">]:</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATES</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;OPTIONS&#39;</span><span class="p">][</span><span class="s1">&#39;context_processors&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payments_notifications_context</span><span class="p">)</span>
+
+        <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE_ENGINE</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">TEMPLATES</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="c1"># We must find a way to register this error</span>
+        <span class="k">pass</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

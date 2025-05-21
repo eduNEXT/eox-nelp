@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp package &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="eox_nelp.admin package" href="eox_nelp.admin.html" />
+    <link rel="prev" title="API Reference" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+      <li class="breadcrumb-item active">eox_nelp package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eox_nelp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-eox_nelp">
+<span id="eox-nelp-package"></span><h1>eox_nelp package<a class="headerlink" href="#module-eox_nelp" title="Link to this heading"></a></h1>
+<p>Init module for eox_nelp.</p>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.admin.html">eox_nelp.admin package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.admin.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.admin.certificates.html">eox_nelp.admin.certificates module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.admin.course_creators.html">eox_nelp.admin.course_creators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.admin.register_admin_model.html">eox_nelp.admin.register_admin_model module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.admin.student.html">eox_nelp.admin.student module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.admin.user.html">eox_nelp.admin.user module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.cms.html">eox_nelp.cms package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.cms.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.cms.api.html">eox_nelp.cms.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.course_api.html">eox_nelp.course_api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.course_api.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_api.v1.html">eox_nelp.course_api.v1 package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_api.v1.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.course_api.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_api.urls.html">eox_nelp.course_api.urls module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.course_experience.html">eox_nelp.course_experience package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.course_experience.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_experience.api.html">eox_nelp.course_experience.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_experience.frontend.html">eox_nelp.course_experience.frontend package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.frontend.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.frontend.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.course_experience.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_experience.admin.html">eox_nelp.course_experience.admin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.course_experience.models.html">eox_nelp.course_experience.models module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.external_certificates.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.external_certificates.api.html">eox_nelp.external_certificates.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.external_certificates.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.external_certificates.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.external_certificates.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.external_certificates.admin.html">eox_nelp.external_certificates.admin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.external_certificates.models.html">eox_nelp.external_certificates.models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.external_certificates.tasks.html">eox_nelp.external_certificates.tasks module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.management.html">eox_nelp.management package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.management.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.management.commands.html">eox_nelp.management.commands package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.management.commands.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.migrations.html">eox_nelp.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.migrations.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0001_initial.html">eox_nelp.migrations.0001_initial module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0002_upcomingcourseduedate.html">eox_nelp.migrations.0002_upcomingcourseduedate module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0003_feedback.html">eox_nelp.migrations.0003_feedback module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0004_feedback_public_default_to_false.html">eox_nelp.migrations.0004_feedback_public_default_to_false module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0004_feedback_public_default_to_false.html#eox_nelp.migrations.0004_feedback_public_default_to_false.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0005_paymentnotification.html">eox_nelp.migrations.0005_paymentnotification module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0005_paymentnotification.html#eox_nelp.migrations.0005_paymentnotification.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0006_auto_20230726_1707.html">eox_nelp.migrations.0006_auto_20230726_1707 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0006_auto_20230726_1707.html#eox_nelp.migrations.0006_auto_20230726_1707.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0007_auto_20240529_1724.html">eox_nelp.migrations.0007_auto_20240529_1724 module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0007_auto_20240529_1724.html#eox_nelp.migrations.0007_auto_20240529_1724.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0008_pearsonrtenevent.html">eox_nelp.migrations.0008_pearsonrtenevent module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0008_pearsonrtenevent.html#eox_nelp.migrations.0008_pearsonrtenevent.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0009_pearsonrtenevent_appointments.html">eox_nelp.migrations.0009_pearsonrtenevent_appointments module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0009_pearsonrtenevent_appointments.html#eox_nelp.migrations.0009_pearsonrtenevent_appointments.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0010_pearsonrtenevent_candidate.html">eox_nelp.migrations.0010_pearsonrtenevent_candidate module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0010_pearsonrtenevent_candidate.html#eox_nelp.migrations.0010_pearsonrtenevent_candidate.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0011_pearsonrtenevent_course.html">eox_nelp.migrations.0011_pearsonrtenevent_course module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0011_pearsonrtenevent_course.html#eox_nelp.migrations.0011_pearsonrtenevent_course.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0012_add_pearson_engines_register.html">eox_nelp.migrations.0012_add_pearson_engines_register module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0012_add_pearson_engines_register.html#eox_nelp.migrations.0012_add_pearson_engines_register.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0013_delete_pearsonrtenevent.html">eox_nelp.migrations.0013_delete_pearsonrtenevent module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0013_delete_pearsonrtenevent.html#eox_nelp.migrations.0013_delete_pearsonrtenevent.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0014_add_external_certificate.html">eox_nelp.migrations.0014_add_external_certificate module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0014_add_external_certificate.html#eox_nelp.migrations.0014_add_external_certificate.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0015_alter_reportcourse_reason.html">eox_nelp.migrations.0015_alter_reportcourse_reason module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0015_alter_reportcourse_reason.html#eox_nelp.migrations.0015_alter_reportcourse_reason.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html">eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.update_sc_to_ic"><code class="docutils literal notranslate"><span class="pre">update_sc_to_ic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.reverse_update_sc_to_ic"><code class="docutils literal notranslate"><span class="pre">reverse_update_sc_to_ic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.notifications.html">eox_nelp.notifications package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.notifications.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.notifications.admin.html">eox_nelp.notifications.admin module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.notifications.models.html">eox_nelp.notifications.models module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.notifications.notify_course_due_date.html">eox_nelp.notifications.notify_course_due_date module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.notifications.tasks.html">eox_nelp.notifications.tasks module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.notifications.utils.html">eox_nelp.notifications.utils module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.one_time_password.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.one_time_password.api.html">eox_nelp.one_time_password.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.one_time_password.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.one_time_password.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.one_time_password.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.one_time_password.generators.html">eox_nelp.one_time_password.generators module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.one_time_password.generators.html#eox_nelp.one_time_password.generators.generate_otp_code"><code class="docutils literal notranslate"><span class="pre">generate_otp_code()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.one_time_password.view_decorators.html">eox_nelp.one_time_password.view_decorators module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.openedx_filters.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.openedx_filters.xapi.html">eox_nelp.openedx_filters.xapi package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.openedx_filters.xapi.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.payment_notifications.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.templates.html">eox_nelp.payment_notifications.templates package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.payment_notifications.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.admin.html">eox_nelp.payment_notifications.admin module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.payment_notifications.admin.html#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin"><code class="docutils literal notranslate"><span class="pre">PaymentNotificationAdmin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.context_processor.html">eox_nelp.payment_notifications.context_processor module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.models.html">eox_nelp.payment_notifications.models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.payment_notifications.models.html#eox_nelp.payment_notifications.models.PaymentNotification"><code class="docutils literal notranslate"><span class="pre">PaymentNotification</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.urls.html">eox_nelp.payment_notifications.urls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.payment_notifications.views.html">eox_nelp.payment_notifications.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.pearson_vue_engine.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.admin.html">eox_nelp.pearson_vue_engine.admin module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.admin.html#eox_nelp.pearson_vue_engine.admin.PearsonEngineAdmin"><code class="docutils literal notranslate"><span class="pre">PearsonEngineAdmin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.constants.html">eox_nelp.pearson_vue_engine.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.decorators.html">eox_nelp.pearson_vue_engine.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.models.html">eox_nelp.pearson_vue_engine.models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine"><code class="docutils literal notranslate"><span class="pre">PearsonEngine</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.tasks.html">eox_nelp.pearson_vue_engine.tasks module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.pearson_vue_engine.utils.html">eox_nelp.pearson_vue_engine.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.utils.html#eox_nelp.pearson_vue_engine.utils.update_user_engines"><code class="docutils literal notranslate"><span class="pre">update_user_engines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.utils.html#eox_nelp.pearson_vue_engine.utils.get_user_data"><code class="docutils literal notranslate"><span class="pre">get_user_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.utils.html#eox_nelp.pearson_vue_engine.utils.get_platform_data"><code class="docutils literal notranslate"><span class="pre">get_platform_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.utils.html#eox_nelp.pearson_vue_engine.utils.generate_action_parameters"><code class="docutils literal notranslate"><span class="pre">generate_action_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.processors.html">eox_nelp.processors package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.processors.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.processors.xapi.html">eox_nelp.processors.xapi package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.processors.xapi.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.processors.xapi.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.settings.html">eox_nelp.settings package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.settings.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.settings.common.html">eox_nelp.settings.common module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.common.html#eox_nelp.settings.common.plugin_settings"><code class="docutils literal notranslate"><span class="pre">plugin_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.settings.devstack.html">eox_nelp.settings.devstack module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.devstack.html#eox_nelp.settings.devstack.plugin_settings"><code class="docutils literal notranslate"><span class="pre">plugin_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.settings.production.html">eox_nelp.settings.production module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.production.html#eox_nelp.settings.production.plugin_settings"><code class="docutils literal notranslate"><span class="pre">plugin_settings()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.settings.test.html">eox_nelp.settings.test module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.test.html#eox_nelp.settings.test.SettingsClass"><code class="docutils literal notranslate"><span class="pre">SettingsClass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.test.html#eox_nelp.settings.test.plugin_settings"><code class="docutils literal notranslate"><span class="pre">plugin_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.signals.html">eox_nelp.signals package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.signals.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.signals.receivers.html">eox_nelp.signals.receivers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.signals.tasks.html">eox_nelp.signals.tasks module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.signals.utils.html">eox_nelp.signals.utils module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.stats.html">eox_nelp.stats package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.stats.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.api.html">eox_nelp.stats.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.stats.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.stats.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.templates.html">eox_nelp.stats.templates package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.stats.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.decorators.html">eox_nelp.stats.decorators module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.stats.decorators.html#eox_nelp.stats.decorators.cache_method"><code class="docutils literal notranslate"><span class="pre">cache_method()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.metrics.html">eox_nelp.stats.metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.urls.html">eox_nelp.stats.urls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.stats.views.html">eox_nelp.stats.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.tests.html">eox_nelp.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.tests.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.mixins.html">eox_nelp.tests.mixins module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.test_init_pipeline.html">eox_nelp.tests.test_init_pipeline module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.test_utils.html">eox_nelp.tests.test_utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.test_validators.html">eox_nelp.tests.test_validators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.test_views.html">eox_nelp.tests.test_views module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.tests.utils.html">eox_nelp.tests.utils module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.third_party_auth.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.third_party_auth.exceptions.html">eox_nelp.third_party_auth.exceptions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.third_party_auth.exceptions.html#eox_nelp.third_party_auth.exceptions.EoxNelpAuthException"><code class="docutils literal notranslate"><span class="pre">EoxNelpAuthException</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.third_party_auth.pipeline.html">eox_nelp.third_party_auth.pipeline module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.third_party_auth.utils.html">eox_nelp.third_party_auth.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.third_party_auth.utils.html#eox_nelp.third_party_auth.utils.match_user_using_uid_query"><code class="docutils literal notranslate"><span class="pre">match_user_using_uid_query()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.user_authn.html">eox_nelp.user_authn package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.user_authn.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.user_authn.utils.html">eox_nelp.user_authn.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_authn.utils.html#eox_nelp.user_authn.utils.password_rules"><code class="docutils literal notranslate"><span class="pre">password_rules()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_authn.utils.html#eox_nelp.user_authn.utils.generate_password"><code class="docutils literal notranslate"><span class="pre">generate_password()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.user_profile.html">eox_nelp.user_profile package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.user_profile.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.user_profile.api.html">eox_nelp.user_profile.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_profile.api.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_profile.api.html#submodules">Submodules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.user_profile.templates.html">eox_nelp.user_profile.templates package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.user_profile.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.user_profile.required_fields_validation.html">eox_nelp.user_profile.required_fields_validation module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.apps.html">eox_nelp.apps module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig"><code class="docutils literal notranslate"><span class="pre">EoxNelpConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig.name"><code class="docutils literal notranslate"><span class="pre">EoxNelpConfig.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig.verbose_name"><code class="docutils literal notranslate"><span class="pre">EoxNelpConfig.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig.plugin_app"><code class="docutils literal notranslate"><span class="pre">EoxNelpConfig.plugin_app</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig.ready"><code class="docutils literal notranslate"><span class="pre">EoxNelpConfig.ready()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpCMSConfig"><code class="docutils literal notranslate"><span class="pre">EoxNelpCMSConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpCMSConfig.name"><code class="docutils literal notranslate"><span class="pre">EoxNelpCMSConfig.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpCMSConfig.verbose_name"><code class="docutils literal notranslate"><span class="pre">EoxNelpCMSConfig.verbose_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.apps.html#eox_nelp.apps.EoxNelpCMSConfig.plugin_app"><code class="docutils literal notranslate"><span class="pre">EoxNelpCMSConfig.plugin_app</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.run_init_pipeline"><code class="docutils literal notranslate"><span class="pre">run_init_pipeline()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_user_gender_choices"><code class="docutils literal notranslate"><span class="pre">patch_user_gender_choices()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.set_mako_templates"><code class="docutils literal notranslate"><span class="pre">set_mako_templates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.register_xapi_transformers"><code class="docutils literal notranslate"><span class="pre">register_xapi_transformers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.update_permissions"><code class="docutils literal notranslate"><span class="pre">update_permissions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_generate_password"><code class="docutils literal notranslate"><span class="pre">patch_generate_password()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_registration_form_factory"><code class="docutils literal notranslate"><span class="pre">patch_registration_form_factory()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.middleware.html">eox_nelp.middleware module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.middleware.html#eox_nelp.middleware.PreserveUserLanguageCookieMiddleware"><code class="docutils literal notranslate"><span class="pre">PreserveUserLanguageCookieMiddleware</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.middleware.html#eox_nelp.middleware.PreserveUserLanguageCookieMiddleware.__init__"><code class="docutils literal notranslate"><span class="pre">PreserveUserLanguageCookieMiddleware.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.middleware.html#eox_nelp.middleware.PreserveUserLanguageCookieMiddleware.__call__"><code class="docutils literal notranslate"><span class="pre">PreserveUserLanguageCookieMiddleware.__call__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eox_nelp.views.html">eox_nelp.views module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eox_nelp.views.html#eox_nelp.views.info_view"><code class="docutils literal notranslate"><span class="pre">info_view()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eox_nelp.admin.html" class="btn btn-neutral float-right" title="eox_nelp.admin package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

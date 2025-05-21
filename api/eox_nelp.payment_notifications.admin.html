@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.payment_notifications.admin module &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="eox_nelp.payment_notifications.context_processor module" href="eox_nelp.payment_notifications.context_processor.html" />
+    <link rel="prev" title="eox_nelp.payment_notifications.templates package" href="eox_nelp.payment_notifications.templates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="eox_nelp.html">eox_nelp package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="eox_nelp.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="eox_nelp.html">eox_nelp package</a></li>
+          <li class="breadcrumb-item"><a href="eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+      <li class="breadcrumb-item active">eox_nelp.payment_notifications.admin module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eox_nelp.payment_notifications.admin.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-eox_nelp.payment_notifications.admin">
+<span id="eox-nelp-payment-notifications-admin-module"></span><h1>eox_nelp.payment_notifications.admin module<a class="headerlink" href="#module-eox_nelp.payment_notifications.admin" title="Link to this heading"></a></h1>
+<p>Payment notifications admin file.</p>
+<p>This module contains the admin configuration for the PaymentNotification model.
+It defines the admin class PaymentNotificationAdmin, which specifies how the
+PaymentNotification model is displayed and interacted with in the Django admin interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">ivar PaymentNotificationAdmin<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The admin class for PaymentNotification
+that customizes the display and functionality of the admin interface for this model.</p>
+</dd>
+<dt class="field-even">vartype PaymentNotificationAdmin<span class="colon">:</span></dt>
+<dd class="field-even"><p>admin.ModelAdmin</p>
+</dd>
+</dl>
+<p>This admin class defines the list of fields to be displayed, search fields, and filters
+for PaymentNotification objects. It also includes several methods for summarizing
+user data, transaction data, and message cases, which are used for displaying information
+in the admin interface.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">user_summary(self,</span> <span class="pre">obj)</span></span></dt>
+<dd><p>Summarizes user data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">transaction_summary(self,</span> <span class="pre">obj)</span></span></dt>
+<dd><p>Summarizes transaction data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">msg_cases(self,</span> <span class="pre">obj)</span></span></dt>
+<dd><p>Shows message case state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">redirections_state(self,</span> <span class="pre">obj)</span></span></dt>
+<dd><p>Shows redirections state.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PaymentNotificationAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eox_nelp/payment_notifications/admin.html#PaymentNotificationAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.ModelAdmin" title="(in Django v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></a></p>
+<p>Admin class for PaymentNotification.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('user_summary',</span> <span class="pre">'internal_status',</span> <span class="pre">'cdtrans_amount',</span> <span class="pre">'cdtrans_date',</span> <span class="pre">'transaction_summary',</span> <span class="pre">'msg_cases',</span> <span class="pre">'redirections_state',</span> <span class="pre">'internal_view_count')</span></em><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('cdtrans_lms_user_id',</span> <span class="pre">'cdtrans_username',</span> <span class="pre">'cdtrans_email',</span> <span class="pre">'cdtrans_course_id',</span> <span class="pre">'cdtrans_response_id',</span> <span class="pre">'cdtrans_amount',</span> <span class="pre">'cdtrans_course_id',</span> <span class="pre">'internal_status',</span> <span class="pre">'cdtrans_cert_status',</span> <span class="pre">'cdtrans_enrollment_id',</span> <span class="pre">'cdtrans_sku')</span></em><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('cdtrans_course_id',</span> <span class="pre">'cdtrans_amount',</span> <span class="pre">'internal_status',</span> <span class="pre">'show_msg_case0',</span> <span class="pre">'show_msg_case1',</span> <span class="pre">'show_msg_case2',</span> <span class="pre">'show_msg_custom',</span> <span class="pre">'redirect_from_dashboard',</span> <span class="pre">'redirect_from_course',</span> <span class="pre">'redirect_from_certificate',</span> <span class="pre">'redirect_from_everywhere')</span></em><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.user_summary">
+<span class="sig-name descname"><span class="pre">user_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eox_nelp/payment_notifications/admin.html#PaymentNotificationAdmin.user_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.user_summary" title="Link to this definition"></a></dt>
+<dd><p>Summaries user data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.transaction_summary">
+<span class="sig-name descname"><span class="pre">transaction_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eox_nelp/payment_notifications/admin.html#PaymentNotificationAdmin.transaction_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.transaction_summary" title="Link to this definition"></a></dt>
+<dd><p>Summaries transaction data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.msg_cases">
+<span class="sig-name descname"><span class="pre">msg_cases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eox_nelp/payment_notifications/admin.html#PaymentNotificationAdmin.msg_cases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.msg_cases" title="Link to this definition"></a></dt>
+<dd><p>Show msg case state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.redirections_state">
+<span class="sig-name descname"><span class="pre">redirections_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eox_nelp/payment_notifications/admin.html#PaymentNotificationAdmin.redirections_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eox_nelp.payment_notifications.admin.PaymentNotificationAdmin.redirections_state" title="Link to this definition"></a></dt>
+<dd><p>Show redirections state</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eox_nelp.payment_notifications.templates.html" class="btn btn-neutral float-left" title="eox_nelp.payment_notifications.templates package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eox_nelp.payment_notifications.context_processor.html" class="btn btn-neutral float-right" title="eox_nelp.payment_notifications.context_processor module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

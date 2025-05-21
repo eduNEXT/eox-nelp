@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/eox_nelp.html">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">migrations</span>
+
+
+<div class="viewcode-block" id="update_sc_to_ic">
+<a class="viewcode-back" href="../../../api/eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.update_sc_to_ic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_sc_to_ic</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Change all &#39;reason&#39; fields with value &#39;SC&#39; (Sexual content) to &#39;IC&#39; (Inappropriate content)</span>
+<span class="sd">    in both ReportCourse and ReportUnit models.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ReportCourse</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span> <span class="s1">&#39;ReportCourse&#39;</span><span class="p">)</span>
+    <span class="n">ReportUnit</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span> <span class="s1">&#39;ReportUnit&#39;</span><span class="p">)</span>
+    <span class="n">db_alias</span> <span class="o">=</span> <span class="n">schema_editor</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">alias</span>
+
+    <span class="n">ReportCourse</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db_alias</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;SC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;IC&#39;</span><span class="p">)</span>
+    <span class="n">ReportUnit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db_alias</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;SC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;IC&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reverse_update_sc_to_ic">
+<a class="viewcode-back" href="../../../api/eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.reverse_update_sc_to_ic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reverse_update_sc_to_ic</span><span class="p">(</span><span class="n">apps</span><span class="p">,</span> <span class="n">schema_editor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Revert all &#39;reason&#39; fields with value &#39;IC&#39; back to &#39;SC&#39; in both ReportCourse and ReportUnit models.</span>
+<span class="sd">    Note: This will change every &#39;IC&#39; value to &#39;SC&#39;, regardless of its original meaning.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ReportCourse</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span> <span class="s1">&#39;ReportCourse&#39;</span><span class="p">)</span>
+    <span class="n">ReportUnit</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span> <span class="s1">&#39;ReportUnit&#39;</span><span class="p">)</span>
+    <span class="n">db_alias</span> <span class="o">=</span> <span class="n">schema_editor</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">alias</span>
+
+    <span class="n">ReportCourse</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db_alias</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;IC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;SC&#39;</span><span class="p">)</span>
+    <span class="n">ReportUnit</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">using</span><span class="p">(</span><span class="n">db_alias</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;IC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s1">&#39;SC&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Migration">
+<a class="viewcode-back" href="../../../api/eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.html#eox_nelp.migrations.0016_data_update_sc_to_ic_report_reason.Migration">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Migration</span><span class="p">(</span><span class="n">migrations</span><span class="o">.</span><span class="n">Migration</span><span class="p">):</span>
+
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;eox_nelp&#39;</span><span class="p">,</span> <span class="s1">&#39;0015_alter_reportcourse_reason&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">migrations</span><span class="o">.</span><span class="n">RunPython</span><span class="p">(</span><span class="n">update_sc_to_ic</span><span class="p">,</span> <span class="n">reverse_update_sc_to_ic</span><span class="p">),</span>
+    <span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

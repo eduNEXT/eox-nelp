@@ -1,0 +1,390 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.pearson_vue_engine.models &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/eox_nelp.html">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eox_nelp.pearson_vue_engine.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eox_nelp.pearson_vue_engine.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Database models for Pearson VUE service.</span>
+
+<span class="sd">This module defines models for storing data related to the Pearson VUE service.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    PearsonEngine: A model representing the send to the PearsonEngine service per user.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_user_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="n">User</span> <span class="o">=</span> <span class="n">get_user_model</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="PearsonEngine">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PearsonEngine</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This model contains data related to user and the integration with PearsonVue engine service.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        user (User): OneToOne relationship with User model.</span>
+<span class="sd">        rti_triggers (int): Number of RTI triggers.</span>
+<span class="sd">        cdd_triggers (int): Number of CDD triggers.</span>
+<span class="sd">        ead_triggers (int): Number of EAD triggers.</span>
+<span class="sd">        courses (dict): JSON field storing EAD course data.</span>
+<span class="sd">        created_at (datetime): Timestamp of model instance creation.</span>
+<span class="sd">        updated_at (datetime): Timestamp of last model instance update.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">rti_triggers</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">cdd_triggers</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ead_triggers</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">courses</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">updated_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PearsonEngine.get_triggers">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.get_triggers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_triggers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_type</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of triggers for a specific type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trigger_type (str): The type of trigger (&#39;rti&#39;, &#39;cdd&#39;, or &#39;ead&#39;).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of triggers for the specified type.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If an invalid trigger type is provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">trigger_type</span><span class="si">}</span><span class="s2">_triggers&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid trigger name: </span><span class="si">{</span><span class="n">trigger_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.set_triggers">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.set_triggers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_triggers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the number of triggers for a specific type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trigger_type (str): The type of trigger (&#39;rti&#39;, &#39;cdd&#39;, or &#39;ead&#39;).</span>
+<span class="sd">            value (int): The new value for the trigger count.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the value is not a non-negative integer or if an invalid trigger type is provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">trigger_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">trigger_type</span><span class="si">}</span><span class="s2">_triggers&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Trigger value must be a non-negative integer&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid trigger name: </span><span class="si">{</span><span class="n">trigger_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.increment_trigger">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.increment_trigger">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_type</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increment the number of triggers for a specific type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trigger_type (str): The type of trigger (&#39;rti&#39;, &#39;cdd&#39;, or &#39;ead&#39;).</span>
+<span class="sd">            increment (int, optional): The amount to increment. Defaults to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_triggers</span><span class="p">(</span><span class="n">trigger_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_triggers</span><span class="p">(</span><span class="n">trigger_type</span><span class="p">,</span> <span class="n">current_value</span> <span class="o">+</span> <span class="n">increment</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.get_courses">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.get_courses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_courses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the courses for a specific action type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The courses for the specified action type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">courses</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.get_course_value">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.get_course_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the value of a specific course.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            course_id (str): The ID of the course.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The value of the specified course, or 0 if not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">courses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">courses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.set_course_value">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.set_course_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_course_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the value of a specific course.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            course_id (str): The ID of the course.</span>
+<span class="sd">            value (int or float): The new value for the course.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the value is not a non-negative number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Course value must be a non-negative number&quot;</span><span class="p">)</span>
+        <span class="n">courses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span>
+        <span class="n">courses</span><span class="p">[</span><span class="n">course_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">courses</span> <span class="o">=</span> <span class="n">courses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.increment_course_value">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.increment_course_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment_course_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increment the value of a specific course.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            course_id (str): The ID of the course.</span>
+<span class="sd">            increment (int or float, optional): The amount to increment. Defaults to 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_course_value</span><span class="p">(</span><span class="n">course_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_course_value</span><span class="p">(</span><span class="n">course_id</span><span class="p">,</span> <span class="n">current_value</span> <span class="o">+</span> <span class="n">increment</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.remove_course">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.remove_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove a course from the specified action type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            course_id (str): The ID of the course to remove.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the course is not found in the specified action type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">courses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">course_id</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">courses</span><span class="p">[</span><span class="n">course_id</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">courses</span> <span class="o">=</span> <span class="n">courses</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Course </span><span class="si">{</span><span class="n">course_id</span><span class="si">}</span><span class="s2"> not found in courses&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.get_course_ids">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.get_course_ids">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all course IDs for a specific action type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of all course IDs for the specified action type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="PearsonEngine.get_total_course_value">
+<a class="viewcode-back" href="../../../api/eox_nelp.pearson_vue_engine.models.html#eox_nelp.pearson_vue_engine.models.PearsonEngine.get_total_course_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_total_course_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the total value of all courses for a specific action type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The sum of all course values for the specified action type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_courses</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_triggers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the total number of triggers across all types.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The sum of RTI, CDD, and EAD triggers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rti_triggers</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cdd_triggers</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">ead_triggers</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

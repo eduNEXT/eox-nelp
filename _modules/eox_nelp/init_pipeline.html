@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.init_pipeline &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/eox_nelp.html">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/eox_nelp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eox_nelp.init_pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eox_nelp.init_pipeline</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file contains all the processes that must run after app registration.</span>
+
+<span class="sd">Functions:</span>
+
+<span class="sd">    run_init_pipeline: Wrapper for all the init methods, this avoids to import methods outside this file.</span>
+<span class="sd">    patch_user_gender_choices: Change the current openedx gender options (Male, Female, Other)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_noop</span>
+
+
+<div class="viewcode-block" id="run_init_pipeline">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.run_init_pipeline">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_init_pipeline</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes multiple processes that must run before starting the django application.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">patch_user_gender_choices</span><span class="p">()</span>
+    <span class="n">set_mako_templates</span><span class="p">()</span>
+    <span class="n">register_xapi_transformers</span><span class="p">()</span>
+    <span class="n">update_permissions</span><span class="p">()</span>
+    <span class="n">patch_generate_password</span><span class="p">()</span>
+    <span class="n">patch_registration_form_factory</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="patch_user_gender_choices">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_user_gender_choices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_user_gender_choices</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This overwrites the available gender choices in order to allow the Male and Female options.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="c1"># This cannot be at the top of the file since this file is imported the plugin initialization</span>
+    <span class="c1"># and therefore the settings has not been set yet</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.edxapp_wrapper.student</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+    <span class="n">UserProfile</span><span class="o">.</span><span class="n">GENDER_CHOICES</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="n">gettext_noop</span><span class="p">(</span><span class="s1">&#39;Male&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="n">gettext_noop</span><span class="p">(</span><span class="s1">&#39;Female&#39;</span><span class="p">)),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_mako_templates">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.set_mako_templates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_mako_templates</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This method adds the plugin templates to mako configuration.&quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="c1"># This cannot be at the top of the file since this file is imported on the plugin initialization</span>
+    <span class="c1"># and therefore the settings has not been set yet</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp</span><span class="w"> </span><span class="kn">import</span> <span class="n">static</span> <span class="k">as</span> <span class="n">static_module</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.edxapp_wrapper.edxmako</span><span class="w"> </span><span class="kn">import</span> <span class="n">edxmako</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.payment_notifications</span><span class="w"> </span><span class="kn">import</span> <span class="n">templates</span> <span class="k">as</span> <span class="n">payment_notifications_templates</span>
+
+    <span class="n">module_templates_to_include</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">static_module</span><span class="p">,</span>
+        <span class="n">payment_notifications_templates</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">module_templates_to_include</span><span class="p">:</span>
+        <span class="n">path_to_templates</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path_to_templates</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edxmako</span><span class="o">.</span><span class="n">LOOKUP</span><span class="p">[</span><span class="s1">&#39;main&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">directories</span><span class="p">:</span>
+            <span class="n">edxmako</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">add_lookup</span><span class="p">(</span><span class="s1">&#39;main&#39;</span><span class="p">,</span> <span class="n">path_to_templates</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="register_xapi_transformers">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.register_xapi_transformers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_xapi_transformers</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This method just import the event transformers in order to register all of them.&quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel, unused-import</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.processors.xapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">event_transformers</span> <span class="k">as</span> <span class="n">xapi_event_transformers</span>  <span class="c1"># noqa: F401</span></div>
+
+
+
+<div class="viewcode-block" id="update_permissions">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.update_permissions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_permissions</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This method just change permissions for bussiness cases&quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bridgekeeper</span><span class="w"> </span><span class="kn">import</span> <span class="n">perms</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">bridgekeeper.rules</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_staff</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.edxapp_wrapper.courseware</span><span class="w"> </span><span class="kn">import</span> <span class="n">rules</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.edxapp_wrapper.instructor</span><span class="w"> </span><span class="kn">import</span> <span class="n">permissions</span>
+
+    <span class="n">perms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">CAN_RESEARCH</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">perms</span><span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">CAN_RESEARCH</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">is_staff</span>  <span class="c1"># pylint: disable=unsupported-binary-operation, useless-suppression</span>
+        <span class="o">|</span> <span class="n">rules</span><span class="o">.</span><span class="n">HasRolesRule</span><span class="p">(</span><span class="s2">&quot;data_researcher&quot;</span><span class="p">)</span>
+        <span class="o">|</span> <span class="n">rules</span><span class="o">.</span><span class="n">HasAccessRule</span><span class="p">(</span><span class="s2">&quot;staff&quot;</span><span class="p">)</span>
+        <span class="o">|</span> <span class="n">rules</span><span class="o">.</span><span class="n">HasAccessRule</span><span class="p">(</span><span class="s2">&quot;instructor&quot;</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="patch_generate_password">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_generate_password">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_generate_password</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This method patch `generate_password` of edx_django_util package,</span>
+<span class="sd">    with custom nelp `generate_password`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_tenant.tenant_wise</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_as_proxy</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.user_authn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_password</span>
+
+    <span class="n">set_as_proxy</span><span class="p">(</span>
+        <span class="n">modules</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;lms.djangoapps.support.views.manage_user&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;openedx.core.djangoapps.user_api.accounts.utils&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;openedx.core.djangoapps.user_authn.views.auto_auth&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;openedx.core.djangoapps.user_authn.views.register&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">model</span><span class="o">=</span><span class="s2">&quot;generate_password&quot;</span><span class="p">,</span>
+        <span class="n">proxy</span><span class="o">=</span><span class="n">generate_password</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="patch_registration_form_factory">
+<a class="viewcode-back" href="../../api/eox_nelp.init_pipeline.html#eox_nelp.init_pipeline.patch_registration_form_factory">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">patch_registration_form_factory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This method patches `RegistrationFormFactory` of user_auth.view.registration_form ,</span>
+<span class="sd">    with custom nelp `NelpRegistrationFormFactory`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.edxapp_wrapper.user_authn</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.user_authn.views.registration_form</span><span class="w"> </span><span class="kn">import</span> <span class="n">NelpRegistrationFormFactory</span>
+    <span class="n">views</span><span class="o">.</span><span class="n">registration_form</span><span class="o">.</span><span class="n">RegistrationFormFactory</span> <span class="o">=</span> <span class="n">NelpRegistrationFormFactory</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

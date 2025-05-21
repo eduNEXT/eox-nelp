@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eox_nelp.apps &mdash; eox-nelp 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            eox-nelp
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#installation-steps">Installation Steps</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#clone-the-repository">1. Clone the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#install-the-plugin">2. Install the Plugin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#restart-services">3. Restart Services</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#frontend-development">Frontend Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#development-mode">Development Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#production-build">Production Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/installation.html#dependencies">Dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../modules/installation.html#frontend-dependencies">Frontend Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#plugin-settings">Plugin Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#django-app-configuration">Django App Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#url-configuration">URL Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#settings-configuration">Settings Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../modules/configuration.html#signal-configuration">Signal Configuration</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/eox_nelp.html">eox_nelp package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/eox_nelp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.admin.html">eox_nelp.admin package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.cms.html">eox_nelp.cms package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.course_api.html">eox_nelp.course_api package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.course_experience.html">eox_nelp.course_experience package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.external_certificates.html">eox_nelp.external_certificates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.management.html">eox_nelp.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.migrations.html">eox_nelp.migrations package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.notifications.html">eox_nelp.notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.one_time_password.html">eox_nelp.one_time_password package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.openedx_filters.html">eox_nelp.openedx_filters package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.payment_notifications.html">eox_nelp.payment_notifications package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.pearson_vue_engine.html">eox_nelp.pearson_vue_engine package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.processors.html">eox_nelp.processors package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.settings.html">eox_nelp.settings package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.signals.html">eox_nelp.signals package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.static.html">eox_nelp.static package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.stats.html">eox_nelp.stats package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.tests.html">eox_nelp.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.third_party_auth.html">eox_nelp.third_party_auth package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.user_authn.html">eox_nelp.user_authn package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.user_profile.html">eox_nelp.user_profile package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/eox_nelp.html#submodules">Submodules</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.apps.html">eox_nelp.apps module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.cms_urls.html">eox_nelp.cms_urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.init_pipeline.html">eox_nelp.init_pipeline module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.middleware.html">eox_nelp.middleware module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.urls.html">eox_nelp.urls module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.utils.html">eox_nelp.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.validators.html">eox_nelp.validators module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/eox_nelp.views.html">eox_nelp.views module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">eox-nelp</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eox_nelp.apps</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eox_nelp.apps</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">App configuration for eox_nelp.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">AppConfig</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">eox_nelp.init_pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_init_pipeline</span>
+
+
+<div class="viewcode-block" id="EoxNelpConfig">
+<a class="viewcode-back" href="../../api/eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EoxNelpConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Nelp plugin for custom development. configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp&#39;</span>
+    <span class="n">verbose_name</span> <span class="o">=</span> <span class="s1">&#39;Nelp plugin for custom development.&#39;</span>
+    <span class="n">plugin_app</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;url_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;lms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="s1">&#39;eox-nelp&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;^eox-nelp/&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;urls&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;settings_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;lms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.test&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;common&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.common&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;production&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.production&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;devstack&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.devstack&#39;</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;signals_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;lms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;signals.receivers&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;receivers&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;block_completion_progress_publisher&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;block_completion_publisher_receviver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;completion.models.BlockCompletion&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;emit_initialized_course_event&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;emit_initialized_course_event_receviver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;completion.models.BlockCompletion&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;course_grade_changed_progress_publisher&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;openedx.core.djangoapps.signals.signals.COURSE_GRADE_CHANGED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;course_grade_publisher_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;certificate_publisher&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;openedx_events.learning.signals.CERTIFICATE_CREATED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;certificate_publisher_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;enrollment_publisher&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;enrollment_publisher_receiver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;common.djangoapps.student.models.CourseEnrollment&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;create_usersignupsource_by_enrollment&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;create_usersignupsource_by_enrollment_receiver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;common.djangoapps.student.models.CourseEnrollment&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;update_payment_notifications&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;update_payment_notifications_receiver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;common.djangoapps.student.models.CourseEnrollment&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;include_tracker_context&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;celery.signals.before_task_publish&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;update_async_tracker_context&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;celery.signals.task_prerun&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;emit_subsection_attempt_event&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;emit_subsection_attempt_event&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;lms.djangoapps.grades.signals.signals.SUBSECTION_OVERRIDE_CHANGED&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_completion_handler&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_completion_receviver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;completion.models.BlockCompletion&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_passed_handler&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_PASSED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_passed_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_failed_handler&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_FAILED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;mt_course_failed_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;pearson_vue_course_completion_handler&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;django.db.models.signals.post_save&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;pearson_vue_course_completion_receiver&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;sender_path&#39;</span><span class="p">:</span> <span class="s1">&#39;completion.models.BlockCompletion&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;pearson_vue_course_passed_handler&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;openedx.core.djangoapps.signals.signals.COURSE_GRADE_NOW_PASSED&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;pearson_vue_course_passed_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="EoxNelpConfig.ready">
+<a class="viewcode-back" href="../../api/eox_nelp.apps.html#eox_nelp.apps.EoxNelpConfig.ready">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to perform actions after apps registry is ended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=unused-import, import-error, import-outside-toplevel</span>
+        <span class="c1"># This is required in order to register the receiver inside handlers module.</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">cms.djangoapps.contentstore.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">handlers</span>  <span class="c1"># noqa: F401</span>
+
+        <span class="n">run_init_pipeline</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EoxNelpCMSConfig">
+<a class="viewcode-back" href="../../api/eox_nelp.apps.html#eox_nelp.apps.EoxNelpCMSConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EoxNelpCMSConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;App configuration&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;eox_nelp&#39;</span>
+    <span class="n">verbose_name</span> <span class="o">=</span> <span class="s2">&quot;Nelp Openedx Extensions&quot;</span>
+
+    <span class="n">plugin_app</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;url_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;cms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="s1">&#39;eox-nelp&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;regex&#39;</span><span class="p">:</span> <span class="sa">r</span><span class="s1">&#39;^eox-nelp/&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;cms_urls&#39;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;settings_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;cms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.test&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;common&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.common&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;production&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.production&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;devstack&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;settings.devstack&#39;</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;signals_config&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;cms.djangoapp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;relative_path&#39;</span><span class="p">:</span> <span class="s1">&#39;signals.receivers&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;receivers&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;receiver_func_name&#39;</span><span class="p">:</span> <span class="s1">&#39;create_course_notifications&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;signal_path&#39;</span><span class="p">:</span> <span class="s1">&#39;eox_nelp.edxapp_wrapper.modulestore.course_published&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;dispatch_uid&#39;</span><span class="p">:</span> <span class="s1">&#39;create_course_notifications_receiver&#39;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, eduNEXT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

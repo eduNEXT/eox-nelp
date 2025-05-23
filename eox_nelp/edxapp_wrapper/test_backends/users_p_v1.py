@@ -1,7 +1,7 @@
 """Test backend for eox-coreusers module."""
 from django.contrib.auth.models import User
 from django.db import models
-from eox_core.edxapp_wrapper.backends.users_q_v1_test import *
+from eox_core.edxapp_wrapper.backends.users_q_v1_test import *  # noqa: F403, F401
 from rest_framework import serializers
 
 from eox_nelp.edxapp_wrapper.test_backends import create_test_model

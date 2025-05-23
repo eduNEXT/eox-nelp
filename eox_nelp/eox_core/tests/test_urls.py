@@ -6,6 +6,7 @@ from django.urls import resolve, reverse
 
 from eox_nelp.eox_core.api.v1.views import NelpEdxappUser
 
+
 class URLsTestCase(TestCase):
     """Test case for URLs."""
 

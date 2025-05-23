@@ -9,7 +9,7 @@ class NelpUserReadOnlySerializer(NelpEdxappUserReadOnlySerializer):
     """
     Serializer to extend eox-core's NelpEdxappUser serializer.
     """
-    def to_representation(self, user):  # lint-amnesty, pylint: disable=arguments-differ
+    def to_representation(self, user):
         """
         Overwrite to_native to handle custom logic since we are serializing three models as one here
         :param user: User object

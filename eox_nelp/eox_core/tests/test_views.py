@@ -12,6 +12,7 @@ from eox_nelp.eox_core.api.v1.views import NelpEdxappUser
 
 User = get_user_model()
 
+
 class NelpEdxappUserTestCase(TestCase):
     """Test case for NelpEdxappUser view."""
 

@@ -12,6 +12,7 @@ from .serializers import NelpUserReadOnlySerializer
 
 User = get_user_model()
 
+
 class NelpEdxappUser(CoreEdxappUser):
     """
     Handles the users' actions for the API-V1.
@@ -86,7 +87,6 @@ class NelpEdxappUser(CoreEdxappUser):
 
         return Response(response_data)
 
-
     def get_user_query(self, request, query_params=None):
         """
         Utility to prepare the user query
@@ -97,7 +97,6 @@ class NelpEdxappUser(CoreEdxappUser):
         username = query_params.get("username", None)
         email = query_params.get("email", None)
         national_id = query_params.get("national_id", None)
-
 
         if not email and not username and not national_id:
             raise ValidationError(detail="Email or username or national_id needed")

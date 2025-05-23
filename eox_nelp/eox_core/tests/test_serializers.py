@@ -1,13 +1,14 @@
 """
 Test file for eox_core serializers.
 """
+from custom_reg_form.models import ExtraInfo
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from custom_reg_form.models import ExtraInfo
 
 from eox_nelp.eox_core.api.v1.serializers import NelpUserReadOnlySerializer
 
 User = get_user_model()
+
 
 class NelpUserReadOnlySerializerTestCase(TestCase):
     """Test case for NelpUserReadOnlySerializer."""
@@ -21,7 +22,7 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
         )
 
         # Create ExtraInfo instance
-        self.extra_info = ExtraInfo.objects.create(
+        self.extra_info = ExtraInfo.objects.create(  # pylint: disable=no-member
             user=self.user,
             national_id='1234567890',
             arabic_name='اسم عربي',

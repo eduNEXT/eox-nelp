@@ -23,14 +23,13 @@ def get_user_signup_source():
     )
 
 
-
 class NelpEdxappUserReadOnlySerializer(serializers.Serializer):
     """Mock serializer for NelpEdxappUserReadOnlySerializer."""
     username = serializers.CharField()
     email = serializers.EmailField()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
 
     def to_representation(self, user):
         """Mock to_representation method."""

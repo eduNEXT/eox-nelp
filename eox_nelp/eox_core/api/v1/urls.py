@@ -7,5 +7,5 @@ from eox_nelp.eox_core.api.v1 import views
 app_name = 'eox_nelp'
 
 urlpatterns = [
-    re_path(r'^user/$', views.EdxappUser.as_view(), name='edxapp-user'),
+    re_path(r'^user/$', views.NelpEdxappUser.as_view(), name='edxapp-user'),
 ]

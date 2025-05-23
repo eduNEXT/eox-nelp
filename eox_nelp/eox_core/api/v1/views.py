@@ -12,7 +12,7 @@ from .serializers import NelpUserReadOnlySerializer
 
 User = get_user_model()
 
-class EdxappUser(CoreEdxappUser):
+class NelpEdxappUser(CoreEdxappUser):
     """
     Handles the users' actions for the API-V1.
     This class inherits all functionality from eox-core's EdxappUser view.
@@ -108,7 +108,7 @@ class EdxappUser(CoreEdxappUser):
         if username:
             user_query["username"] = username
         elif email:
-            user_query["email"] = username
+            user_query["email"] = email
         elif national_id:
             user_query["extrainfo__national_id"] = national_id
 

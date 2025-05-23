@@ -23,8 +23,8 @@ def get_user_signup_source():
     )
 
 
-class NelpEdxappUserReadOnlySerializer(serializers.Serializer):
-    """Mock serializer for NelpEdxappUserReadOnlySerializer."""
+class TestEdxappUserReadOnlySerializer(serializers.Serializer):
+    """Mock serializer for CoreEdxappUserReadOnlySerializer."""
     username = serializers.CharField()
     email = serializers.EmailField()
 
@@ -40,9 +40,9 @@ class NelpEdxappUserReadOnlySerializer(serializers.Serializer):
 
 
 def get_user_read_only_serializer():
-    """Return test model.
+    """Return test Serializer.
 
     Returns:
-        UserSignupSource dummy model.
+        Dummy TestEdxappUserReadOnlySerializer.
     """
-    return NelpEdxappUserReadOnlySerializer
+    return TestEdxappUserReadOnlySerializer

@@ -2,12 +2,12 @@
 from django.forms.models import model_to_dict
 from eox_core.edxapp_wrapper.users import get_user_read_only_serializer
 
-NelpEdxappUserReadOnlySerializer = get_user_read_only_serializer()
+CoreEdxappUserReadOnlySerializer = get_user_read_only_serializer()
 
 
-class NelpUserReadOnlySerializer(NelpEdxappUserReadOnlySerializer):
+class NelpUserReadOnlySerializer(CoreEdxappUserReadOnlySerializer):
     """
-    Serializer to extend eox-core's NelpEdxappUser serializer.
+    Serializer to extend eox-core's CoreEdxappUserReadOnly serializer.
     """
     def to_representation(self, user):
         """

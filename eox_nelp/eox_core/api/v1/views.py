@@ -78,10 +78,10 @@ class NelpEdxappUser(CoreEdxappUser):
         user_query = self.get_user_query(request)
         user = get_object_or_404(User, **user_query)
         admin_fields = getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}).get(
-            "admin_fields", {}
+            "admin_fields", {},
         )
         serialized_user = NelpUserReadOnlySerializer(
-            user, custom_fields=admin_fields, context={"request": request}
+            user, custom_fields=admin_fields, context={"request": request},
         )
         response_data = serialized_user.data
 

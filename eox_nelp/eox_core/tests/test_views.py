@@ -27,8 +27,8 @@ class NelpEdxappUserTestCase(TestCase):
                 national_id='1234567890',
                 arabic_name='اسم عربي',
                 arabic_first_name='الاسم الأول',
-                arabic_last_name='اسم العائلة'
-            )
+                arabic_last_name='اسم العائلة',
+            ),
         )
 
         # Mock get_query_params to return request.GET

@@ -18,7 +18,7 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass'
+            password='testpass',
         )
 
         # Create ExtraInfo instance
@@ -27,14 +27,14 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
             national_id='1234567890',
             arabic_name='اسم عربي',
             arabic_first_name='الاسم الأول',
-            arabic_last_name='اسم العائلة'
+            arabic_last_name='اسم العائلة',
         )
 
         # Create user without extrainfo
         self.user_without_extrainfo = User.objects.create_user(
             username='usernoextra',
             email='noextra@example.com',
-            password='testpass'
+            password='testpass',
         )
 
     def test_to_representation(self):

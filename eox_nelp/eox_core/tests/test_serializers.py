@@ -30,6 +30,13 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
             arabic_last_name='اسم العائلة'
         )
 
+        # Create user without extrainfo
+        self.user_without_extrainfo = User.objects.create_user(
+            username='usernoextra',
+            email='noextra@example.com',
+            password='testpass'
+        )
+
     def test_to_representation(self):
         """Test serializer's to_representation method.
 
@@ -46,3 +53,19 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
         self.assertEqual(data['extrainfo']['arabic_name'], 'اسم عربي')
         self.assertEqual(data['extrainfo']['arabic_first_name'], 'الاسم الأول')
         self.assertEqual(data['extrainfo']['arabic_last_name'], 'اسم العائلة')
+
+    def test_to_representation_without_extrainfo(self):
+        """Test serializer's to_representation method for user without extrainfo.
+
+        Expected behavior:
+            - Returns serialized data with empty extrainfo dict
+            - Base user fields are still present
+        """
+        serializer = NelpUserReadOnlySerializer(self.user_without_extrainfo)
+
+        data = serializer.data
+
+        self.assertIn('extrainfo', data)
+        self.assertEqual(data['extrainfo'], {})
+        self.assertEqual(data['username'], 'usernoextra')
+        self.assertEqual(data['email'], 'noextra@example.com')

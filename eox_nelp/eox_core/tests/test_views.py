@@ -41,9 +41,12 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns query dict with username
+            - Query contains the correct username
+            - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
         self.mock_get_query_params.return_value = {'username': 'testuser'}
+
         query = self.view.get_user_query(request)
 
         self.assertEqual(query, {'username': 'testuser'})
@@ -54,9 +57,12 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns query dict with email
+            - Query contains the correct email
+            - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
         self.mock_get_query_params.return_value = {'email': 'test@example.com'}
+
         query = self.view.get_user_query(request)
 
         self.assertEqual(query, {'email': 'test@example.com'})
@@ -67,9 +73,12 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns query dict with extrainfo__national_id
+            - Query contains the correct national_id in extrainfo format
+            - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
         self.mock_get_query_params.return_value = {'national_id': '1234567890'}
+
         query = self.view.get_user_query(request)
 
         self.assertEqual(query, {'extrainfo__national_id': '1234567890'})
@@ -79,10 +88,12 @@ class NelpEdxappUserTestCase(TestCase):
         """Test get_user_query method with no parameters.
 
         Expected behavior:
-            - Raises ValidationError
+            - Raises ValidationError with correct error message
+            - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
         self.mock_get_query_params.return_value = {}
+
         with self.assertRaises(ValidationError) as context:
             self.view.get_user_query(request)
 
@@ -96,24 +107,22 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns 200 status code
-            - Returns serialized user data
+            - Returns serialized user data in expected format
+            - get_object_or_404 is called with correct User model and username
+            - Serializer class is instantiated
+            - get_query_params is called exactly once with the request
         """
-        # Setup mocks
         mock_get_object.return_value = self.mock_user
         mock_serializer = MagicMock()
         mock_serializer.data = {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}}
         mock_serializer_class.return_value = mock_serializer
         self.mock_get_query_params.return_value = {'username': 'testuser'}
-
-        # Make request
         request = self.factory.get('/')
+
         response = self.view.get(request)
 
-        # Verify response
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}})
-
-        # Verify mocks were called correctly
         mock_get_object.assert_called_once_with(User, username='testuser')
         mock_serializer_class.assert_called_once()
         self.mock_get_query_params.assert_called_once_with(request)
@@ -125,24 +134,22 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns 200 status code
-            - Returns serialized user data
+            - Returns serialized user data in expected format
+            - get_object_or_404 is called with correct User model and national_id
+            - Serializer class is instantiated
+            - get_query_params is called exactly once with the request
         """
-        # Setup mocks
         mock_get_object.return_value = self.mock_user
         mock_serializer = MagicMock()
         mock_serializer.data = {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}}
         mock_serializer_class.return_value = mock_serializer
         self.mock_get_query_params.return_value = {'national_id': '1234567890'}
-
-        # Make request
         request = self.factory.get('/')
+
         response = self.view.get(request)
 
-        # Verify response
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}})
-
-        # Verify mocks were called correctly
         mock_get_object.assert_called_once_with(User, extrainfo__national_id='1234567890')
         mock_serializer_class.assert_called_once()
         self.mock_get_query_params.assert_called_once_with(request)

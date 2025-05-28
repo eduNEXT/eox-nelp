@@ -1,5 +1,5 @@
 """
-Eox-nelp API v1 views to extender eox-core api v1 views.
+Eox-nelp API v1 views to extend eox-core api v1 views.
 """
 from django.conf import settings
 from django.contrib.auth import get_user_model

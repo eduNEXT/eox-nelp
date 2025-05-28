@@ -38,6 +38,7 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
             - Extrainfo contains all expected fields
         """
         serializer = NelpUserReadOnlySerializer(self.user)
+
         data = serializer.data
 
         self.assertIn('extrainfo', data)

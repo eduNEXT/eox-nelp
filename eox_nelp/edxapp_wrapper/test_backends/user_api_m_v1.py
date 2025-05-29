@@ -30,3 +30,12 @@ def get_errors():
         "AccountValidationError": AccountValidationError,
         "AccountUpdateError": AccountUpdateError,
     })
+
+
+def get_models():
+    """Return test module.
+
+    Returns:
+        Mock instance.
+    """
+    return Mock()

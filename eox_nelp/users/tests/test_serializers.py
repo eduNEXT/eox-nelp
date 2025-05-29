@@ -1,11 +1,11 @@
 """
-Test file for eox_core serializers.
+Test file for users serializers.
 """
 from custom_reg_form.models import ExtraInfo
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from eox_nelp.eox_core.api.v1.serializers import NelpUserReadOnlySerializer
+from eox_nelp.users.api.v1.serializers import NelpUserReadOnlySerializer
 
 User = get_user_model()
 

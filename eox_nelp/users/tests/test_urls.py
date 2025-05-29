@@ -1,10 +1,10 @@
 """
-Test file for eox_core URLs.
+Test file for users URLs.
 """
 from django.test import TestCase
 from django.urls import resolve, reverse
 
-from eox_nelp.eox_core.api.v1.views import NelpEdxappUser
+from eox_nelp.users.api.v1.views import NelpEdxappUser
 
 
 class URLsTestCase(TestCase):
@@ -17,8 +17,9 @@ class URLsTestCase(TestCase):
             - URL name resolves to correct path
             - Path resolves to correct view
         """
-        url = reverse('eox-core:v1:edxapp-user')
-        self.assertEqual(url, '/eox-core/api/v1/user/')
+        url = reverse('users:v1:edxapp-user')
 
         resolver = resolve(url)
+
+        self.assertEqual(url, '/api/users/v1/user/')
         self.assertEqual(resolver.func.view_class, NelpEdxappUser)

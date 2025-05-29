@@ -27,7 +27,7 @@ class NelpEdxappUser(CoreEdxappUser):
 
         **Example Requests**
 
-            GET eox-nelp/eox-core/api/v1/user/?username=johndoe
+            GET api/users/v1/user/?username=johndoe
 
             Query parameters: {
               "username": "johndoe",

@@ -1,14 +1,14 @@
 """
-Test file for eox_core views.
+Test file for users views.
 """
+from unittest.mock import MagicMock, patch
+
 from django.contrib.auth import get_user_model
-from django.test import TestCase
-from mock import MagicMock, patch
+from django.test import RequestFactory, TestCase
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.test import APIRequestFactory
 
-from eox_nelp.eox_core.api.v1.views import NelpEdxappUser
+from eox_nelp.users.api.v1.views import NelpEdxappUser
 
 User = get_user_model()
 
@@ -18,8 +18,8 @@ class NelpEdxappUserTestCase(TestCase):
 
     def setUp(self):
         """Set up test case."""
+        self.factory = RequestFactory()
         self.view = NelpEdxappUser()
-        self.factory = APIRequestFactory()
         self.mock_user = MagicMock(
             username='testuser',
             email='test@example.com',
@@ -30,17 +30,13 @@ class NelpEdxappUserTestCase(TestCase):
                 arabic_last_name='اسم العائلة',
             ),
         )
-
-        # Mock get_query_params to return request.GET
-        patcher = patch.object(NelpEdxappUser, 'get_query_params', return_value={})
-        self.mock_get_query_params = patcher.start()
-        self.addCleanup(patcher.stop)
+        self.mock_get_query_params = MagicMock()
+        self.view.get_query_params = self.mock_get_query_params
 
     def test_get_user_query_with_username(self):
         """Test get_user_query method with username parameter.
 
         Expected behavior:
-            - Returns query dict with username
             - Query contains the correct username
             - get_query_params is called exactly once with the request
         """
@@ -57,7 +53,6 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns query dict with email
-            - Query contains the correct email
             - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
@@ -73,7 +68,6 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Returns query dict with extrainfo__national_id
-            - Query contains the correct national_id in extrainfo format
             - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
@@ -89,6 +83,7 @@ class NelpEdxappUserTestCase(TestCase):
 
         Expected behavior:
             - Raises ValidationError with correct error message
+            - Query contains the correct error message
             - get_query_params is called exactly once with the request
         """
         request = self.factory.get('/')
@@ -100,8 +95,8 @@ class NelpEdxappUserTestCase(TestCase):
         self.assertEqual(context.exception.detail[0], 'Email or username or national_id needed')
         self.mock_get_query_params.assert_called_once_with(request)
 
-    @patch('eox_nelp.eox_core.api.v1.views.get_object_or_404')
-    @patch('eox_nelp.eox_core.api.v1.views.NelpUserReadOnlySerializer')
+    @patch('eox_nelp.users.api.v1.views.get_object_or_404')
+    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
     def test_get_with_username(self, mock_serializer_class, mock_get_object):
         """Test get method with username parameter.
 
@@ -127,8 +122,8 @@ class NelpEdxappUserTestCase(TestCase):
         mock_serializer_class.assert_called_once()
         self.mock_get_query_params.assert_called_once_with(request)
 
-    @patch('eox_nelp.eox_core.api.v1.views.get_object_or_404')
-    @patch('eox_nelp.eox_core.api.v1.views.NelpUserReadOnlySerializer')
+    @patch('eox_nelp.users.api.v1.views.get_object_or_404')
+    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
     def test_get_with_national_id(self, mock_serializer_class, mock_get_object):
         """Test get method with national_id parameter.
 

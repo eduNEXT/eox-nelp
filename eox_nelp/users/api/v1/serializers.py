@@ -1,4 +1,6 @@
-"""Serializer to extend eox-core's NelpEdxappUser serializer."""
+"""
+Users API v1 serializers.
+"""
 from django.forms.models import model_to_dict
 from eox_core.edxapp_wrapper.users import get_user_read_only_serializer
 

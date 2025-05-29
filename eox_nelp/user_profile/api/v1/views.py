@@ -19,11 +19,11 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from eox_nelp.edxapp_wrapper.user_api import accounts, errors
+from eox_nelp.edxapp_wrapper.user_api import errors
 from eox_nelp.one_time_password.view_decorators import validate_otp
 from eox_nelp.pearson_vue_engine.tasks import real_time_import_task_v2
+from eox_nelp.user_profile.api.v1.helpers import update_account, update_extrainfo
 from eox_nelp.user_profile.required_fields_validation import validate_required_user_fields
-from eox_nelp.utils import save_extrainfo
 
 logger = logging.getLogger(__name__)
 
@@ -56,28 +56,10 @@ def update_user_data(request):
     """
     try:
         with transaction.atomic():
-            accounts.api.update_account_settings(request.user, request.data)
-
-            # This extra code block is required since the method update_account_settings just
-            # allows to update fields defined in the AccountUserSerializer and the AccountLegacyProfileSerializer
-            # so some fields like first_name and last_name are not editable in the standad implementation.
-
-            extra_account_user_fields = getattr(settings, "EXTRA_ACCOUNT_USER_FIELDS", [])
-
-            for field in extra_account_user_fields:
-                if (value := request.data.get(field)) and hasattr(request.user, field):
-                    setattr(request.user, field, value)
-                    request.user.save()
-            # Also some fields related ExtraInfo are not editable too  in the standard implementation. So we need
-            # save_extrainfo_field method with the desired settings.
-            required_user_extra_info_fields = getattr(settings, 'USER_PROFILE_API_EXTRA_INFO_FIELDS', [])
-            extra_info_data = {
-                field: request.data[field] for field in required_user_extra_info_fields if field in request.data
-            }
-
-            if extra_info_data:
-                save_extrainfo(request.user, extra_info_data)
-
+            user = request.user
+            data = request.data
+            update_account(user, data)
+            update_extrainfo(user, data)
     except errors.AccountValidationError as err:
         return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
     except errors.AccountUpdateError as err:

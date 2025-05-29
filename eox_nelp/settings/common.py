@@ -28,6 +28,7 @@ JSON_API_REST_FRAMEWORK = 'rest_framework_json_api'
 EOX_AUDIT_MODEL_APP = 'eox_audit_model.apps.EoxAuditModelConfig'
 EOX_SUPPORT_APP = 'eox_support.apps.EoxSupportConfig'
 CUSTOM_REG_FORM_APP = 'custom_reg_form.apps.CustomRegFormConfig'
+LOCALE_PATHS = ["eox_nelp/locale"]
 
 
 def plugin_settings(settings):

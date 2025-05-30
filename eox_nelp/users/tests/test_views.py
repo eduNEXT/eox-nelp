@@ -4,16 +4,17 @@ Test file for users views.
 from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
+from rest_framework.test import APITestCase
 
 from eox_nelp.users.api.v1.views import NelpEdxappUser
 
 User = get_user_model()
 
 
-class NelpEdxappUserTestCase(TestCase):
+class NelpEdxappUserTestCase(APITestCase):
     """Test case for NelpEdxappUser view."""
 
     def setUp(self):

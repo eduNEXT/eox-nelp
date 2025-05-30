@@ -49,10 +49,10 @@ class NelpUserReadOnlySerializerTestCase(TestCase):
         data = serializer.data
 
         self.assertIn('extrainfo', data)
-        self.assertEqual(data['extrainfo']['national_id'], '1234567890')
-        self.assertEqual(data['extrainfo']['arabic_name'], 'اسم عربي')
-        self.assertEqual(data['extrainfo']['arabic_first_name'], 'الاسم الأول')
-        self.assertEqual(data['extrainfo']['arabic_last_name'], 'اسم العائلة')
+        self.assertEqual(data['extrainfo']['national_id'], self.extra_info.national_id)
+        self.assertEqual(data['extrainfo']['arabic_name'], self.extra_info.arabic_name)
+        self.assertEqual(data['extrainfo']['arabic_first_name'], self.extra_info.arabic_first_name)
+        self.assertEqual(data['extrainfo']['arabic_last_name'], self.extra_info.arabic_last_name)
 
     def test_to_representation_without_extrainfo(self):
         """Test serializer's to_representation method for user without extrainfo.

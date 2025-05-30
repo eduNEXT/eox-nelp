@@ -8,7 +8,7 @@ from eox_core.api.v1.views import EdxappUser as CoreEdxappUser
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from .serializers import NelpUserReadOnlySerializer
+from eox_nelp.users.api.v1.serializers import NelpUserReadOnlySerializer
 
 User = get_user_model()
 
@@ -21,13 +21,13 @@ class NelpEdxappUser(CoreEdxappUser):
     def get(self, request, *args, **kwargs):
         """
         Retrieves information about an edxapp user,
-        given an email or a username.
+        given an email, username or national_id.
 
         The username prevails over the email when both are provided to get the user.
 
         **Example Requests**
 
-            GET api/users/v1/user/?username=johndoe
+            GET eox-nelp/api/users/v1/user/?username=johndoe
 
             Query parameters: {
               "username": "johndoe",
@@ -83,9 +83,8 @@ class NelpEdxappUser(CoreEdxappUser):
         serialized_user = NelpUserReadOnlySerializer(
             user, custom_fields=admin_fields, context={"request": request},
         )
-        response_data = serialized_user.data
 
-        return Response(response_data)
+        return Response(serialized_user.data)
 
     def get_user_query(self, request, query_params=None):
         """
@@ -102,8 +101,6 @@ class NelpEdxappUser(CoreEdxappUser):
             raise ValidationError(detail="Email or username or national_id needed")
 
         user_query = {}
-        # if hasattr(self, "site") and self.site: Not tenant aware
-        #     user_query["site"] = self.site
         if username:
             user_query["username"] = username
         elif email:

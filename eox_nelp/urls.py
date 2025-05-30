@@ -37,4 +37,5 @@ urlpatterns = [
         'api/external-certificates/',
         include('eox_nelp.external_certificates.api.urls', namespace='external-certificates-api'),
     ),
+    path('api/users/', include('eox_nelp.users.urls', namespace='users')),
 ]

@@ -134,6 +134,7 @@ EOX_CORE_GRADES_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.grades_m_v1"
 EOX_CORE_CERTIFICATES_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.certificates_m_v1"
 EOX_CORE_USERS_BACKEND = "eox_nelp.edxapp_wrapper.test_backends.users_p_v1"
 EOX_CORE_BEARER_AUTHENTICATION = 'eox_core.edxapp_wrapper.backends.bearer_authentication_j_v1_test'
+EOX_CORE_LOAD_PERMISSIONS = False
 
 GET_SITE_CONFIGURATION_MODULE = 'eox_tenant.edxapp_wrapper.backends.site_configuration_module_test_v1'
 GET_THEMING_HELPERS = 'eox_tenant.edxapp_wrapper.backends.theming_helpers_test_v1'

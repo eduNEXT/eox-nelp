@@ -1,15 +1,15 @@
 """
 Test file for users views.
 """
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
+from custom_reg_form.models import ExtraInfo
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory
+from django.urls import reverse
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient, APITestCase
 
-from eox_nelp.users.api.v1.views import NelpEdxappUser
+from eox_nelp.users.api.v1.views import CoreEdxappUser
 
 User = get_user_model()
 
@@ -19,133 +19,130 @@ class NelpEdxappUserTestCase(APITestCase):
 
     def setUp(self):
         """Set up test case."""
-        self.factory = RequestFactory()
-        self.view = NelpEdxappUser()
-        self.mock_user = MagicMock(
+        self.url = reverse('users:v1:edxapp-user')
+        self.client = APIClient()
+
+        # Create admin user for authentication
+        self.client_user, _ = User.objects.get_or_create(username='test_admin', password='test123')
+        self.client.force_authenticate(self.client_user)
+        self.test_user, _ = User.objects.get_or_create(
             username='testuser',
             email='test@example.com',
-            extrainfo=MagicMock(
-                national_id='1234567890',
-                arabic_name='اسم عربي',
-                arabic_first_name='الاسم الأول',
-                arabic_last_name='اسم العائلة',
-            ),
+            defaults={
+                'is_active': True,
+            },
         )
-        self.mock_get_query_params = MagicMock()
-        self.view.get_query_params = self.mock_get_query_params
+        self.test_user.extrainfo = ExtraInfo.objects.create(  # pylint: disable=no-member
+            user=self.test_user,
+            national_id='1234567890',
+            arabic_name='اسم عربي',
+            arabic_first_name='الاسم الأول',
+            arabic_last_name='اسم العائلة',
+        )
 
-    def test_get_user_query_with_username(self):
+        # Patch authentication classes
+        self.auth_patcher = patch.object(
+            CoreEdxappUser,
+            'authentication_classes',
+            [],
+        )
+        self.auth_patcher.start()
+
+        # Patch permission classes
+        self.perm_patcher = patch.object(
+            CoreEdxappUser,
+            'permission_classes',
+            [],
+        )
+        self.perm_patcher.start()
+
+    def tearDown(self):
+        """Clean up after each test."""
+        self.auth_patcher.stop()
+        self.perm_patcher.stop()
+        super().tearDown()
+
+    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
+    def test_get_user_query_with_username(self, mock_serializer_class):
         """Test get_user_query method with username parameter.
 
         Expected behavior:
-            - Query contains the correct username
-            - get_query_params is called exactly once with the request
+            - Returns 200 status code
+            - Response data matches expected serialized user data
+            - NelpUserReadOnlySerializer is instantiated once
         """
-        request = self.factory.get('/')
-        self.mock_get_query_params.return_value = {'username': 'testuser'}
+        serializer_data = {
+            'username': self.test_user.username,
+            'extrainfo': {'national_id': self.test_user.extrainfo.national_id},
+        }
+        mock_serializer_class.return_value.data = serializer_data
 
-        query = self.view.get_user_query(request)
+        response = self.client.get(f"{self.url}?username={self.test_user.username}")
 
-        self.assertEqual(query, {'username': 'testuser'})
-        self.mock_get_query_params.assert_called_once_with(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer_data)
+        mock_serializer_class.assert_called_once()
 
-    def test_get_user_query_with_email(self):
+    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
+    def test_get_user_query_with_email(self, mock_serializer_class):
         """Test get_user_query method with email parameter.
 
         Expected behavior:
-            - Returns query dict with email
-            - get_query_params is called exactly once with the request
+            - Returns 200 status code
+            - Response data matches expected serialized user data
+            - NelpUserReadOnlySerializer is instantiated once
         """
-        request = self.factory.get('/')
-        self.mock_get_query_params.return_value = {'email': 'test@example.com'}
+        serializer_data = {
+            'username': self.test_user.username,
+            'email': self.test_user.email,
+        }
+        mock_serializer_class.return_value.data = serializer_data
 
-        query = self.view.get_user_query(request)
+        response = self.client.get(f"{self.url}?email={self.test_user.email}")
 
-        self.assertEqual(query, {'email': 'test@example.com'})
-        self.mock_get_query_params.assert_called_once_with(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer_data)
+        mock_serializer_class.assert_called_once()
 
-    def test_get_user_query_with_national_id(self):
+    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
+    def test_get_user_query_with_national_id(self, mock_serializer_class):
         """Test get_user_query method with national_id parameter.
 
         Expected behavior:
-            - Returns query dict with extrainfo__national_id
-            - get_query_params is called exactly once with the request
+            - Returns 200 status code
+            - Response data matches expected serialized user data
+            - NelpUserReadOnlySerializer is instantiated once
         """
-        request = self.factory.get('/')
-        self.mock_get_query_params.return_value = {'national_id': '1234567890'}
+        serializer_data = {
+            'username': self.test_user.username,
+            'extrainfo': {'national_id': self.test_user.extrainfo.national_id},
+        }
+        mock_serializer_class.return_value.data = serializer_data
 
-        query = self.view.get_user_query(request)
+        response = self.client.get(f"{self.url}?national_id={self.test_user.extrainfo.national_id}")
 
-        self.assertEqual(query, {'extrainfo__national_id': '1234567890'})
-        self.mock_get_query_params.assert_called_once_with(request)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer_data)
+        mock_serializer_class.assert_called_once()
 
     def test_get_user_query_no_params(self):
         """Test get_user_query method with no parameters.
 
         Expected behavior:
-            - Raises ValidationError with correct error message
-            - Query contains the correct error message
-            - get_query_params is called exactly once with the request
+            - Returns 400 Bad Request status code
+            - Error message indicates missing required parameters
         """
-        request = self.factory.get('/')
-        self.mock_get_query_params.return_value = {}
+        response = self.client.get(self.url)
 
-        with self.assertRaises(ValidationError) as context:
-            self.view.get_user_query(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]), 'Email or username or national_id needed')
 
-        self.assertEqual(context.exception.detail[0], 'Email or username or national_id needed')
-        self.mock_get_query_params.assert_called_once_with(request)
-
-    @patch('eox_nelp.users.api.v1.views.get_object_or_404')
-    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
-    def test_get_with_username(self, mock_serializer_class, mock_get_object):
-        """Test get method with username parameter.
+    def test_get_user_not_found(self):
+        """Test get method when user is not found.
 
         Expected behavior:
-            - Returns 200 status code
-            - Returns serialized user data in expected format
-            - get_object_or_404 is called with correct User model and username
-            - Serializer class is instantiated
-            - get_query_params is called exactly once with the request
+            - Returns 404 Not Found status code
         """
-        mock_get_object.return_value = self.mock_user
-        mock_serializer = MagicMock()
-        mock_serializer.data = {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}}
-        mock_serializer_class.return_value = mock_serializer
-        self.mock_get_query_params.return_value = {'username': 'testuser'}
-        request = self.factory.get('/')
+        response = self.client.get(f"{self.url}?username=nonexistent")
 
-        response = self.view.get(request)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}})
-        mock_get_object.assert_called_once_with(User, username='testuser')
-        mock_serializer_class.assert_called_once()
-        self.mock_get_query_params.assert_called_once_with(request)
-
-    @patch('eox_nelp.users.api.v1.views.get_object_or_404')
-    @patch('eox_nelp.users.api.v1.views.NelpUserReadOnlySerializer')
-    def test_get_with_national_id(self, mock_serializer_class, mock_get_object):
-        """Test get method with national_id parameter.
-
-        Expected behavior:
-            - Returns 200 status code
-            - Returns serialized user data in expected format
-            - get_object_or_404 is called with correct User model and national_id
-            - Serializer class is instantiated
-            - get_query_params is called exactly once with the request
-        """
-        mock_get_object.return_value = self.mock_user
-        mock_serializer = MagicMock()
-        mock_serializer.data = {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}}
-        mock_serializer_class.return_value = mock_serializer
-        self.mock_get_query_params.return_value = {'national_id': '1234567890'}
-        request = self.factory.get('/')
-
-        response = self.view.get(request)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'username': 'testuser', 'extrainfo': {'national_id': '1234567890'}})
-        mock_get_object.assert_called_once_with(User, extrainfo__national_id='1234567890')
-        mock_serializer_class.assert_called_once()
-        self.mock_get_query_params.assert_called_once_with(request)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

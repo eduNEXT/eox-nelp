@@ -26,6 +26,10 @@ def update_account(user, data):
     - Manually updates additional fields (e.g., first_name, last_name) defined in EXTRA_ACCOUNT_USER_FIELDS
       that are not handled by the standard serializers.
 
+    Args:
+        user (User): The Django user instance whose data will be updated.
+        data (dict): Dictionary containing the fields and values to be updated.
+
     Raises:
         AccountValidationError: If phone number validation fails.
     """
@@ -59,6 +63,10 @@ def update_extrainfo(user, data):
     - Persists the data using save_extrainfo helper.
 
     Fields are saved only if they are present in the request.
+
+    Args:
+        user (User): The Django user instance whose extra info will be updated.
+        data (dict): Dictionary containing the extra info fields and values to be updated.
     """
     required_user_extra_info_fields = getattr(settings, 'USER_PROFILE_API_EXTRA_INFO_FIELDS', [])
     extra_info_data = {

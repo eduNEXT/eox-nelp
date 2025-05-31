@@ -47,7 +47,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that update_account_settings method has called once.
             - Check cdd_task async task is called user.id
         """
-        payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
+        payload = {"phone_number": "+573219990000", "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
 
         response = self.client.post(url_endpoint, payload, format="json")
@@ -69,7 +69,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that update_account_settings method has called once.
             - Check cdd_task async is not called.
         """
-        payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
+        payload = {"phone_number": "+573219990000", "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
         accounts.api.update_account_settings.side_effect = errors.AccountValidationError(
             field_errors="Invalid phone number",
@@ -94,7 +94,7 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
             - Check that update_account_settings method has called once.
             - Check cdd_task async is not called.
         """
-        payload = {"phone_number": 3219990000, "one_time_password": "correct26"}
+        payload = {"phone_number": "+573219990000", "one_time_password": "correct26"}
         url_endpoint = reverse(self.reverse_viewname)
         expected_response = {
             "developer_message": "The testing method failed",
@@ -185,6 +185,45 @@ class UpdateUserDataTestCase(POSTAuthenticatedTestMixin, APITestCase):
         self.assertEqual(self.user.extrainfo.arabic_first_name, payload["arabic_first_name"])
         self.assertEqual(self.user.extrainfo.arabic_last_name, payload["arabic_last_name"])
         cdd_task_mock.delay.assert_called_with(user_id=self.user.id, action_name="cdd")
+
+    @override_settings(ENABLE_OTP_VALIDATION=False)
+    def test_invalid_phone_number(self):
+        """
+        Test that a bad request is returned when an invalid phone number is provided.
+
+        Expected behavior:
+            - Check the response contains fields_errors.
+            - Status code 400.
+            - Check that update_account_settings method is not called.
+        """
+        payload = {"phone_number": "+573219990", "one_time_password": ""}
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertDictEqual(response.json(), {"field_errors": {"phone_number": ["Invalid phone number"]}})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        accounts.api.update_account_settings.assert_not_called()
+
+    @override_settings(ENABLE_OTP_VALIDATION=False, USER_PROFILE_API_VALIDATE_PHONE_NUMBER=False)
+    def test_allow_invalid_phone_number(self):
+        """
+        Test that the request completes its execution successfully when an invalid phone numer is
+        provided and USER_PROFILE_API_VALIDATE_PHONE_NUMBER is False.
+
+        Expected behavior:
+            - Check the response says that the field has been updated.
+            - Status code 200.
+            - Check that update_account_settings method has called once.
+        """
+        payload = {"phone_number": "+573219990", "one_time_password": "correct26"}
+        url_endpoint = reverse(self.reverse_viewname)
+
+        response = self.client.post(url_endpoint, payload, format="json")
+
+        self.assertDictEqual(response.json(), {"message": "User's fields has been updated successfully"})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        accounts.api.update_account_settings.assert_called_once_with(self.user, payload)
 
 
 class GetValidatedUserFieldsTestCase(APITestCase):

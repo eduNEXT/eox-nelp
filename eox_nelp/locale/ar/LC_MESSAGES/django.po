@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eox-nelp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-23 16:19-0600\n"
+"POT-Creation-Date: 2025-05-29 17:36-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Andrey Canon <andrey.canon@edunext.co>\n"
 "Language-Team: Arabic\n"
@@ -19,24 +19,43 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: eox_nelp/middleware.py:106
-msgid "Select your"
-msgstr "أدخل"
+#: eox_nelp/init_pipeline.py:37
+msgid "Male"
+msgstr "ذكر"
 
-#: eox_nelp/middleware.py:111
-msgid "Enter your"
-msgstr "حدد"
+#: eox_nelp/init_pipeline.py:38
+msgid "Female"
+msgstr "أنثى"
 
-#: eox_nelp/third_party_auth/pipeline.py:99
+#: eox_nelp/notifications/admin.py:42
+msgid "Any date"
+msgstr "أي تاريخ"
+
+#: eox_nelp/notifications/admin.py:44
+msgid "Next day"
+msgstr "اليوم التالي"
+
+#: eox_nelp/notifications/admin.py:51
+msgid "Next seven days"
+msgstr "الأيام السبعة القادمة"
+
+#: eox_nelp/notifications/admin.py:58
+msgid "Next month"
+msgstr "الشهر القادم"
+
+#: eox_nelp/third_party_auth/pipeline.py:144
 msgid "It is not allowed to auto associate staff or admin users"
 msgstr "لا يجوز ربط الموظفين أو المستخدمين الإداريين تلقائيًا"
 
-#: eox_nelp/third_party_auth/pipeline.py:99
+#: eox_nelp/third_party_auth/pipeline.py:146
 msgid ""
-"You are trying to access with a user that already exists with privileged permissions."
-" Please try to authenticate on the site where you registered for the first time "
-"or contact support to change permissions."
+"You are trying to access with a user that already exists with privileged "
+"permissions. Please try to authenticate on the site where you registered for "
+"the first time or contact support to change permissions."
 msgstr ""
-"أنت تحاول الوصول مع مستخدم موجود بالفعل بأذونات مميزة."
-"يرجى محاولة المصادقة على الموقع الذي قمت بالتسجيل فيه لأول مرة"
-"أو اتصل بالدعم لتغيير الأذونات."
+"أنت تحاول الوصول مع مستخدم موجود بالفعل بأذونات مميزة.يرجى محاولة المصادقة "
+"على الموقع الذي قمت بالتسجيل فيه لأول مرةأو اتصل بالدعم لتغيير الأذونات."
+
+#: eox_nelp/user_profile/api/v1/helpers.py:36
+msgid "Invalid phone number"
+msgstr "رقم الهاتف غير صالح"

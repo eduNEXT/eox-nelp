@@ -169,3 +169,6 @@ TEMPLATES = [
         },
     },
 ]
+
+# ------------user profile api settings------------------------------
+USER_PROFILE_API_VALIDATE_PHONE_NUMBER = True

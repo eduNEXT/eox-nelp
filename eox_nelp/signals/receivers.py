@@ -16,6 +16,7 @@ Functions:
 """
 import logging
 
+from crum import get_current_user
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
@@ -32,6 +33,7 @@ from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
+    set_default_advanced_modules,
     update_mt_training_stage,
 )
 from eox_nelp.signals.utils import _generate_external_certificate_data, get_completed_and_graded
@@ -443,4 +445,27 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
         user_id=user.id,
         exam_id=str(course_id),
         action_name="rti",
+    )
+
+
+def receive_course_publish(course_key, **kwargs):  # pylint: disable=unused-argument
+    """
+    Django signal receiver that triggers the `set_default_advanced_modules` async task when the
+    `course_published` signal is sent.
+
+    This function listens for the `course_published` signal and, upon receiving the signal, calls
+    the asynchronous task `set_default_advanced_modules` to update the `advanced_modules` of the
+    published course. The task is executed with the `course_key` and the current user's ID.
+
+    Args:
+        sender: The sender of the signal.
+        course_key: The ID of the course that was published, passed as a CourseLocater instance.
+        **kwargs: Additional keyword arguments passed with the signal, if any.
+
+    Returns:
+        None: This function does not return any value. It triggers an asynchronous task.
+    """
+    set_default_advanced_modules.delay(
+        course_id=str(course_key),
+        user_id=get_current_user().id,
     )

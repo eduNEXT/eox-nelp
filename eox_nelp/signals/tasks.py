@@ -17,12 +17,13 @@ from eox_core.edxapp_wrapper.enrollments import get_enrollment
 from eventtracking import tracker
 from nelc_api_clients.clients.futurex import FuturexApiClient
 from nelc_api_clients.clients.mt import MinisterOfTourismApiClient
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from eox_nelp.edxapp_wrapper.course_blocks import get_student_module_as_dict
 from eox_nelp.edxapp_wrapper.course_overviews import CourseOverview
 from eox_nelp.edxapp_wrapper.grades import SubsectionGradeFactory
 from eox_nelp.edxapp_wrapper.modulestore import modulestore
+from eox_nelp.edxapp_wrapper.site_configuration import configuration_helpers
 from eox_nelp.signals.utils import _user_has_passing_grade, get_completed_and_graded, get_completion_summary
 
 logger = logging.getLogger(__name__)
@@ -227,3 +228,34 @@ def course_completion_mt_updater(user_id, course_id, stage_result, force_graded=
         national_id=national_id,
         stage_result=stage_result,
     )
+
+
+@shared_task
+def set_default_advanced_modules(user_id, course_id):
+    """
+    Updates the `advanced_modules` field of a course with the default advanced modules defined by
+    the course's organization.
+
+    This process retrieves the advanced modules configured at the organization level of the course
+    from the site configuration (using `configuration_helpers.get_value_for_org`). It then adds these
+    modules to the course's `advanced_modules` list (ensuring no duplicates are present).
+
+    The update is performed in the **modulestore**, which stores the course information in the Mongo database.
+
+    Args:
+        user_id (int): The ID of the user performing the update.
+        course_id (str): The ID of the course to be updated, represented as a string.
+
+    Returns:
+        None: The function does not return any value but performs an update in the **modulestore**.
+    """
+    store = modulestore()
+    course_key = CourseKey.from_string(course_id)
+    course = store.get_course(course_key)
+    default_modules = configuration_helpers.get_value_for_org(
+        course_key.org,
+        "DEFAULT_ADVANCED_MODULES",
+        getattr(settings, "DEFAULT_ADVANCED_MODULES", []),
+    )
+    course.advanced_modules = list(set(course.advanced_modules + default_modules))
+    store.update_item(course, user_id)

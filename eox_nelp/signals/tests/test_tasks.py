@@ -28,6 +28,7 @@ from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
+    set_default_advanced_modules,
     update_mt_training_stage,
 )
 from eox_nelp.signals.utils import get_completion_summary
@@ -622,3 +623,53 @@ class CourseCompletionMtUpdaterTestCase(TestCase):
             stage_result=2,
         )
         self.mock_validations()
+
+
+class SetDefaultAdvancedModulesTestCase(TestCase):
+    """Test class for set_default_advanced_modules function."""
+
+    def setUp(self):
+        """ Set common conditions for test cases."""
+        self.user, _ = User.objects.get_or_create(username="1245789652")
+        self.course_id = "course-v1:test+Cx105+2022_T4"
+
+    def tearDown(self):
+        """Restore mocks' state"""
+        modulestore.reset_mock()
+
+    @patch("eox_nelp.signals.tasks.configuration_helpers")
+    def test_successful_updating(self, configuration_helpers_mock):
+        """
+        Test that the course's advanced modules has been updated successfully
+
+        Expected behavior:
+            - modulestore's get_course method has been called once with a CourseLocator.
+            - configuration_helpers' get_value_for_org method has been called with the right data.
+            - the advanced_modules contains the expect elements.
+            - modulestore's update_item method has been called once with the right data.
+        """
+        store = modulestore()
+        course = Mock()
+        course.advanced_modules = ["sga", "ora", "gradebook"]
+        store.get_course.return_value = course
+        course_key = CourseKey.from_string(self.course_id)
+        configuration_helpers_mock.get_value_for_org.return_value = [
+            "completion",
+            "checkboxes",
+            "html",
+            "gradebook",
+        ]
+
+        set_default_advanced_modules(user_id=self.user.id, course_id=self.course_id)
+
+        store.get_course.assert_called_once_with(course_key)
+        configuration_helpers_mock.get_value_for_org.assert_called_once_with(
+            course_key.org,
+            "DEFAULT_ADVANCED_MODULES",
+            [],
+        )
+        self.assertCountEqual(
+            course.advanced_modules,
+            ["sga", "ora", "gradebook", "completion", "checkboxes", "html"],
+        )
+        store.update_item.assert_called_once_with(course, self.user.id)

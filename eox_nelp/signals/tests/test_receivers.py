@@ -890,7 +890,7 @@ class ReceiveCoursePublishTestCase(unittest.TestCase):
 
         receive_course_publish(CourseKey.from_string(course_id))
 
-        task_mock.delay.assert_called_with(
-            course_id=course_id,
-            user_id=user.id,
+        task_mock.apply_async.assert_called_with(
+            args=[user.id, course_id],
+            countdown=5
         )

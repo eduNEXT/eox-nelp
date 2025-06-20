@@ -465,7 +465,7 @@ def receive_course_publish(course_key, **kwargs):  # pylint: disable=unused-argu
     Returns:
         None: This function does not return any value. It triggers an asynchronous task.
     """
-    set_default_advanced_modules.delay(
-        course_id=str(course_key),
-        user_id=get_current_user().id,
+    set_default_advanced_modules.apply_async(
+        args=[get_current_user().id, str(course_key)],
+        countdown=5,
     )

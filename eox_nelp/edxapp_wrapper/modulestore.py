@@ -5,8 +5,9 @@ This contains all the required dependencies from modulestore
 
 Attributes:
     backend:Imported module by using the plugin settings.
-    CourseCreator: Wrapper CourseCreator model.
-    CourseCreatorAdmin: Wrapper CourseCreatorAdmin class.
+    modulestore: Wrapper modulestore class.
+    ItemNotFoundError: Wrapper ItemNotFoundError class.
+    ModuleStoreEnum: Wrapper ModuleStoreEnum class.
 """
 from importlib import import_module
 
@@ -16,3 +17,4 @@ backend = import_module(settings.EOX_NELP_XMODULE_MODULESTORE)
 
 modulestore = backend.get_modulestore()
 ItemNotFoundError = backend.get_exception_ItemNotFoundError()
+ModuleStoreEnum = backend.get_module_store_enum()

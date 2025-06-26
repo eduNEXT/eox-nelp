@@ -18,3 +18,12 @@ def get_exception_ItemNotFoundError():
         Mock class.
     """
     return Exception
+
+
+def get_module_store_enum():
+    """Return test class.
+
+    Returns:
+        Mock class.
+    """
+    return Mock()

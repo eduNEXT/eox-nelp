@@ -3,6 +3,7 @@
 This file contains all the necessary dependencies from
 https://github.com/eduNEXT/edunext-platform/blob/master/common/lib/xmodule/xmodule/modulestore
 """
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore  # pylint: disable=import-error
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -25,3 +26,13 @@ def get_exception_ItemNotFoundError():
         ItemNotFoundError Exception.
     """
     return ItemNotFoundError
+
+
+def get_module_store_enum():
+    """Allow to get ModuleStoreEnum class from
+    https://github.com/nelc/edx-platform/blob/open-release/redwood.nelp/xmodule/modulestore/__init__.py#L44
+
+    Returns:
+        ModuleStoreEnum class.
+    """
+    return ModuleStoreEnum

@@ -448,24 +448,29 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
     )
 
 
-def receive_course_publish(course_key, **kwargs):  # pylint: disable=unused-argument
+def receive_course_created(course, **kwargs):  # pylint: disable=unused-argument
     """
     Django signal receiver that triggers the `set_default_advanced_modules` async task when the
-    `course_published` signal is sent.
+    `COURSE_CREATED` signal is sent.
 
-    This function listens for the `course_published` signal and, upon receiving the signal, calls
+    This function listens for the `COURSE_CREATED` signal and, upon receiving the signal, calls
     the asynchronous task `set_default_advanced_modules` to update the `advanced_modules` of the
-    published course. The task is executed with the `course_key` and the current user's ID.
+    course. The task is executed with the `course_key` and the current user's ID.
 
     Args:
-        sender: The sender of the signal.
-        course_key: The ID of the course that was published, passed as a CourseLocater instance.
+        course <CourseData>: CourseData instance
+            https://github.com/openedx/openedx-events/blob/v9.10.0/openedx_events/content_authoring/data.py#L19
         **kwargs: Additional keyword arguments passed with the signal, if any.
 
     Returns:
         None: This function does not return any value. It triggers an asynchronous task.
     """
+    user = get_current_user()
+
+    if not user:
+        return
+
     set_default_advanced_modules.apply_async(
-        args=[get_current_user().id, str(course_key)],
+        args=[get_current_user().id, str(course.course_key)],
         countdown=5,
     )

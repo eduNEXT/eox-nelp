@@ -39,7 +39,7 @@ from eox_nelp.signals.receivers import (
     mt_course_passed_handler,
     pearson_vue_course_completion_handler,
     pearson_vue_course_passed_handler,
-    receive_course_publish,
+    receive_course_created,
     update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
@@ -874,7 +874,7 @@ class CreateUserSignUpSourceByEnrollmentTestCase(unittest.TestCase):
 
 
 class ReceiveCoursePublishTestCase(unittest.TestCase):
-    """Test class for receive_course_publish function."""
+    """Test class for receive_course_created function."""
 
     @patch("eox_nelp.signals.receivers.get_current_user")
     @patch("eox_nelp.signals.receivers.set_default_advanced_modules")
@@ -888,9 +888,11 @@ class ReceiveCoursePublishTestCase(unittest.TestCase):
         user, _ = User.objects.get_or_create(username="Severus")
         get_current_user_mock.return_value = user
 
-        receive_course_publish(CourseKey.from_string(course_id))
+        receive_course_created(
+            Mock(course_key=CourseKey.from_string(course_id)),
+        )
 
         task_mock.apply_async.assert_called_with(
             args=[user.id, course_id],
-            countdown=5
+            countdown=5,
         )

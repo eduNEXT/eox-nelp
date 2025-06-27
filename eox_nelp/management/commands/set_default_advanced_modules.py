@@ -5,6 +5,7 @@ This command is used to update the `advanced_modules` list in the modulestore
 based on organization-level defaults. It can operate on a specific course
 (using `--course-id`) or all available courses (`--all`).
 """
+import logging
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -13,6 +14,7 @@ from eox_nelp.edxapp_wrapper.modulestore import ModuleStoreEnum
 from eox_nelp.signals.tasks import set_default_advanced_modules
 
 DEFAULT_USER_ID = ModuleStoreEnum.UserID.mgmt_command
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -44,13 +46,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options["all"]:
             courses = CourseOverview.objects.all()
-            self.stdout.write(f"Processing {courses.count()} courses...")
+            logger.info("Processing %s courses...", courses.count())
             for course in courses:
                 set_default_advanced_modules.delay(
                     user_id=DEFAULT_USER_ID,
                     course_id=str(course.id)
                 )
-                self.stdout.write(f"Queued task for {course.id}")
+                logger.info("Queued task for %s", course.id)
         else:
             course_id = options.get("course_id")
             if not course_id:
@@ -64,4 +66,4 @@ class Command(BaseCommand):
                 user_id=DEFAULT_USER_ID,
                 course_id=str(course.id)
             )
-            self.stdout.write(f"Queued task for {course.id}")
+            logger.info("Queued task for %s", course.id)

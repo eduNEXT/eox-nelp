@@ -468,9 +468,10 @@ def receive_course_created(course, **kwargs):  # pylint: disable=unused-argument
     user = get_current_user()
 
     if not user:
+        LOGGER.warning("receive_course_created couldn't init set_default_advanced_modules since there is no user")
         return
 
     set_default_advanced_modules.apply_async(
-        args=[get_current_user().id, str(course.course_key)],
+        args=[user.id, str(course.course_key)],
         countdown=5,
     )

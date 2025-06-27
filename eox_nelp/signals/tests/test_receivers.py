@@ -39,6 +39,7 @@ from eox_nelp.signals.receivers import (
     mt_course_passed_handler,
     pearson_vue_course_completion_handler,
     pearson_vue_course_passed_handler,
+    receive_course_created,
     update_async_tracker_context,
 )
 from eox_nelp.tests.utils import set_key_values
@@ -869,4 +870,29 @@ class CreateUserSignUpSourceByEnrollmentTestCase(unittest.TestCase):
         self.assertIsInstance(
             UserSignupSource.objects.get(user=self.user, site=site_name),
             UserSignupSource,
+        )
+
+
+class ReceiveCoursePublishTestCase(unittest.TestCase):
+    """Test class for receive_course_created function."""
+
+    @patch("eox_nelp.signals.receivers.get_current_user")
+    @patch("eox_nelp.signals.receivers.set_default_advanced_modules")
+    def test_call_async_task_v2(self, task_mock, get_current_user_mock):
+        """Test that the async task is called with the right parameters
+
+        Expected behavior:
+            - delay method is called with the right values.
+        """
+        course_id = "course-v1:test+Cx105+2022_T4"
+        user, _ = User.objects.get_or_create(username="Severus")
+        get_current_user_mock.return_value = user
+
+        receive_course_created(
+            Mock(course_key=CourseKey.from_string(course_id)),
+        )
+
+        task_mock.apply_async.assert_called_with(
+            args=[user.id, course_id],
+            countdown=5,
         )

@@ -161,9 +161,14 @@ class EoxNelpCMSConfig(AppConfig):
                 'receivers': [
                     {
                         'receiver_func_name': 'create_course_notifications',
-                        'signal_path': 'eox_nelp.edxapp_wrapper.modulestore.course_published',
+                        'signal_path': 'xmodule.modulestore.django.COURSE_PUBLISHED',
                         'dispatch_uid': 'create_course_notifications_receiver',
                     },
+                    {
+                        'receiver_func_name': 'receive_course_created',
+                        'signal_path': 'openedx_events.content_authoring.signals.COURSE_CREATED',
+                        'dispatch_uid': 'course_published_receiver',
+                    }
                 ],
             },
         },

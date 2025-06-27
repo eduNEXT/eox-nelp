@@ -16,6 +16,7 @@ Functions:
 """
 import logging
 
+from crum import get_current_user
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from eox_core.edxapp_wrapper.grades import get_course_grade_factory
@@ -32,6 +33,7 @@ from eox_nelp.signals.tasks import (
     course_completion_mt_updater,
     dispatch_futurex_progress,
     emit_subsection_attempt_event_task,
+    set_default_advanced_modules,
     update_mt_training_stage,
 )
 from eox_nelp.signals.utils import _generate_external_certificate_data, get_completed_and_graded
@@ -443,4 +445,33 @@ def pearson_vue_course_passed_handler(user, course_id, **kwargs):  # pylint: dis
         user_id=user.id,
         exam_id=str(course_id),
         action_name="rti",
+    )
+
+
+def receive_course_created(course, **kwargs):  # pylint: disable=unused-argument
+    """
+    Django signal receiver that triggers the `set_default_advanced_modules` async task when the
+    `COURSE_CREATED` signal is sent.
+
+    This function listens for the `COURSE_CREATED` signal and, upon receiving the signal, calls
+    the asynchronous task `set_default_advanced_modules` to update the `advanced_modules` of the
+    course. The task is executed with the `course_key` and the current user's ID.
+
+    Args:
+        course <CourseData>: CourseData instance
+            https://github.com/openedx/openedx-events/blob/v9.10.0/openedx_events/content_authoring/data.py#L19
+        **kwargs: Additional keyword arguments passed with the signal, if any.
+
+    Returns:
+        None: This function does not return any value. It triggers an asynchronous task.
+    """
+    user = get_current_user()
+
+    if not user:
+        LOGGER.warning("receive_course_created couldn't init set_default_advanced_modules since there is no user")
+        return
+
+    set_default_advanced_modules.apply_async(
+        args=[user.id, str(course.course_key)],
+        countdown=5,
     )
